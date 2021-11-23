@@ -49,7 +49,7 @@ jobs:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
         key: ${{ secrets.DROPLET_KEY }}
-        source: "docker-compose.yml"
+        source: "docker-compose.yml, start.sh"
         target: "telegram_bot"
     - name: Restart conteiners with latest images
       uses: appleboy/ssh-action@v0.1.4
@@ -65,5 +65,4 @@ jobs:
         envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD
         script: |
           cd telegram_bot
-          docker-compose stop
-          docker-compose up --build -d
+          bash start.sh
