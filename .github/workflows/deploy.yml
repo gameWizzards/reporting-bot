@@ -43,15 +43,15 @@ jobs:
         push: true
         tags: mihaphoenix/telegram_bot:latest
         
-    - name: copy file via ssh password
+    - name: copy docker-compose.yml to server
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
         key: ${{ secrets.DROPLET_KEY }}
         source: "docker-compose.yml"
-        target: "telegram-bot/docker-compose.yml"
-    - name: SSH Remote Commands
+        target: "docker-compose.yml"
+    - name: Redeploy docker images
       uses: appleboy/ssh-action@v0.1.4
       env:
           BOT_USERNAME: ${{ secrets.ENV_BOT_USERNAME }}
@@ -64,6 +64,5 @@ jobs:
         key: ${{ secrets.DROPLET_KEY }}
         script: |
           envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD
-          cd telegram-bot
           docker-compose stop
           docker-compose up --build -d
