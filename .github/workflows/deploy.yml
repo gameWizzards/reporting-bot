@@ -62,8 +62,8 @@ jobs:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
         key: ${{ secrets.DROPLET_KEY }}
+        envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD
         script: |
-          envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD
           cd telegram_bot
           docker-compose stop
           docker-compose up --build -d
