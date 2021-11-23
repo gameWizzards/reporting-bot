@@ -70,5 +70,5 @@ jobs:
           export BOT_TOKEN=$BOT_TOKEN
           export BOT_DB_USERNAME=$BOT_DB_USERNAME
           export BOT_DB_PASSWORD=$BOT_DB_PASSWORD
-          docker pull telegram_bot:latest
+          docker-compose pull miha_bot
           docker-compose up --build -d
