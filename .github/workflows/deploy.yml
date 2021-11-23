@@ -49,7 +49,7 @@ jobs:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
         key: ${{ secrets.DROPLET_KEY }}
-        source: "/docker-compose.yml"
+        source: "docker-compose.yml"
         target: "telegram_bot"
     - name: Restart conteiners with latest images
       uses: appleboy/ssh-action@v0.1.4
