@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  telegram_bot:
+  miha_bot:
     image: "mihaphoenix/telegram_bot:latest"
     depends_on:
       - miha_db
