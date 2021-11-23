@@ -4,14 +4,16 @@ services:
   miha_bot:
     image: "mihaphoenix/telegram_bot:latest"
     depends_on:
-      - miha_db
+      - miha-db
     environment:
       BOT_USERNAME: ${BOT_USERNAME}
       BOT_TOKEN: ${BOT_TOKEN}
       BOT_DB_USERNAME: ${BOT_DB_USERNAME}
       BOT_DB_PASSWORD: ${BOT_DB_PASSWORD}
     restart: always
-  miha_db:
+    links:
+      - miha-db
+  miha-db:
     image: mysql:5.7
     restart: always
     environment:
