@@ -12,7 +12,7 @@ import static com.miha.telegram.command.CommandUtils.getChatId;
  */
 public class StartCommand implements Command {
 
-    public final static String START_MESSAGE = "Привет. Я Miha Telegram Bot.\n " +
+    public final static String START_MESSAGE = "Привет. Я Miha Telegram Bot.\n" +
             "Не знаешь о чем я? Напиши /help, чтобы узнать что я умею.";
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
