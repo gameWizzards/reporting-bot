@@ -42,4 +42,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: mihaphoenix/app:latest
+        tags: mihaphoenix/telegram_bot:latest
