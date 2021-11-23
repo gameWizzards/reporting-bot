@@ -48,7 +48,7 @@ jobs:
       with:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
-        password: ${{ secrets.DROPLET_PASSWORD }}
+        key: ${{ secrets.DROPLET_KEY }}
         source: "docker-compose.yml"
         target: "telegram-bot/docker-compose.yml"
     - name: SSH Remote Commands
@@ -61,7 +61,7 @@ jobs:
       with:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
-        password: ${{ secrets.DROPLET_PASSWORD }}
+        key: ${{ secrets.DROPLET_KEY }}
         script: |
           envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD
           cd telegram-bot
