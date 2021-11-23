@@ -14,7 +14,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +44,7 @@ jobs:
         tags: mihaphoenix/telegram_bot:latest
         
     - name: copy file via ssh password
-    - uses: appleboy/scp-action@master
+      uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
@@ -53,7 +52,7 @@ jobs:
         source: "docker-compose.yml"
         target: "telegram-bot/docker-compose.yml"
     - name: SSH Remote Commands
-    - uses: appleboy/ssh-action@v0.1.4
+      uses: appleboy/ssh-action@v0.1.4
       env:
           BOT_USERNAME: ${{ secrets.ENV_BOT_USERNAME }}
           BOT_TOKEN: ${{ secrets.ENV_BOT_TOKEN }}
