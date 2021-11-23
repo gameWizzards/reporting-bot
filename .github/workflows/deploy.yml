@@ -65,8 +65,8 @@ jobs:
         envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD
         script: |
           cd telegram_bot
-          export $BOT_USERNAME
-          export $BOT_TOKEN
-          export $BOT_DB_USERNAME
-          export $BOT_DB_PASSWORD
+          export BOT_USERNAME=$BOT_USERNAME
+          export BOT_TOKEN=$BOT_TOKEN
+          export BOT_DB_USERNAME=$BOT_DB_USERNAME
+          export BOT_DB_PASSWORD=$BOT_DB_PASSWORD
           bash start.sh
