@@ -21,7 +21,7 @@ services:
     environment:
       MYSQL_USER: ${BOT_DB_USERNAME}
       MYSQL_PASSWORD: ${BOT_DB_PASSWORD}
-      MYSQL_DATABASE: ${BOT_DB_NAME}
+      MYSQL_DATABASE: 'miha-db'
       MYSQL_ROOT_PASSWORD: ${BOT_DB_ROOT_PASSWORD}
     ports:
       - '3306:3306'

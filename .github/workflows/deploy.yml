@@ -58,13 +58,12 @@ jobs:
         BOT_TOKEN: ${{ secrets.ENV_BOT_TOKEN }}
         BOT_DB_USERNAME: ${{ secrets.ENV_BOT_DB_USERNAME }}
         BOT_DB_PASSWORD: ${{ secrets.ENV_BOT_DB_PASSWORD }}
-        BOT_DB_NAME: ${{ secrets.ENV_BOT_DB_NAME }}
         BOT_DB_ROOT_PASSWORD: ${{ secrets.ENV_BOT_DB_ROOT_PASSWORD }}
       with:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
         key: ${{ secrets.DROPLET_KEY }}
-        envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD, BOT_DB_NAME, BOT_DB_ROOT_PASSWORD
+        envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD, BOT_DB_ROOT_PASSWORD
         script: |
           cd telegram_bot
           docker-compose stop
@@ -72,7 +71,6 @@ jobs:
           export BOT_TOKEN=$BOT_TOKEN
           export BOT_DB_USERNAME=$BOT_DB_USERNAME
           export BOT_DB_PASSWORD=$BOT_DB_PASSWORD
-          export BOT_DB_NAME=$BOT_DB_NAME
           export BOT_DB_ROOT_PASSWORD=$BOT_DB_ROOT_PASSWORD
           docker-compose pull miha_bot
           docker-compose up --build -d
