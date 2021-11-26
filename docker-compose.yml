@@ -2,6 +2,7 @@ version: '3.1'
 
 services:
   miha_bot:
+    container_name: bot
     image: "mihaphoenix/telegram_bot:latest"
     depends_on:
       - miha-db
@@ -14,15 +15,20 @@ services:
     links:
       - miha-db
   miha-db:
+    container_name: db
     image: mysql:5.7
     restart: always
     environment:
       MYSQL_USER: ${BOT_DB_USERNAME}
       MYSQL_PASSWORD: ${BOT_DB_PASSWORD}
-      MYSQL_DATABASE: 'miha-db'
-      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: ${BOT_DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${BOT_DB_ROOT_PASSWORD}
     ports:
       - '3306:3306'
     expose:
       - '3306'
     command: --character-set-server=utf8 --collation-server=utf8_general_ci
+    volumes:
+      - mysql-volume:/var/lib/mysql
+volumes:
+  mysql-volume:

@@ -28,8 +28,8 @@ public class PingJob {
         this.sendBotMessageService = sendBotMessageService;
     }
 
-    @Scheduled(fixedRateString = "${bot.recountNewPostFixedRate}")
-    public void findNewPosts() {
+    @Scheduled(fixedRateString = "${bot.updateDataFixedRate}")
+    public void ping() {
         LocalDateTime start = LocalDateTime.now();
         log.info("Ping job started.");
 
