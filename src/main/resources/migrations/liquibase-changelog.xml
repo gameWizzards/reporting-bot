@@ -1,0 +1,107 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="miha_phoenix" id="init">
+        <createTable tableName="user">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" primaryKeyName="user_id_pk"/>
+            </column>
+            <column name="chat_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surname" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="user" indexName="user_chat_id_idx" unique="true">
+            <column name="chat_id"/>
+        </createIndex>
+        <createIndex tableName="user" indexName="user_phone_idx" unique="true">
+            <column name="phone"/>
+        </createIndex>
+
+        <createTable tableName="report">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" primaryKeyName="report_id_pk"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="report_user_id_fk" nullable="false"/>
+            </column>
+            <column name="date" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="report" indexName="report_user_id_idx">
+            <column name="user_id"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="report" baseColumnNames="user_id" constraintName="report_user_id_fk"
+                                 referencedTableName="user" referencedColumnNames="id"
+                                 onDelete="CASCADE" onUpdate="RESTRICT"
+        />
+
+        <createTable tableName="category">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="category_id_pk"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="category" indexName="category_name_idx" unique="true">
+            <column name="name"/>
+        </createIndex>
+
+        <createTable tableName="time_record">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" primaryKeyName="time_record_id_pk"/>
+            </column>
+            <column name="report_id" type="bigint">
+                <constraints foreignKeyName="time_record_report_id_fk" nullable="false"/>
+            </column>
+            <column name="category_id" type="bigint">
+                <constraints foreignKeyName="time_record_category_id_fk" nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="minutes" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="time_record" indexName="time_record_report_id_idx">
+            <column name="report_id"/>
+        </createIndex>
+        <createIndex tableName="time_record" indexName="time_record_category_id_idx">
+            <column name="category_id"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="time_record" baseColumnNames="report_id"
+                                 constraintName="time_record_report_id_fk"
+                                 referencedTableName="report" referencedColumnNames="id"
+                                 onDelete="CASCADE" onUpdate="RESTRICT"
+        />
+        <addForeignKeyConstraint baseTableName="time_record" baseColumnNames="category_id"
+                                 constraintName="time_record_category_id_fk"
+                                 referencedTableName="category" referencedColumnNames="id"
+                                 onDelete="CASCADE" onUpdate="RESTRICT"
+        />
+    </changeSet>
+
+</databaseChangeLog>

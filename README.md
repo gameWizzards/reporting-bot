@@ -1,4 +1,4 @@
-# Miha Telegram Bot
+# Reporting Telegram Bot
 
 ## Deployment
 Deployment process as easy as possible:
@@ -33,7 +33,6 @@ And add VM Options:
 - SpringBoot as a skeleton framework
 - Spring Scheduler as a task manager
 - MySQL database as a database for saving user and subscription info
-- Flyway database migration tool
 - Telegram-bot SpringBoot starter
 - Spring Data starter
 - Unirest - lib for working with REST calls
