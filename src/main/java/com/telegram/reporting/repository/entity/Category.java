@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Data
 @Entity
-@Table(name = "category")
+@Table(name = "category", schema = "public")
 @EqualsAndHashCode()
 public class Category {
 

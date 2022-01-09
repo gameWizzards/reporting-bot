@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Entity
-@Table(name = "time_record")
+@Table(name = "time_record", schema = "public")
 @EqualsAndHashCode()
 public class TimeRecord {
 

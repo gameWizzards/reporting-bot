@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Data
 @Entity
-@Table(name = "report")
+@Table(name = "report", schema = "public")
 @EqualsAndHashCode()
 public class Report {
 
