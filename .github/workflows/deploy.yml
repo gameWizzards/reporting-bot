@@ -42,35 +42,4 @@ jobs:
         context: .
         push: true
         tags: mihaphoenix/telegram_bot:latest
-        
-    - name: Update docker-compose.yml on server
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.DROPLET_HOST }}
-        username: ${{ secrets.DROPLET_USERNAME }}
-        key: ${{ secrets.DROPLET_KEY }}
-        source: "docker-compose.yml"
-        target: "telegram_bot"
-    - name: Restart conteiners with latest images
-      uses: appleboy/ssh-action@v0.1.4
-      env:
-        BOT_USERNAME: ${{ secrets.ENV_BOT_USERNAME }}
-        BOT_TOKEN: ${{ secrets.ENV_BOT_TOKEN }}
-        BOT_DB_USERNAME: ${{ secrets.ENV_BOT_DB_USERNAME }}
-        BOT_DB_PASSWORD: ${{ secrets.ENV_BOT_DB_PASSWORD }}
-        BOT_DB_ROOT_PASSWORD: ${{ secrets.ENV_BOT_DB_ROOT_PASSWORD }}
-      with:
-        host: ${{ secrets.DROPLET_HOST }}
-        username: ${{ secrets.DROPLET_USERNAME }}
-        key: ${{ secrets.DROPLET_KEY }}
-        envs: BOT_USERNAME, BOT_TOKEN, BOT_DB_USERNAME, BOT_DB_PASSWORD, BOT_DB_ROOT_PASSWORD
-        script: |
-          cd telegram_bot
-          docker-compose stop
-          export BOT_USERNAME=$BOT_USERNAME
-          export BOT_TOKEN=$BOT_TOKEN
-          export BOT_DB_USERNAME=$BOT_DB_USERNAME
-          export BOT_DB_PASSWORD=$BOT_DB_PASSWORD
-          export BOT_DB_ROOT_PASSWORD=$BOT_DB_ROOT_PASSWORD
-          docker-compose pull miha_bot
-          docker-compose up --build -d
+    
