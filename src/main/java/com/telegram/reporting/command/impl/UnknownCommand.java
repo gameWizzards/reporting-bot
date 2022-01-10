@@ -10,7 +10,10 @@ import static com.telegram.reporting.command.CommandUtils.getChatId;
  */
 public non-sealed class UnknownCommand implements Command {
 
-    public static final String UNKNOWN_MESSAGE = "Не понимаю тебя \uD83D\uDE1F, напиши /help чтобы узнать что я понимаю.";
+    public static final String UNKNOWN_MESSAGE = """
+            test
+            test
+            """;
 
     private final SendBotMessageService sendBotMessageService;
 
@@ -20,7 +23,7 @@ public non-sealed class UnknownCommand implements Command {
 
     @Override
     public String alias() {
-        return "null";
+        return "unknownCommand";
     }
 
     @Override

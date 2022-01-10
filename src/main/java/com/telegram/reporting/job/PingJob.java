@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-/**
- * Job for finding new posts.
- */
 @Slf4j
 @Component
 public class PingJob {
@@ -30,14 +27,13 @@ public class PingJob {
 
     @Scheduled(fixedRateString = "${bot.updateDataFixedRate}")
     public void ping() {
-        LocalDateTime start = LocalDateTime.now();
+        long start = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         log.info("Ping job started.");
 
         telegramUserService.findAll()
                 .forEach(telegramUser -> sendBotMessageService.sendMessage(telegramUser.getChatId(), pingMessage));
 
-        LocalDateTime end = LocalDateTime.now();
-        log.info("Pinging finished. Took seconds: {}",
-                end.toEpochSecond(ZoneOffset.UTC) - start.toEpochSecond(ZoneOffset.UTC));
+        long end = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        log.info("Pinging finished. Took seconds: {}", end - start);
     }
 }

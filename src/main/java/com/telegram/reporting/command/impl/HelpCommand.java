@@ -9,7 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public non-sealed class HelpCommand implements Command {
 
-    public static final String HELP_MESSAGE = "test";
+    public static final String HELP_MESSAGE = """
+            test
+            test
+            """;
 
     private final SendBotMessageService sendBotMessageService;
 

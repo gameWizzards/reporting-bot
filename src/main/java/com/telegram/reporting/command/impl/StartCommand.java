@@ -11,8 +11,12 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public non-sealed class StartCommand implements Command {
 
-    public final static String START_MESSAGE = "Привет. Я Miha Telegram Bot.\n" +
-            "Не знаешь о чем я? Напиши /help, чтобы узнать что я умею.";
+    public final static String START_MESSAGE = """
+            test
+            test
+            test
+            """;
+
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
 

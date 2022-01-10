@@ -11,8 +11,11 @@ import static com.telegram.reporting.command.CommandUtils.getChatId;
  */
 public non-sealed class StopCommand implements Command {
 
-    public static final String STOP_MESSAGE = "Деактивировал все твои подписки \uD83D\uDE1F.\n" +
-            "Ты всегда можешь вернуться нажав /start";
+    public static final String STOP_MESSAGE = """
+            test
+            test
+            """;
+
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
 

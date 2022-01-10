@@ -1,6 +1,7 @@
 package com.telegram.reporting.bot;
 
 import com.telegram.reporting.command.CommandContainer;
+import com.telegram.reporting.command.CommandUtils;
 import com.telegram.reporting.service.SendBotMessageServiceImpl;
 import com.telegram.reporting.service.TelegramUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,14 @@ import java.util.List;
 @Component
 public class ReportingTelegramBot extends TelegramLongPollingBot {
 
-    public static String COMMAND_PREFIX = "/";
-    private final CommandContainer commandContainer;
     @Value("#{'${bot.admins}'.split(',')}")
     List<String> admins;
     @Value("${bot.username}")
     private String username;
     @Value("${bot.token}")
     private String token;
+
+    private final CommandContainer commandContainer;
 
     @Autowired
     public ReportingTelegramBot(TelegramUserService telegramUserService) {
@@ -35,7 +36,7 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String message = update.getMessage().getText().trim();
             String username = update.getMessage().getFrom().getUserName();
-            if (message.startsWith(COMMAND_PREFIX)) {
+            if (message.startsWith(CommandUtils.COMMAND_PREFIX)) {
                 String commandIdentifier = getCommandIdentifier(message);
                 commandContainer.findCommand(commandIdentifier, username).execute(update);
             } else {

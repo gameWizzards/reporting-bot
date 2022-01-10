@@ -9,8 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public non-sealed class NoCommand implements Command {
 
-    public static final String NO_MESSAGE = "Я поддерживаю команды, начинающиеся со слеша(/).\n"
-            + "Чтобы посмотреть список комманд введи /help";
+    public static final String NO_MESSAGE = "test";
+
     private final SendBotMessageService sendBotMessageService;
 
     public NoCommand(SendBotMessageService sendBotMessageService) {
@@ -19,7 +19,7 @@ public non-sealed class NoCommand implements Command {
 
     @Override
     public String alias() {
-        return "nocommand";
+        return "noCommand";
     }
 
     @Override

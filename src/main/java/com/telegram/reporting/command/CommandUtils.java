@@ -7,6 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public class CommandUtils {
 
+    public static String COMMAND_PREFIX = "/";
+
     /**
      * Get chatId from {@link Update} object.
      *
