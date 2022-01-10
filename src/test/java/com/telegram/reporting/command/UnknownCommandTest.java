@@ -1,5 +1,6 @@
 package com.telegram.reporting.command;
 
+import com.telegram.reporting.command.impl.Command;
 import com.telegram.reporting.command.impl.UnknownCommand;
 import org.junit.jupiter.api.DisplayName;
 

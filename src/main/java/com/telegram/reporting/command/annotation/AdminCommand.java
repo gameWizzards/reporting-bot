@@ -1,6 +1,6 @@
 package com.telegram.reporting.command.annotation;
 
-import com.telegram.reporting.command.Command;
+import com.telegram.reporting.command.impl.Command;
 
 import java.lang.annotation.Retention;
 

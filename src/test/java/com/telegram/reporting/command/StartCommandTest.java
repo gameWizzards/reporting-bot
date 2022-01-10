@@ -1,5 +1,6 @@
 package com.telegram.reporting.command;
 
+import com.telegram.reporting.command.impl.Command;
 import com.telegram.reporting.command.impl.StartCommand;
 import org.junit.jupiter.api.DisplayName;
 
@@ -10,7 +11,7 @@ class StartCommandTest extends AbstractCommandTest {
 
     @Override
     String getCommandName() {
-        return CommandName.START.getCommandName();
+        return getCommand().alias();
     }
 
     @Override

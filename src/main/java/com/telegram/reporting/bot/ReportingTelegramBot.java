@@ -1,7 +1,6 @@
 package com.telegram.reporting.bot;
 
 import com.telegram.reporting.command.CommandContainer;
-import com.telegram.reporting.command.CommandName;
 import com.telegram.reporting.service.SendBotMessageServiceImpl;
 import com.telegram.reporting.service.TelegramUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
                 String commandIdentifier = getCommandIdentifier(message);
                 commandContainer.findCommand(commandIdentifier, username).execute(update);
             } else {
-                commandContainer.findCommand(CommandName.NO.getCommandName(), username).execute(update);
+                commandContainer.noCommand(username).execute(update);
             }
         }
     }

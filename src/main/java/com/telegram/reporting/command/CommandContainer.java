@@ -1,7 +1,7 @@
 package com.telegram.reporting.command;
 
-import com.google.common.collect.ImmutableMap;
 import com.telegram.reporting.command.annotation.AdminCommand;
+import com.telegram.reporting.command.impl.Command;
 import com.telegram.reporting.command.impl.HelpCommand;
 import com.telegram.reporting.command.impl.NoCommand;
 import com.telegram.reporting.command.impl.StartCommand;
@@ -11,6 +11,10 @@ import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 
@@ -19,21 +23,22 @@ import static java.util.Objects.nonNull;
  */
 public class CommandContainer {
 
-    private final ImmutableMap<String, Command> commandMap;
+    private final Map<String, Command> commandMap;
     private final Command unknownCommand;
+    private final Command noCommand;
     private final List<String> admins;
 
     public CommandContainer(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService, List<String> admins) {
-
         this.admins = admins;
-        commandMap = ImmutableMap.<String, Command>builder()
-                .put(CommandName.START.getCommandName(), new StartCommand(sendBotMessageService, telegramUserService))
-                .put(CommandName.STOP.getCommandName(), new StopCommand(sendBotMessageService, telegramUserService))
-                .put(CommandName.HELP.getCommandName(), new HelpCommand(sendBotMessageService))
-                .put(CommandName.NO.getCommandName(), new NoCommand(sendBotMessageService))
-                .build();
+
+        commandMap = Stream.of(
+                new StartCommand(sendBotMessageService, telegramUserService),
+                new StopCommand(sendBotMessageService, telegramUserService),
+                new HelpCommand(sendBotMessageService)
+        ).collect(Collectors.toUnmodifiableMap(Command::alias, Function.identity()));
 
         unknownCommand = new UnknownCommand(sendBotMessageService);
+        noCommand = new NoCommand(sendBotMessageService);
     }
 
     public Command findCommand(String commandIdentifier, String username) {
@@ -46,6 +51,10 @@ public class CommandContainer {
             }
         }
         return command;
+    }
+
+    public Command noCommand(String username) {
+        return noCommand;
     }
 
     private boolean isAdminCommand(Command command) {

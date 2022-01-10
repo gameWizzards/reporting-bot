@@ -1,11 +1,14 @@
-package com.telegram.reporting.command;
+package com.telegram.reporting.command.impl;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
  * Command interface for handling telegram-bot commands.
  */
-public interface Command {
+public sealed interface Command
+        permits HelpCommand, NoCommand, StartCommand, StopCommand, UnknownCommand {
+
+    String alias();
 
     /**
      * Main method, which is executing command logic.

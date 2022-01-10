@@ -1,5 +1,6 @@
 package com.telegram.reporting.command;
 
+import com.telegram.reporting.command.impl.Command;
 import com.telegram.reporting.command.impl.NoCommand;
 import org.junit.jupiter.api.DisplayName;
 
@@ -8,7 +9,7 @@ public class NoCommandTest extends AbstractCommandTest {
 
     @Override
     String getCommandName() {
-        return CommandName.NO.getCommandName();
+        return getCommand().alias();
     }
 
     @Override

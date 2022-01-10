@@ -1,5 +1,6 @@
 package com.telegram.reporting.command;
 
+import com.telegram.reporting.command.impl.Command;
 import com.telegram.reporting.command.impl.UnknownCommand;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
@@ -8,8 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.Arrays;
 
 import static java.util.Collections.singletonList;
 
@@ -26,16 +25,6 @@ class CommandContainerTest {
                 telegramUserService,
                 singletonList("username")
         );
-    }
-
-    @Test
-    public void shouldGetAllTheExistingCommands() {
-        //when-then
-        Arrays.stream(CommandName.values())
-                .forEach(commandName -> {
-                    Command command = commandContainer.findCommand(commandName.getCommandName(), "username");
-                    Assertions.assertNotEquals(UnknownCommand.class, command.getClass());
-                });
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.telegram.reporting.command.impl;
 
-import com.telegram.reporting.command.Command;
 import com.telegram.reporting.command.CommandUtils;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.SendBotMessageService;
@@ -10,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 /**
  * Start {@link Command}.
  */
-public class StartCommand implements Command {
+public non-sealed class StartCommand implements Command {
 
     public final static String START_MESSAGE = "Привет. Я Miha Telegram Bot.\n" +
             "Не знаешь о чем я? Напиши /help, чтобы узнать что я умею.";
@@ -20,6 +19,11 @@ public class StartCommand implements Command {
     public StartCommand(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
         this.sendBotMessageService = sendBotMessageService;
         this.telegramUserService = telegramUserService;
+    }
+
+    @Override
+    public String alias() {
+        return "/start";
     }
 
     @Override
