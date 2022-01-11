@@ -17,7 +17,7 @@ That's all.
 For local development and testing, use `docker-compose-test.yml`. 
 Run command: 
 ```shell
-docker-compose -f docker-compose-test.yml up
+docker-compose -f docker-compose-test.yml up -d
 ```
 Next step, is to run SpringBoot app with configured **Edit Configuration** in which two env vars are provided: 
 
