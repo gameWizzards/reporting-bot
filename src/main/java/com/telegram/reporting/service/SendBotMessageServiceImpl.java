@@ -1,6 +1,7 @@
 package com.telegram.reporting.service;
 
 import com.telegram.reporting.bot.ReportingTelegramBot;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -22,6 +23,12 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     @Autowired
     public SendBotMessageServiceImpl(ReportingTelegramBot reportingTelegramBot) {
         this.reportingTelegramBot = reportingTelegramBot;
+    }
+
+    @Override
+    @SneakyThrows
+    public void sendMessage(SendMessage message) {
+        reportingTelegramBot.execute(message);
     }
 
     @Override

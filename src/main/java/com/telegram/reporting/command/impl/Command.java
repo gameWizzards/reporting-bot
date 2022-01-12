@@ -16,4 +16,9 @@ public sealed interface Command
      * @param update provided {@link Update} object with all the needed data for command.
      */
     void execute(Update update);
+
+    default void handle(Update update, String username) {
+    }
+
+    ;
 }

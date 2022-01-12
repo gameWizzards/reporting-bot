@@ -9,6 +9,7 @@ import com.telegram.reporting.command.impl.StopCommand;
 import com.telegram.reporting.command.impl.UnknownCommand;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -59,5 +60,9 @@ public class CommandContainer {
 
     private boolean isAdminCommand(Command command) {
         return nonNull(command.getClass().getAnnotation(AdminCommand.class));
+    }
+
+    public void handleMessage(Update update, String username) {
+        commandMap.get("/start").handle(update, username);
     }
 }
