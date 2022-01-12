@@ -1,10 +1,10 @@
 package com.telegram.reporting.bot;
 
 import com.telegram.reporting.command.CommandContainer;
-import com.telegram.reporting.command.CommandUtils;
 import com.telegram.reporting.command.impl.StartCommand;
 import com.telegram.reporting.service.SendBotMessageServiceImpl;
 import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.utils.CommandUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

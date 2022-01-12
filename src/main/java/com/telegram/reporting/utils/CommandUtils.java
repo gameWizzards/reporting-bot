@@ -1,4 +1,4 @@
-package com.telegram.reporting.command;
+package com.telegram.reporting.utils;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 

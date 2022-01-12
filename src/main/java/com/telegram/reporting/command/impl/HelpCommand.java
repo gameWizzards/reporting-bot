@@ -1,7 +1,7 @@
 package com.telegram.reporting.command.impl;
 
-import com.telegram.reporting.command.CommandUtils;
 import com.telegram.reporting.service.SendBotMessageService;
+import com.telegram.reporting.utils.CommandUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**

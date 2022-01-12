@@ -1,8 +1,8 @@
 package com.telegram.reporting.command.impl;
 
-import com.telegram.reporting.command.CommandUtils;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.utils.CommandUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;

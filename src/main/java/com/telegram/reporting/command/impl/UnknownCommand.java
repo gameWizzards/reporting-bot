@@ -3,7 +3,7 @@ package com.telegram.reporting.command.impl;
 import com.telegram.reporting.service.SendBotMessageService;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import static com.telegram.reporting.command.CommandUtils.getChatId;
+import static com.telegram.reporting.utils.CommandUtils.getChatId;
 
 /**
  * Unknown {@link Command}.
