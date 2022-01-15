@@ -1,6 +1,7 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.bot.ReportingTelegramBot;
+import com.telegram.reporting.job.bot.ReportingTelegramBot;
+import com.telegram.reporting.service.impl.SendBotMessageServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

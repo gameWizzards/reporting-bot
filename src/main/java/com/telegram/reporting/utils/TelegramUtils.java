@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 /**
  * Utils class for Commands.
  */
-public class CommandUtils {
+public class TelegramUtils {
 
     public static String COMMAND_PREFIX = "/";
 
@@ -26,6 +26,6 @@ public class CommandUtils {
      * @return the text of the message from the provided {@link Update} object.
      */
     public static String getMessage(Update update) {
-        return update.getMessage().getText();
+        return update.getMessage().getText().trim();
     }
 }

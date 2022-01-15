@@ -1,7 +1,7 @@
 package com.telegram.reporting.command.impl;
 
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.utils.CommandUtils;
+import com.telegram.reporting.utils.TelegramUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
@@ -24,6 +24,6 @@ public non-sealed class NoCommand implements Command {
 
     @Override
     public void execute(Update update) {
-        sendBotMessageService.sendMessage(CommandUtils.getChatId(update), NO_MESSAGE);
+        sendBotMessageService.sendMessage(TelegramUtils.getChatId(update), NO_MESSAGE);
     }
 }

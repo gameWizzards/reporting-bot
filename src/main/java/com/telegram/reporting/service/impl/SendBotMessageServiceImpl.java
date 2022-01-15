@@ -1,6 +1,7 @@
-package com.telegram.reporting.service;
+package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.bot.ReportingTelegramBot;
+import com.telegram.reporting.job.bot.ReportingTelegramBot;
+import com.telegram.reporting.service.SendBotMessageService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package com.telegram.reporting.command.impl;
 
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
-import com.telegram.reporting.utils.CommandUtils;
+import com.telegram.reporting.utils.TelegramUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -46,7 +46,7 @@ public non-sealed class StartCommand implements Command {
 
     @Override
     public void execute(Update update) {
-        Long chatId = CommandUtils.getChatId(update);
+        Long chatId = TelegramUtils.getChatId(update);
 
 //        telegramUserService.findByChatId(chatId).ifPresentOrElse(telegramUserService::save,
 //                () -> {
@@ -113,7 +113,7 @@ public non-sealed class StartCommand implements Command {
             default -> "хз что ты имеешь в виду";
         };
         SendMessage message = new SendMessage(); // Create a message object object
-        message.setChatId(CommandUtils.getChatId(update).toString());
+        message.setChatId(TelegramUtils.getChatId(update).toString());
         message.setText(userMessage);
         sendBotMessageService.sendMessage(message);
     }

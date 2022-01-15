@@ -1,10 +1,10 @@
-package com.telegram.reporting.bot;
+package com.telegram.reporting.job.bot;
 
 import com.telegram.reporting.command.CommandContainer;
-import com.telegram.reporting.command.impl.StartCommand;
-import com.telegram.reporting.service.SendBotMessageServiceImpl;
+import com.telegram.reporting.service.DialogRouterService;
+import com.telegram.reporting.service.impl.SendBotMessageServiceImpl;
 import com.telegram.reporting.service.TelegramUserService;
-import com.telegram.reporting.utils.CommandUtils;
+import com.telegram.reporting.utils.TelegramUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,9 +24,11 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
     private String token;
 
     private final CommandContainer commandContainer;
+    private final DialogRouterService dialogRouterService;
 
     @Autowired
-    public ReportingTelegramBot(TelegramUserService telegramUserService) {
+    public ReportingTelegramBot(TelegramUserService telegramUserService, DialogRouterService dialogRouterService) {
+        this.dialogRouterService = dialogRouterService;
         this.commandContainer = new CommandContainer(
                 new SendBotMessageServiceImpl(this), telegramUserService, admins
         );
@@ -37,13 +39,13 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String message = update.getMessage().getText().trim();
             String username = update.getMessage().getFrom().getUserName();
-            if (message.startsWith(CommandUtils.COMMAND_PREFIX)) {
+            if (message.startsWith(TelegramUtils.COMMAND_PREFIX)) {
                 String commandIdentifier = getCommandIdentifier(message);
                 commandContainer.findCommand(commandIdentifier, username).execute(update);
-            } else if (StartCommand.availableTexts().contains(message)) {
-                commandContainer.handleMessage(update, username);
             } else {
-                commandContainer.noCommand(username).execute(update);
+                // buttons or user input
+                // TODO implement router for all dialogs
+                dialogRouterService.handleTelegramUpdateEvent(update);
             }
         } else if (update.hasCallbackQuery()) {
             //TODO

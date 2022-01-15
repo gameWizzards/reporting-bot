@@ -1,9 +1,9 @@
 package com.telegram.reporting.command;
 
-import com.telegram.reporting.bot.ReportingTelegramBot;
+import com.telegram.reporting.job.bot.ReportingTelegramBot;
 import com.telegram.reporting.command.impl.Command;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.SendBotMessageServiceImpl;
+import com.telegram.reporting.service.impl.SendBotMessageServiceImpl;
 import com.telegram.reporting.service.TelegramUserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
