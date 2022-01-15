@@ -33,8 +33,6 @@ public non-sealed class StopCommand implements Command {
     public void execute(Update update) {
         sendBotMessageService.sendMessage(getChatId(update), STOP_MESSAGE);
         telegramUserService.findByChatId(getChatId(update))
-                .ifPresent(it -> {
-                    telegramUserService.save(it);
-                });
+                .ifPresent(telegramUserService::save);
     }
 }

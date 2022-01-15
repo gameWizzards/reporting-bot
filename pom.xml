@@ -19,8 +19,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <telegrambot.starter.version>5.6.0</telegrambot.starter.version>
-        <unirest.version>3.11.01</unirest.version>
         <apache.commons.version>3.12.0</apache.commons.version>
+        <statemachine.version>3.0.1</statemachine.version>
     </properties>
 
     <dependencies>
@@ -80,6 +80,26 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.statemachine</groupId>
+            <artifactId>spring-statemachine-starter</artifactId>
+            <version>${statemachine.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.statemachine</groupId>
+            <artifactId>spring-statemachine-data-redis</artifactId>
+            <version>${statemachine.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.statemachine</groupId>
+            <artifactId>spring-statemachine-test</artifactId>
+            <version>${statemachine.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
