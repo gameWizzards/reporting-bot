@@ -1,4 +1,4 @@
-package com.telegram.reporting.job.bot.configuration;
+package com.telegram.reporting.bot.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;

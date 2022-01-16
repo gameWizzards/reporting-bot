@@ -1,9 +1,9 @@
-package com.telegram.reporting.dialogs.update_report;
+package com.telegram.reporting.dialogs.impl.delete_report;
 
+import com.telegram.reporting.bot.MessageEvent;
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.messages.MessageEvent;
 
-public class UpdateReportStateMachineHandlerImpl implements StateMachineHandler {
+public class DeleteReportStateMachineHandlerImpl implements StateMachineHandler {
 
     @Override
     public void handleMessageEvent(MessageEvent messageEvent) {

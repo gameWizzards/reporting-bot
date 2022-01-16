@@ -1,7 +1,7 @@
-package com.telegram.reporting.dialogs.create_report;
+package com.telegram.reporting.dialogs.impl.create_report;
 
+import com.telegram.reporting.bot.MessageEvent;
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.messages.MessageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 

@@ -2,14 +2,11 @@ package com.telegram.reporting.command;
 
 import com.telegram.reporting.command.annotation.AdminCommand;
 import com.telegram.reporting.command.impl.Command;
-import com.telegram.reporting.command.impl.HelpCommand;
-import com.telegram.reporting.command.impl.NoCommand;
 import com.telegram.reporting.command.impl.StartCommand;
 import com.telegram.reporting.command.impl.StopCommand;
 import com.telegram.reporting.command.impl.UnknownCommand;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
-import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +23,6 @@ public class CommandContainer {
 
     private final Map<String, Command> commandMap;
     private final Command unknownCommand;
-    private final Command noCommand;
     private final List<String> admins;
 
     public CommandContainer(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService, List<String> admins) {
@@ -34,12 +30,10 @@ public class CommandContainer {
 
         commandMap = Stream.of(
                 new StartCommand(sendBotMessageService, telegramUserService),
-                new StopCommand(sendBotMessageService, telegramUserService),
-                new HelpCommand(sendBotMessageService)
+                new StopCommand(sendBotMessageService, telegramUserService)
         ).collect(Collectors.toUnmodifiableMap(Command::alias, Function.identity()));
 
         unknownCommand = new UnknownCommand(sendBotMessageService);
-        noCommand = new NoCommand(sendBotMessageService);
     }
 
     public Command findCommand(String commandIdentifier, String username) {
@@ -54,15 +48,7 @@ public class CommandContainer {
         return command;
     }
 
-    public Command noCommand(String username) {
-        return noCommand;
-    }
-
     private boolean isAdminCommand(Command command) {
         return nonNull(command.getClass().getAnnotation(AdminCommand.class));
-    }
-
-    public void handleMessage(Update update, String username) {
-        commandMap.get("/start").handle(update, username);
     }
 }

@@ -1,9 +1,9 @@
-package com.telegram.reporting.job.bot;
+package com.telegram.reporting.bot;
 
 import com.telegram.reporting.command.CommandContainer;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.service.impl.SendBotMessageServiceImpl;
 import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.impl.SendBotMessageServiceImpl;
 import com.telegram.reporting.utils.TelegramUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,12 +43,8 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
                 String commandIdentifier = getCommandIdentifier(message);
                 commandContainer.findCommand(commandIdentifier, username).execute(update);
             } else {
-                // buttons or user input
-                // TODO implement router for all dialogs
                 dialogRouterService.handleTelegramUpdateEvent(update);
             }
-        } else if (update.hasCallbackQuery()) {
-            //TODO
         }
     }
 

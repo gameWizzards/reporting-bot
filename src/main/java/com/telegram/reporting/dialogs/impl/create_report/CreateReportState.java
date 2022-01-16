@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.create_report;
+package com.telegram.reporting.dialogs.impl.create_report;
 
 public enum CreateReportState {
     USER_DATE_INPUTTING,

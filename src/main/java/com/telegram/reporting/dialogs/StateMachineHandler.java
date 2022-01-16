@@ -1,6 +1,6 @@
 package com.telegram.reporting.dialogs;
 
-import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.bot.MessageEvent;
 
 public interface StateMachineHandler {
 

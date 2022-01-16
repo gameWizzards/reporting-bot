@@ -1,4 +1,4 @@
-package com.telegram.reporting.messages;
+package com.telegram.reporting.bot;
 
 import java.util.Arrays;
 import java.util.List;

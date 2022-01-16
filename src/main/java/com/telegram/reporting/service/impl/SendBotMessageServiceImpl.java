@@ -1,12 +1,11 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.job.bot.ReportingTelegramBot;
+import com.telegram.reporting.bot.ReportingTelegramBot;
 import com.telegram.reporting.service.SendBotMessageService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 
@@ -33,6 +32,7 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     }
 
     @Override
+    @SneakyThrows
     public void sendMessage(Long chatId, String message) {
         if (isBlank(message)) return;
 
@@ -41,12 +41,7 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         sendMessage.enableHtml(true);
         sendMessage.setText(message);
 
-        try {
-            reportingTelegramBot.execute(sendMessage);
-        } catch (TelegramApiException e) {
-            //todo add logging to the project.
-            e.printStackTrace();
-        }
+        reportingTelegramBot.execute(sendMessage);
     }
 
     @Override
