@@ -1,10 +1,10 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.bot.MessageEvent;
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.dialogs.impl.create_report.CreateReportStateMachineHandlerImpl;
-import com.telegram.reporting.dialogs.impl.delete_report.DeleteReportStateMachineHandlerImpl;
-import com.telegram.reporting.dialogs.impl.update_report.UpdateReportStateMachineHandlerImpl;
+import com.telegram.reporting.dialogs.impl.create_report.CreateReportStateMachineHandler;
+import com.telegram.reporting.dialogs.impl.delete_report.DeleteReportStateMachineHandler;
+import com.telegram.reporting.dialogs.impl.update_report.UpdateReportStateMachineHandler;
+import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.utils.TelegramUtils;
 import org.springframework.stereotype.Service;
@@ -13,19 +13,20 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class DialogRouterServiceImpl implements DialogRouterService {
-    private Map<MessageEvent, StateMachineHandler> startHandlers;
+    private Map<Message, StateMachineHandler> startHandlers;
 
     private Map<Long, StateMachineHandler> stateMachineHandlers = new HashMap<>();
 
     @PostConstruct
     public void init() {
         startHandlers = new HashMap<>(3);
-        startHandlers.put(MessageEvent.CREATE_REPORT_EVENT, new CreateReportStateMachineHandlerImpl());
-        startHandlers.put(MessageEvent.UPDATE_REPORT_EVENT, new UpdateReportStateMachineHandlerImpl());
-        startHandlers.put(MessageEvent.DELETE_REPORT_EVENT, new DeleteReportStateMachineHandlerImpl());
+        startHandlers.put(Message.CREATE_REPORT, new CreateReportStateMachineHandler());
+        startHandlers.put(Message.UPDATE_REPORT, new UpdateReportStateMachineHandler());
+        startHandlers.put(Message.DELETE_REPORT, new DeleteReportStateMachineHandler());
     }
 
     @Override
@@ -33,21 +34,26 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         String input = TelegramUtils.getMessage(update);
         Long chatId = TelegramUtils.getChatId(update);
 
-        MessageEvent messageEvent = MessageEvent.getByMessage(input);
-        if (messageEvent != null) {
-            if (startHandlers.containsKey(messageEvent)) {
-                createStateMachineHandler(chatId, messageEvent);
+        Optional<Message> messageOptional = Message.getByText(input);
+        if (messageOptional.isPresent()) {
+            Message message = messageOptional.get();
+
+            if (startHandlers.containsKey(message)) {
+                createStateMachineHandler(chatId, message);
             }
-            stateMachineHandlers.get(chatId).handleMessageEvent(messageEvent);
+            stateMachineHandlers.get(chatId).handleMessage(message);
         } else {
             stateMachineHandlers.get(chatId).handleUserInput(input);
         }
     }
 
-    private void createStateMachineHandler(Long chatId, MessageEvent messageEvent) {
+    private void createStateMachineHandler(Long chatId, Message message) {
         if (stateMachineHandlers.containsKey(chatId)) {
             throw new IllegalStateException("Already has state machine for chat: " + chatId);
         }
-        stateMachineHandlers.put(chatId, startHandlers.get(messageEvent));
+        //TODO problems
+        //1. need to init new instance for users
+        //2. need to inject chatId to handler
+        stateMachineHandlers.put(chatId, startHandlers.get(message));
     }
 }

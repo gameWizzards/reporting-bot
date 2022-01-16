@@ -1,6 +1,6 @@
 package com.telegram.reporting.command.impl;
 
-import com.telegram.reporting.bot.MessageEvent;
+import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.TelegramUtils;
@@ -18,12 +18,12 @@ import java.util.List;
 public non-sealed class StartCommand implements Command {
 
     public final static String START_MESSAGE = """
-            test
-            test
-            test
+            Окей.
+            Давай создадим отчет за сегодня.
             """;
 
     private final SendBotMessageService sendBotMessageService;
+
     private final TelegramUserService telegramUserService;
 
     public StartCommand(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
@@ -57,10 +57,10 @@ public non-sealed class StartCommand implements Command {
 
     private List<KeyboardRow> getKeyboards() {
         KeyboardRow firstRow = new KeyboardRow();
-        firstRow.add(MessageEvent.CREATE_REPORT_EVENT.getMessage());
+        firstRow.add(Message.CREATE_REPORT.text());
 
         KeyboardRow secondRow = new KeyboardRow();
-        secondRow.addAll(Arrays.asList(MessageEvent.UPDATE_REPORT_EVENT.getMessage(), MessageEvent.DELETE_REPORT_EVENT.getMessage()));
+        secondRow.addAll(Arrays.asList(Message.UPDATE_REPORT.text(), Message.DELETE_REPORT.text()));
 
         return Arrays.asList(firstRow, secondRow);
     }

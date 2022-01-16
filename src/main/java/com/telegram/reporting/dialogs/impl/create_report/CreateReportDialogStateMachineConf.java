@@ -1,6 +1,6 @@
 package com.telegram.reporting.dialogs.impl.create_report;
 
-import com.telegram.reporting.bot.MessageEvent;
+import com.telegram.reporting.messages.MessageEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;

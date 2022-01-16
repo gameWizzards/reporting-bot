@@ -1,6 +1,6 @@
 package com.telegram.reporting.dialogs.impl.create_report;
 
-import com.telegram.reporting.bot.MessageEvent;
+import com.telegram.reporting.messages.MessageEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateContext;
