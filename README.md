@@ -1,38 +1,28 @@
 # Reporting Telegram Bot
+Telegram bot for managing working time. 
 
-## Deployment
-Deployment process as easy as possible:
-Required software:
-- terminal for running bash scripts
-- docker
-- docker-compose
-
-to deploy application, switch to needed branch and run bash script:
-
-$ bash start.sh ${bot_username} ${bot_token}
-
-That's all.
+Domain termines: 
+- Report: report of worked hours per day. List of timeRecords binded to day.
+- TimeRecord: minimal unit of time that employee can add to report.
 
 # Local development
-For local development and testing, use `docker-compose-test.yml`. 
+
+1. Setup PostgresQL database:
 Run command: 
 ```shell
 docker-compose -f docker-compose-test.yml up -d
 ```
-Next step, is to run SpringBoot app with configured **Edit Configuration** in which two env vars are provided: 
-
+2. Configure and run Spring Boot Application:
+Setup two env vars:
 `bot.token=${BOT_TOKEN};bot.username=${BOT_USERNAME}`
+Add VM Options: `-Dspring.profiles.active=test `
 
-And add VM Options: 
-
-`-Dspring.profiles.active=test `
-
- With these configurations - run SpringBoot main method.
+With these configurations - run SpringBoot main method.
 
 # Technological stack
 - SpringBoot as a skeleton framework
-- Spring Scheduler as a task manager
-- MySQL database as a database for saving user and subscription info
 - Telegram-bot SpringBoot starter
 - Spring Data starter
-- Unirest - lib for working with REST calls
+- Spring State Machine
+- Spring Scheduler as a task manager
+- PostgresQL databases
