@@ -1,10 +1,10 @@
-package com.telegram.reporting.dialogs.create_report;
+package com.telegram.reporting.dialogs;
 
 import com.telegram.reporting.messages.MessageEvent;
 
 public interface StateMachineHandler {
 
-    void handleMessageEvent();
+    void handleMessageEvent(MessageEvent messageEvent);
 
     void handleUserInput(String userInput);
 }
