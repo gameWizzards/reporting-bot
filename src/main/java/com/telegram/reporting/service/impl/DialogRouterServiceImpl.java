@@ -2,11 +2,10 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.dialogs.impl.create_report.CreateReportStateMachineHandler;
-import com.telegram.reporting.dialogs.impl.delete_report.DeleteReportStateMachineHandler;
-import com.telegram.reporting.dialogs.impl.update_report.UpdateReportStateMachineHandler;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.utils.TelegramUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -19,14 +18,15 @@ import java.util.Optional;
 public class DialogRouterServiceImpl implements DialogRouterService {
     private Map<Message, StateMachineHandler> startHandlers;
 
-    private Map<Long, StateMachineHandler> stateMachineHandlers = new HashMap<>();
+    private final Map<Long, StateMachineHandler> stateMachineHandlers = new HashMap<>();
+
+    @Autowired
+    private CreateReportStateMachineHandler createReportStateMachineHandler;
 
     @PostConstruct
     public void init() {
-        startHandlers = new HashMap<>(3);
-        startHandlers.put(Message.CREATE_REPORT, new CreateReportStateMachineHandler());
-        startHandlers.put(Message.UPDATE_REPORT, new UpdateReportStateMachineHandler());
-        startHandlers.put(Message.DELETE_REPORT, new DeleteReportStateMachineHandler());
+        startHandlers = new HashMap<>(1);
+        startHandlers.put(Message.CREATE_REPORT, createReportStateMachineHandler);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
             Message message = messageOptional.get();
 
             if (startHandlers.containsKey(message)) {
-                createStateMachineHandler(chatId, message);
+                createStateMachineHandler(chatId, message).setChatId(chatId);
             }
             stateMachineHandlers.get(chatId).handleMessage(message);
         } else {
@@ -47,13 +47,10 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         }
     }
 
-    private void createStateMachineHandler(Long chatId, Message message) {
+    private StateMachineHandler createStateMachineHandler(Long chatId, Message message) {
         if (stateMachineHandlers.containsKey(chatId)) {
             throw new IllegalStateException("Already has state machine for chat: " + chatId);
         }
-        //TODO problems
-        //1. need to init new instance for users
-        //2. need to inject chatId to handler
-        stateMachineHandlers.put(chatId, startHandlers.get(message));
+        return stateMachineHandlers.put(chatId, startHandlers.get(message));
     }
 }

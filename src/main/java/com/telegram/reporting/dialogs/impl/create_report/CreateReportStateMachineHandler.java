@@ -2,8 +2,13 @@ package com.telegram.reporting.dialogs.impl.create_report;
 
 import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.messages.Message;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-public class CreateReportStateMachineHandler implements StateMachineHandler {
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+public class CreateReportStateMachineHandler extends StateMachineHandler {
 
     // not sure to init state machine like that, but maybe it's ok because state that machine has unique generic -> CreateReportState
     //    @Autowired
