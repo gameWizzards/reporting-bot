@@ -6,6 +6,7 @@ import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.utils.TelegramUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -22,6 +23,10 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
     @Autowired
     private CreateReportStateMachineHandler createReportStateMachineHandler;
+
+    @Autowired
+    @Qualifier("CreateReportStateMachineHandlerImpl")
+    private StateMachineHandler createReportHandler;
 
     @PostConstruct
     public void init() {
@@ -43,8 +48,10 @@ public class DialogRouterServiceImpl implements DialogRouterService {
             }
             stateMachineHandlers.get(chatId).handleMessage(message);
         } else {
+            //TODO get from state StateMachineHandler
             stateMachineHandlers.get(chatId).handleUserInput(input);
         }
+
     }
 
     private StateMachineHandler createStateMachineHandler(Long chatId, Message message) {
