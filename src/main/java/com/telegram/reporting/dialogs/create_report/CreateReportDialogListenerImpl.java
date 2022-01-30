@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.impl.create_report;
+package com.telegram.reporting.dialogs.create_report;
 
 import com.telegram.reporting.messages.MessageEvent;
 import lombok.extern.slf4j.Slf4j;
