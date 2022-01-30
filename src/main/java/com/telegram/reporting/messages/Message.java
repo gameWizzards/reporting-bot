@@ -1,6 +1,7 @@
 package com.telegram.reporting.messages;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public enum Message {
@@ -30,6 +31,10 @@ public enum Message {
         return Arrays.stream(values())
                 .filter(message -> message.text().equals(text))
                 .findFirst();
+    }
+
+    public static List<Message> startMessages() {
+        return Arrays.asList(CREATE_REPORT, DELETE_REPORT, UPDATE_REPORT);
     }
 
     public String text() {

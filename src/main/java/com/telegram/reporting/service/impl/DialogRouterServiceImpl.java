@@ -1,38 +1,31 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.dialogs.impl.create_report.CreateReportStateMachineHandler;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.utils.TelegramUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class DialogRouterServiceImpl implements DialogRouterService {
-    private Map<Message, StateMachineHandler> startHandlers;
-
     private final Map<Long, StateMachineHandler> stateMachineHandlers = new HashMap<>();
 
     @Autowired
-    private CreateReportStateMachineHandler createReportStateMachineHandler;
-
-    @Autowired
-    @Qualifier("CreateReportStateMachineHandlerImpl")
+    @Qualifier("CreateReportStateMachineHandler")
     private StateMachineHandler createReportHandler;
 
-    @PostConstruct
-    public void init() {
-        startHandlers = new HashMap<>(1);
-        startHandlers.put(Message.CREATE_REPORT, createReportStateMachineHandler);
-    }
+    @Autowired
+    @Qualifier("DeleteReportStateMachineHandler")
+    private StateMachineHandler deleteReportHandler;
 
     @Override
     public void handleTelegramUpdateEvent(Update update) {
@@ -43,21 +36,25 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         if (messageOptional.isPresent()) {
             Message message = messageOptional.get();
 
-            if (startHandlers.containsKey(message)) {
-                createStateMachineHandler(chatId, message).setChatId(chatId);
+            if (Message.startMessages().contains(message)) {
+                createStateMachineHandler(chatId, message);
             }
-            stateMachineHandlers.get(chatId).handleMessage(message);
+            stateMachineHandlers.get(chatId).handleMessage(chatId, message);
         } else {
-            //TODO get from state StateMachineHandler
-            stateMachineHandlers.get(chatId).handleUserInput(input);
+            stateMachineHandlers.get(chatId).handleUserInput(chatId, input);
         }
-
     }
 
     private StateMachineHandler createStateMachineHandler(Long chatId, Message message) {
-        if (stateMachineHandlers.containsKey(chatId)) {
-            throw new IllegalStateException("Already has state machine for chat: " + chatId);
-        }
-        return stateMachineHandlers.put(chatId, startHandlers.get(message));
+        stateMachineHandlers.put(chatId, getStateMachineHandler(chatId, message));
+        return stateMachineHandlers.get(chatId);
+    }
+
+    private StateMachineHandler getStateMachineHandler(Long chatId, Message message) {
+        return switch (message) {
+            case CREATE_REPORT -> createReportHandler.initStateMachine(chatId);
+            case DELETE_REPORT -> deleteReportHandler.initStateMachine(chatId);
+            default -> null;
+        };
     }
 }

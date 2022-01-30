@@ -2,19 +2,11 @@ package com.telegram.reporting.dialogs;
 
 import com.telegram.reporting.messages.Message;
 
-public abstract class StateMachineHandler {
+public interface StateMachineHandler {
 
-    protected Long chatId;
+    void handleMessage(Long chatId, Message message);
 
-    public Long getChatId() {
-        return chatId;
-    }
+    void handleUserInput(Long chatId, String userInput);
 
-    public void setChatId(Long chatId) {
-        this.chatId = chatId;
-    }
-
-    public abstract void handleMessage(Message message);
-
-    public abstract void handleUserInput(String userInput);
+    StateMachineHandler initStateMachine(Long chatId);
 }
