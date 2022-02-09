@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "bot.username",
+      "type": "java.lang.String",
+      "description": "Your bot username registered with BotFather (without @)."
+    },
+    {
+      "name": "bot.token",
+      "type": "java.lang.String",
+      "description": "Your bot token acquired from BotFather."
+    },
+    {
+      "name": "bot.admins",
+      "type": "java.lang.String",
+      "description": "Usernames of admins that has unlimited access."
+    }
+  ]
+}
