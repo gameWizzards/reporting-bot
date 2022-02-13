@@ -1,5 +1,6 @@
 package com.telegram.reporting.utils;
 
+import org.springframework.statemachine.StateContext;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
@@ -15,8 +16,12 @@ public class TelegramUtils {
      * @param update provided {@link Update}
      * @return chatID from the provided {@link Update} object.
      */
-    public static Long getChatId(Update update) {
+    public static Long currentChatId(Update update) {
         return update.getMessage().getChatId();
+    }
+
+    public static String currentChatId(StateContext context) {
+        return String.valueOf(context.getExtendedState().getVariables().get("chat_id"));
     }
 
     /**

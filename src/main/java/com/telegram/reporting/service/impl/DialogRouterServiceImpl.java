@@ -34,7 +34,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     @Override
     public void handleTelegramUpdateEvent(Update update) {
         String input = TelegramUtils.getMessage(update);
-        Long chatId = TelegramUtils.getChatId(update);
+        Long chatId = TelegramUtils.currentChatId(update);
 
         Optional<Message> messageOptional = Message.getByText(input);
         if (messageOptional.isPresent()) {

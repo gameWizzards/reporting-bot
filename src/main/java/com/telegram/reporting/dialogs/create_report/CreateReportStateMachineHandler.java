@@ -27,10 +27,7 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
         MessageEvent messageEvent = switch (message) {
             case CREATE_REPORT -> MessageEvent.CREATE_REPORT_EVENT;
             case USER_DATE_INPUT -> MessageEvent.USER_DATE_INPUT;
-//           case CHOICE_REPORT_CATEGORY -> ?? кнопки
-//           case
-//           case VALID_TIME ->
-//           case INVALID_TIME ->
+            case CHOICE_REPORT_CATEGORY -> MessageEvent.CHOICE_REPORT_CATEGORY;
 //           case CONFIRM_ADDITIONAL_REPORT ->
 //           case DECLINE_ADDITIONAL_REPORT ->
 //           case CONFIRM_CREATION_FINAL_REPORT ->

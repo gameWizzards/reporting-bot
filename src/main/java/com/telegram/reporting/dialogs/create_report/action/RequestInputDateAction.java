@@ -3,6 +3,7 @@ package com.telegram.reporting.dialogs.create_report.action;
 import com.telegram.reporting.dialogs.create_report.CreateReportState;
 import com.telegram.reporting.messages.MessageEvent;
 import com.telegram.reporting.service.SendBotMessageService;
+import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
@@ -18,7 +19,7 @@ public class RequestInputDateAction implements Action<CreateReportState, Message
 
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {
-        String chatId = String.valueOf(context.getExtendedState().getVariables().get("chat_id"));
+        String chatId = TelegramUtils.currentChatId(context);
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText("Введите дату для создния отчета");

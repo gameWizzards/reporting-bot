@@ -3,7 +3,7 @@ package com.telegram.reporting.command.impl;
 import com.telegram.reporting.service.SendBotMessageService;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import static com.telegram.reporting.utils.TelegramUtils.getChatId;
+import static com.telegram.reporting.utils.TelegramUtils.currentChatId;
 
 /**
  * Unknown {@link Command}.
@@ -28,6 +28,6 @@ public non-sealed class UnknownCommand implements Command {
 
     @Override
     public void execute(Update update) {
-        sendBotMessageService.sendMessage(getChatId(update), UNKNOWN_MESSAGE);
+        sendBotMessageService.sendMessage(currentChatId(update), UNKNOWN_MESSAGE);
     }
 }

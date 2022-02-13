@@ -4,7 +4,7 @@ import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import static com.telegram.reporting.utils.TelegramUtils.getChatId;
+import static com.telegram.reporting.utils.TelegramUtils.currentChatId;
 
 /**
  * Stop {@link Command}.
@@ -31,8 +31,8 @@ public non-sealed class StopCommand implements Command {
 
     @Override
     public void execute(Update update) {
-        sendBotMessageService.sendMessage(getChatId(update), STOP_MESSAGE);
-        telegramUserService.findByChatId(getChatId(update))
+        sendBotMessageService.sendMessage(currentChatId(update), STOP_MESSAGE);
+        telegramUserService.findByChatId(currentChatId(update))
                 .ifPresent(telegramUserService::save);
     }
 }
