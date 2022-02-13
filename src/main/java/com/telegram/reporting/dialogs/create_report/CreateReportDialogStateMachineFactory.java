@@ -1,7 +1,11 @@
 package com.telegram.reporting.dialogs.create_report;
 
+import com.telegram.reporting.dialogs.create_report.action.RequestInputDateAction;
+import com.telegram.reporting.dialogs.create_report.action.ValidateDateAction;
 import com.telegram.reporting.messages.MessageEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -13,6 +17,16 @@ import java.util.EnumSet;
 @Configuration
 @EnableStateMachineFactory(name = "CreateReportDialogStateMachineFactory")
 public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<CreateReportState, MessageEvent> {
+
+
+    private final RequestInputDateAction requestInputDateAction;
+    private final ValidateDateAction validateDateAction;
+
+    @Autowired
+    public CreateReportDialogStateMachineFactory(@Lazy RequestInputDateAction requestInputDateAction, @Lazy ValidateDateAction validateDateAction) {
+        this.requestInputDateAction = requestInputDateAction;
+        this.validateDateAction = validateDateAction;
+    }
 
     @Override
     public void configure(StateMachineConfigurationConfigurer<CreateReportState, MessageEvent> config) throws Exception {
@@ -37,13 +51,13 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .source(CreateReportState.START_DIALOG)
                 .event(MessageEvent.CREATE_REPORT_EVENT)
                 .target(CreateReportState.USER_DATE_INPUTTING)
-//                .action(reservedAction(), errorAction()) вернуть в бот текст введите дату отчета
+                .action(requestInputDateAction) //errorAction()) вернуть в бот текст введите дату отчета
 
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_INPUTTING)
                 .event(MessageEvent.USER_DATE_INPUT)
                 .target(CreateReportState.DATE_VALIDATION)
-//                .action(reservedAction(), errorAction())
+                .action(validateDateAction) //, errorAction())
 
                 .and().withExternal()
                 .source(CreateReportState.DATE_VALIDATION)

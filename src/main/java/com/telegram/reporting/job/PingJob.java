@@ -25,7 +25,8 @@ public class PingJob {
         this.sendBotMessageService = sendBotMessageService;
     }
 
-    @Scheduled(fixedRateString = "${bot.updateDataFixedRate}")
+//    @Scheduled(fixedRateString = "${bot.updateDataFixedRate}")
+    @Scheduled(fixedDelay = 100_000L)
     public void ping() {
         long start = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         log.info("Ping job started.");

@@ -2,6 +2,7 @@ package com.telegram.reporting.service;
 
 import lombok.SneakyThrows;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 
@@ -28,4 +29,6 @@ public interface SendBotMessageService {
      * @param message collection of provided messages to be sent.
      */
     void sendMessage(Long chatId, List<String> message);
+
+    void sendCommand(String commandIdentifier, String username, Update update);
 }

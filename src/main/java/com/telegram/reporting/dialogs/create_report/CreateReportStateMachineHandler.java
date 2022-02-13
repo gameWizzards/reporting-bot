@@ -72,7 +72,9 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
 
     @Override
     public StateMachineHandler initStateMachine(Long chatId) {
-        stateMachines.put(chatId, stateMachineFactory.getStateMachine());
+        StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachineFactory.getStateMachine();
+        stateMachine.getExtendedState().getVariables().put("chat_id", chatId);
+        stateMachines.put(chatId, stateMachine);
         return this;
     }
 }
