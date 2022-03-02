@@ -22,6 +22,8 @@ public interface SendBotMessageService {
      */
     void sendMessage(Long chatId, String message);
 
+    void sendMessage(String chatId, String message);
+
     /**
      * Send messages via telegram bot.
      *
@@ -29,6 +31,8 @@ public interface SendBotMessageService {
      * @param message collection of provided messages to be sent.
      */
     void sendMessage(Long chatId, List<String> message);
+
+    void sendMessage(String chatId, List<String> message);
 
     void sendCommand(String commandIdentifier, String username, Update update);
 }

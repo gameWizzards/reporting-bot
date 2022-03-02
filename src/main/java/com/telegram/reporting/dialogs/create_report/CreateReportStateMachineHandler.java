@@ -1,5 +1,6 @@
 package com.telegram.reporting.dialogs.create_report;
 
+import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.messages.MessageEvent;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component("CreateReportStateMachineHandler")
@@ -26,20 +28,17 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
         MessageEvent messageEvent = switch (message) {
             case CREATE_REPORT -> MessageEvent.CREATE_REPORT_EVENT;
-            case USER_DATE_INPUT -> MessageEvent.USER_DATE_INPUT;
-            case CHOICE_REPORT_CATEGORY -> MessageEvent.CHOICE_REPORT_CATEGORY;
-//           case CONFIRM_ADDITIONAL_REPORT ->
-//           case DECLINE_ADDITIONAL_REPORT ->
-//           case CONFIRM_CREATION_FINAL_REPORT ->
-//           case DECLINE_CREATION_FINAL_REPORT ->
-//           case UPDATE_REPORT ->
-//           case DELETE_REPORT ->
-//           case ADD_NEW_USER ->
-//           case CANCEL ->
-//           case RETURN_TO_MAIN_MENU ->
+            case REPORT_CATEGORY_ON_STORAGE,
+                    REPORT_CATEGORY_ON_ORDER,
+                    REPORT_CATEGORY_ON_OFFICE,
+                    REPORT_CATEGORY_ON_COORDINATION -> MessageEvent.CHOICE_REPORT_CATEGORY;
+            case CONFIRM_ADDITIONAL_REPORT -> MessageEvent.CONFIRM_ADDITIONAL_REPORT;
+            case DECLINE_ADDITIONAL_REPORT -> MessageEvent.DECLINE_ADDITIONAL_REPORT;
+            case CONFIRM_CREATION_FINAL_REPORT -> MessageEvent.CONFIRM_CREATION_FINAL_REPORT;
+            case DECLINE_CREATION_FINAL_REPORT -> MessageEvent.DECLINE_CREATION_FINAL_REPORT;
             default -> null;
         };
-
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE.name(), message.text());
         log.info("Current state = [{}]. Message = [{}] -> MessageEvent = [{}]", stateMachine.getState().getId(), message, messageEvent);
         stateMachine.sendEvent(messageEvent);
         log.info("Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
@@ -50,19 +49,25 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
         log.info("Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
         CreateReportState stateLog = stateMachine.getState().getId();
-        MessageEvent messageEvent;
+        MessageEvent messageEvent = null;
         log.info("User input = [{}]", userInput);
         CreateReportState currentState = stateMachine.getState().getId();
         Map<Object, Object> variables = stateMachine.getExtendedState().getVariables();
 
-        if (CreateReportState.USER_DATE_INPUTTING.equals(currentState)) {
-            messageEvent = MessageEvent.USER_DATE_INPUT;
-        } else {
-            messageEvent = MessageEvent.USER_TIME_INPUT;
+        switch (currentState) {
+            case USER_DATE_INPUTTING -> {
+                variables.put(ContextVariable.REPORT_DATE.name(), userInput);
+                messageEvent = MessageEvent.USER_DATE_INPUT_VALIDATE;
+            }
+            case USER_TIME_INPUTTING -> {
+                variables.put(ContextVariable.REPORT_TIME.name(), userInput);
+                messageEvent = MessageEvent.USER_TIME_INPUT_VALIDATE;
+            }
         }
 
-        variables.put(messageEvent.name(), userInput);
-        stateMachine.sendEvent(messageEvent);
+        Optional.ofNullable(messageEvent)
+                .ifPresent(stateMachine::sendEvent);
+
         log.info("Current state = [{}]. User input = [{}] -> MessageEvent = [{}]", stateLog, userInput, messageEvent);
 
     }

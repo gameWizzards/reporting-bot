@@ -40,10 +40,16 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     @Override
     @SneakyThrows
     public void sendMessage(Long chatId, String message) {
+        sendMessage(String.valueOf(chatId), message);
+    }
+
+    @Override
+    @SneakyThrows
+    public void sendMessage(String chatId, String message) {
         if (isBlank(message)) return;
 
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId.toString());
+        sendMessage.setChatId(chatId);
         sendMessage.enableHtml(true);
         sendMessage.setText(message);
 
@@ -51,10 +57,15 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     }
 
     @Override
+    public void sendMessage(String chatId, List<String> messages) {
+        if (isEmpty(messages)) return;
+        messages.forEach(m -> sendMessage(chatId, m));
+    }
+
+    @Override
     public void sendMessage(Long chatId, List<String> messages) {
         if (isEmpty(messages)) return;
-
-        messages.forEach(m -> sendMessage(chatId, m));
+        sendMessage(String.valueOf(chatId), messages);
     }
 
     @Override

@@ -1,7 +1,16 @@
 package com.telegram.reporting.dialogs.create_report;
 
+import com.telegram.reporting.dialogs.create_report.action.EndDialogAction;
+import com.telegram.reporting.dialogs.create_report.action.HandleDateCategoryAction;
+import com.telegram.reporting.dialogs.create_report.action.HandleUserDateInputAction;
+import com.telegram.reporting.dialogs.create_report.action.HandleUserTimeInputAction;
+import com.telegram.reporting.dialogs.create_report.action.RequestAdditionalReportAction;
+import com.telegram.reporting.dialogs.create_report.action.RequestConfirmationReport;
 import com.telegram.reporting.dialogs.create_report.action.RequestInputDateAction;
-import com.telegram.reporting.dialogs.create_report.action.ValidateDateAction;
+import com.telegram.reporting.dialogs.create_report.action.RequestInputTimeAction;
+import com.telegram.reporting.dialogs.create_report.action.SendCategoryButtonsAction;
+import com.telegram.reporting.dialogs.create_report.guard.ValidateDateGuard;
+import com.telegram.reporting.dialogs.create_report.guard.ValidateTimeGuard;
 import com.telegram.reporting.messages.MessageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +29,35 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
 
 
     private final RequestInputDateAction requestInputDateAction;
-    private final ValidateDateAction validateDateAction;
+    private final HandleUserDateInputAction handleUserDateInputAction;
+    private final SendCategoryButtonsAction sendCategoryButtonsAction;
+    private final ValidateDateGuard validateDateGuard;
+    private final HandleDateCategoryAction handleDateCategoryAction;
+    private final RequestInputTimeAction requestInputTimeAction;
+    private final ValidateTimeGuard validateTimeGuard;
+    private final HandleUserTimeInputAction handleUserTimeInputAction;
+    private final RequestAdditionalReportAction requestAdditionalReportAction;
+    private final RequestConfirmationReport requestConfirmationReport;
+    private final EndDialogAction endDialogAction;
 
     @Autowired
-    public CreateReportDialogStateMachineFactory(@Lazy RequestInputDateAction requestInputDateAction, @Lazy ValidateDateAction validateDateAction) {
+    public CreateReportDialogStateMachineFactory(@Lazy RequestInputDateAction requestInputDateAction, @Lazy HandleUserDateInputAction handleUserDateInputAction,
+                                                 @Lazy SendCategoryButtonsAction sendCategoryButtonsAction, @Lazy ValidateDateGuard validateDateGuard,
+                                                 @Lazy HandleDateCategoryAction handleDateCategoryAction, @Lazy RequestInputTimeAction requestInputTimeAction,
+                                                 @Lazy ValidateTimeGuard validateTimeGuard, @Lazy HandleUserTimeInputAction handleUserTimeInputAction,
+                                                 @Lazy RequestAdditionalReportAction requestAdditionalReportAction, @Lazy RequestConfirmationReport requestConfirmationReport,
+                                                 @Lazy EndDialogAction endDialogAction) {
         this.requestInputDateAction = requestInputDateAction;
-        this.validateDateAction = validateDateAction;
+        this.handleUserDateInputAction = handleUserDateInputAction;
+        this.sendCategoryButtonsAction = sendCategoryButtonsAction;
+        this.validateDateGuard = validateDateGuard;
+        this.handleDateCategoryAction = handleDateCategoryAction;
+        this.requestInputTimeAction = requestInputTimeAction;
+        this.validateTimeGuard = validateTimeGuard;
+        this.handleUserTimeInputAction = handleUserTimeInputAction;
+        this.requestAdditionalReportAction = requestAdditionalReportAction;
+        this.requestConfirmationReport = requestConfirmationReport;
+        this.endDialogAction = endDialogAction;
     }
 
     @Override
@@ -49,100 +81,79 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
     public void configure(StateMachineTransitionConfigurer<CreateReportState, MessageEvent> transitions) throws Exception {
         transitions.withExternal()
                 .source(CreateReportState.START_DIALOG)
-                .event(MessageEvent.CREATE_REPORT_EVENT)
+                .event(MessageEvent.CREATE_REPORT_EVENT) //handle button
                 .target(CreateReportState.USER_DATE_INPUTTING)
                 .action(requestInputDateAction) //errorAction()) вернуть в бот текст введите дату отчета
 
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_INPUTTING)
-                .event(MessageEvent.USER_DATE_INPUT)
-                .target(CreateReportState.DATE_VALIDATION)
-                .action(validateDateAction) //, errorAction())
-
-                .and().withExternal()
-                .source(CreateReportState.DATE_VALIDATION)
-                .event(MessageEvent.VALID_DATE)
+                .event(MessageEvent.USER_DATE_INPUT_VALIDATE) //handle user input
                 .target(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-//                .guard(hideGuard())
-//                .action(reservedAction(), errorAction()) вернуть в бот список категорий и текст выберите
-
-                .and().withExternal()
-                .source(CreateReportState.DATE_VALIDATION)
-                .event(MessageEvent.INVALID_DATE)
-                .target(CreateReportState.USER_DATE_INPUTTING)
-//                .action(reservedAction(), errorAction())
+                .guard(validateDateGuard)
+                .action(handleUserDateInputAction)
+                .action(sendCategoryButtonsAction)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
                 .event(MessageEvent.CHOICE_REPORT_CATEGORY)
                 .target(CreateReportState.USER_TIME_INPUTTING)
-//                .action(reservedAction(), errorAction()) обработать выбор категорий времени
+                .action(handleDateCategoryAction)
+                .action(requestInputTimeAction)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_TIME_INPUTTING)
-                .event(MessageEvent.USER_TIME_INPUT)
-                .target(CreateReportState.TIME_VALIDATION)
-//                .action(reservedAction(), errorAction())
-
-                .and().withExternal()
-                .source(CreateReportState.TIME_VALIDATION)
-                .event(MessageEvent.VALID_TIME)
+                .event(MessageEvent.USER_TIME_INPUT_VALIDATE)
                 .target(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
-//                .guard(hideGuard())
-//                .action(reservedAction(), errorAction())
+                .guard(validateTimeGuard)
+                .action(handleUserTimeInputAction)
+                .action(requestAdditionalReportAction)
+                // TODO add step - "Additional info"
 
-                .and().withExternal()
-                .source(CreateReportState.TIME_VALIDATION)
-                .event(MessageEvent.INVALID_TIME)
-                .target(CreateReportState.USER_TIME_INPUTTING)
-//                .action(reservedAction(), errorAction())
-
+//TODO add handling multi reporting
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.CONFIRM_ADDITIONAL_REPORT)
                 .target(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-//                .action(reservedAction(), errorAction())
+                .action(sendCategoryButtonsAction)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.DECLINE_ADDITIONAL_REPORT)
                 .target(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
-//                .action(reservedAction(), errorAction())
+                .action(requestConfirmationReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.CONFIRM_CREATION_FINAL_REPORT)
                 .target(CreateReportState.END_DIALOG)
-//                .action(reservedAction(), errorAction())
+                .action(endDialogAction)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.DECLINE_CREATION_FINAL_REPORT)
                 .target(CreateReportState.USER_DATE_INPUTTING)
+                .action(endDialogAction);
+
+
+        // Handling CANCEL button
+//                .and().withExternal()
+//                .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
+//                .event(MessageEvent.CANCEL)
+//                .target(CreateReportState.USER_DATE_INPUTTING)
+//                .action(reservedAction(), errorAction())
+
+//                .and().withExternal()
+//                .source(CreateReportState.USER_TIME_INPUTTING)
+//                .event(MessageEvent.CANCEL)
+//                .target(CreateReportState.USER_DATE_INPUTTING)
 //                .action(reservedAction(), errorAction())
 
 
-            // Handling CANCEL button
-                .and().withExternal()
-                .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-                .event(MessageEvent.CANCEL)
-                .target(CreateReportState.USER_DATE_INPUTTING)
-//                .action(reservedAction(), errorAction())
-
-                .and().withExternal()
-                .source(CreateReportState.USER_TIME_INPUTTING)
-                .event(MessageEvent.CANCEL)
-                .target(CreateReportState.USER_DATE_INPUTTING)
-//                .action(reservedAction(), errorAction())
-
-
-            // Handling RETURN_TO_MAIN_MENU button
-                .and().withExternal()
-                .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-                .target(CreateReportState.END_DIALOG)
-                .event(MessageEvent.RETURN_TO_MAIN_MENU);
+        // Handling RETURN_TO_MAIN_MENU button
+//                .and().withExternal()
+//                .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
+//                .target(CreateReportState.END_DIALOG)
+//                .event(MessageEvent.RETURN_TO_MAIN_MENU);
 //                .action(reservedAction(), errorAction());
-
-
     }
 }

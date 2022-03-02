@@ -29,7 +29,7 @@ public class CreateReportDialogListenerImpl implements StateMachineListener<Crea
 
     @Override
     public void eventNotAccepted(Message<MessageEvent> message) {
-        log.error("Invalid transition! Invalid event {}.", message);
+        log.error("Event not accepted! Invalid transition! Invalid event {}.", message);
     }
 
     @Override

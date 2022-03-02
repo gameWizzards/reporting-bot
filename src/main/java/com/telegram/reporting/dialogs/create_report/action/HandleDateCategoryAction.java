@@ -1,24 +1,19 @@
 package com.telegram.reporting.dialogs.create_report.action;
 
+import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.create_report.CreateReportState;
-import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.messages.MessageEvent;
-import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class RequestInputDateAction implements Action<CreateReportState, MessageEvent> {
-    @Autowired
-    private SendBotMessageService sendBotMessageService;
-
+public class HandleDateCategoryAction implements Action<CreateReportState, MessageEvent> {
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), Message.USER_DATE_INPUT.text());
+        String reportCategoryType = (String) context.getExtendedState().getVariables().get(ContextVariable.MESSAGE.name());
+        context.getExtendedState().getVariables().put(ContextVariable.REPORT_CATEGORY_TYPE.name(), reportCategoryType);
     }
 }
