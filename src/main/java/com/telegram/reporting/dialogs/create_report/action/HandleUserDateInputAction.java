@@ -21,8 +21,11 @@ import java.util.List;
 @Slf4j
 @Component
 public class HandleUserDateInputAction implements Action<CreateReportState, MessageEvent> {
-    @Autowired
-    private SendBotMessageService sendBotMessageService;
+    private final SendBotMessageService sendBotMessageService;
+
+    public HandleUserDateInputAction(SendBotMessageService sendBotMessageService) {
+        this.sendBotMessageService = sendBotMessageService;
+    }
 
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {

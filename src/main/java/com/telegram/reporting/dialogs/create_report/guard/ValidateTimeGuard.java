@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ValidateTimeGuard implements Guard<CreateReportState, MessageEvent> {
+    private final SendBotMessageService sendBotMessageService;
 
-    @Autowired
-    private SendBotMessageService sendBotMessageService;
+    public ValidateTimeGuard(SendBotMessageService sendBotMessageService) {
+        this.sendBotMessageService = sendBotMessageService;
+    }
 
     @Override
     public boolean evaluate(StateContext<CreateReportState, MessageEvent> context) {

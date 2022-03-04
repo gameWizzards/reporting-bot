@@ -5,7 +5,6 @@ import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.messages.MessageEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.stereotype.Component;
@@ -18,10 +17,13 @@ import java.util.Optional;
 @Component("CreateReportStateMachineHandler")
 public class CreateReportStateMachineHandler implements StateMachineHandler {
 
-    private final Map<Long, StateMachine<CreateReportState, MessageEvent>> stateMachines = new HashMap<>();
+    private final StateMachineFactory<CreateReportState, MessageEvent> stateMachineFactory;
+    private final Map<Long, StateMachine<CreateReportState, MessageEvent>> stateMachines;
 
-    @Autowired
-    private StateMachineFactory<CreateReportState, MessageEvent> stateMachineFactory;
+    public CreateReportStateMachineHandler(StateMachineFactory<CreateReportState, MessageEvent> stateMachineFactory) {
+        this.stateMachineFactory = stateMachineFactory;
+        stateMachines = new HashMap<>();
+    }
 
     @Override
     public void handleMessage(Long chatId, Message message) {

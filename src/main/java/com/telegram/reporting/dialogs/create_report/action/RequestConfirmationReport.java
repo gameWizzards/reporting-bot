@@ -18,8 +18,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 @Slf4j
 @Component
 public class RequestConfirmationReport implements Action<CreateReportState, MessageEvent> {
-    @Autowired
-    private SendBotMessageService sendBotMessageService;
+    private final SendBotMessageService sendBotMessageService;
+
+    public RequestConfirmationReport(SendBotMessageService sendBotMessageService) {
+        this.sendBotMessageService = sendBotMessageService;
+    }
 
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {

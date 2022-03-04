@@ -1,6 +1,7 @@
 package com.telegram.reporting.dialogs.delete_report;
 
 import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.dialogs.create_report.CreateReportState;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.messages.MessageEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,15 @@ import java.util.Map;
 @Slf4j
 @Component("DeleteReportStateMachineHandler")
 public class DeleteReportStateMachineHandler implements StateMachineHandler {
-    private final Map<Long, StateMachine<DeleteReportState, MessageEvent>> stateMachines = new HashMap<>();
 
-    @Autowired
-    private StateMachineFactory<DeleteReportState, MessageEvent> stateMachineFactory;
+    private final StateMachineFactory<DeleteReportState, MessageEvent> stateMachineFactory;
+    private final Map<Long, StateMachine<DeleteReportState, MessageEvent>> stateMachines;
+
+
+    public DeleteReportStateMachineHandler(StateMachineFactory<DeleteReportState, MessageEvent> stateMachineFactory) {
+        this.stateMachineFactory = stateMachineFactory;
+        stateMachines = new HashMap<>();
+    }
 
     @Override
     public void handleMessage(Long chatId, Message message) {

@@ -5,8 +5,6 @@ import com.telegram.reporting.command.CommandContainer;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -25,7 +23,6 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     private final ReportingTelegramBot reportingTelegramBot;
     private final CommandContainer commandContainer;
 
-    @Autowired
     public SendBotMessageServiceImpl(TelegramUserService telegramUserService, ReportingTelegramBot reportingTelegramBot) {
         this.reportingTelegramBot = reportingTelegramBot;
         this.commandContainer = new CommandContainer(this, telegramUserService);

@@ -19,7 +19,6 @@ public class PingJob {
     private final TelegramUserService telegramUserService;
     private final SendBotMessageService sendBotMessageService;
 
-    @Autowired
     public PingJob(TelegramUserService telegramUserService, SendBotMessageService sendBotMessageService) {
         this.telegramUserService = telegramUserService;
         this.sendBotMessageService = sendBotMessageService;

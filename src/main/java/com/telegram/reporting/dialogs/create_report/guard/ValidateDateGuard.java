@@ -17,8 +17,11 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @Component
 public class ValidateDateGuard implements Guard<CreateReportState, MessageEvent> {
-    @Autowired
-    private SendBotMessageService sendBotMessageService;
+    private final SendBotMessageService sendBotMessageService;
+
+    public ValidateDateGuard(SendBotMessageService sendBotMessageService) {
+        this.sendBotMessageService = sendBotMessageService;
+    }
 
     @Override
     public boolean evaluate(StateContext<CreateReportState, MessageEvent> context) {

@@ -1,18 +1,12 @@
 package com.telegram.reporting.bot;
 
-import com.telegram.reporting.command.CommandContainer;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.service.TelegramUserService;
-import com.telegram.reporting.service.impl.SendBotMessageServiceImpl;
 import com.telegram.reporting.utils.TelegramUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import java.util.List;
 
 @Component
 public class ReportingTelegramBot extends TelegramLongPollingBot {
@@ -24,7 +18,6 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
 
     private final DialogRouterService dialogRouterService;
 
-    @Autowired
     public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService) {
         this.dialogRouterService = dialogRouterService;
     }

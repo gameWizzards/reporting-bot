@@ -6,7 +6,6 @@ import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -18,18 +17,26 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class DialogRouterServiceImpl implements DialogRouterService {
-    private final Map<Long, StateMachineHandler> stateMachineHandlers = new HashMap<>();
+    private final Map<Long, StateMachineHandler> stateMachineHandlers;
 
-    @Autowired
-    @Qualifier("CreateReportStateMachineHandler")
-    private StateMachineHandler createReportHandler;
+    //    @Autowired
+//    @Qualifier("CreateReportStateMachineHandler")
+    private final StateMachineHandler createReportHandler;
 
-    @Autowired
-    @Qualifier("DeleteReportStateMachineHandler")
+    //    @Autowired
+//    @Qualifier("DeleteReportStateMachineHandler")
     private StateMachineHandler deleteReportHandler;
 
-    @Autowired
     private SendBotMessageService sendBotMessageService;
+
+    public DialogRouterServiceImpl(@Qualifier("CreateReportStateMachineHandler") StateMachineHandler createReportHandler,
+                                   @Qualifier("DeleteReportStateMachineHandler") StateMachineHandler deleteReportHandler,
+                                   SendBotMessageService sendBotMessageService) {
+        this.createReportHandler = createReportHandler;
+        this.deleteReportHandler = deleteReportHandler;
+        this.sendBotMessageService = sendBotMessageService;
+        stateMachineHandlers = new HashMap<>();
+    }
 
     @Override
     public void handleTelegramUpdateEvent(Update update) {

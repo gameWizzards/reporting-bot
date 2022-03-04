@@ -3,7 +3,6 @@ package com.telegram.reporting.service.impl;
 import com.telegram.reporting.repository.TelegramUserRepository;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.TelegramUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +16,6 @@ public class TelegramUserServiceImpl implements TelegramUserService {
 
     private final TelegramUserRepository telegramUserRepository;
 
-    @Autowired
     public TelegramUserServiceImpl(TelegramUserRepository telegramUserRepository) {
         this.telegramUserRepository = telegramUserRepository;
     }
