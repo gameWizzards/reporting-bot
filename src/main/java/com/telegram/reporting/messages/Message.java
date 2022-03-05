@@ -15,11 +15,14 @@ public enum Message {
 
     USER_TIME_INPUT("Введите затраченное время согласно выбранной категории отчета. Формат времени - часы"),
 
-    REQUEST_TO_ADDITIONAL_REPORT("Хотите добавить еще один отчет за выбранную дату?"),
+    REQUEST_ADDITIONAL_REPORT("Хотите добавить еще один отчет за выбранную дату?"),
     CONFIRM_ADDITIONAL_REPORT("Да"),
     DECLINE_ADDITIONAL_REPORT("Нет"),
 
-    REQUEST_TO_CONFIRMATION_REPORT("Убедитесь что отчет коректный. Отправить отчет?"),
+    REQUEST_ADD_NOTE_REPORT("Добавьте примечание к отчету. (Опционально)"),
+    SKIP_NOTE("Пропустить примечание"),
+
+    REQUEST_CONFIRMATION_REPORT("Убедитесь что отчет коректный. Отправить отчет?"),
     CONFIRM_CREATION_FINAL_REPORT("Отправить отчет"),
     DECLINE_CREATION_FINAL_REPORT("Отменить отчет"),
 

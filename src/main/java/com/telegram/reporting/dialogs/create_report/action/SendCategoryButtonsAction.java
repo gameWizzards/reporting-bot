@@ -27,7 +27,7 @@ public class SendCategoryButtonsAction implements Action<CreateReportState, Mess
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.CHOICE_REPORT_CATEGORY.text());
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.REPORT_CATEGORY_ON_STORAGE.text(), Message.REPORT_CATEGORY_ON_ORDER.text());
         KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.REPORT_CATEGORY_ON_OFFICE.text(), Message.REPORT_CATEGORY_ON_COORDINATION.text());
-        sendMessage.setReplyMarkup(KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
-        sendBotMessageService.sendMessage(sendMessage);
+
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
     }
 }

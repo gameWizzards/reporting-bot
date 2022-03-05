@@ -41,9 +41,7 @@ public non-sealed class StartCommand implements Command {
         KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT.text());
         KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT.text(), Message.DELETE_REPORT.text());
 
-        message.setReplyMarkup(KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
-
-        sendBotMessageService.sendMessage(message);
+        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
     }
 
 }

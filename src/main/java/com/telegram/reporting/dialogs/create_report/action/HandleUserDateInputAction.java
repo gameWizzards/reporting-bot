@@ -7,7 +7,6 @@ import com.telegram.reporting.messages.MessageEvent;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;

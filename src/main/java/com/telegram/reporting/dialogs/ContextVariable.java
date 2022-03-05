@@ -4,5 +4,6 @@ public enum ContextVariable {
     MESSAGE,
     REPORT_DATE,
     REPORT_TIME,
-    REPORT_CATEGORY_TYPE
+    REPORT_CATEGORY_TYPE,
+    REPORT_NOTE
 }

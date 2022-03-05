@@ -8,8 +8,11 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -28,9 +31,10 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         this.commandContainer = new CommandContainer(this, telegramUserService);
     }
 
-    @Override
     @SneakyThrows
-    public void sendMessage(SendMessage message) {
+    public void sendMessageWithKeys(SendMessage message, ReplyKeyboardMarkup keyboardMarkup) {
+        Objects.requireNonNull(keyboardMarkup, "Keyboard markup is require!");
+        message.setReplyMarkup(keyboardMarkup);
         reportingTelegramBot.execute(message);
     }
 
@@ -49,6 +53,7 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         sendMessage.setChatId(chatId);
         sendMessage.enableHtml(true);
         sendMessage.setText(message);
+        sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
 
         reportingTelegramBot.execute(sendMessage);
     }

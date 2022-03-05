@@ -38,6 +38,7 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
             case DECLINE_ADDITIONAL_REPORT -> MessageEvent.DECLINE_ADDITIONAL_REPORT;
             case CONFIRM_CREATION_FINAL_REPORT -> MessageEvent.CONFIRM_CREATION_FINAL_REPORT;
             case DECLINE_CREATION_FINAL_REPORT -> MessageEvent.DECLINE_CREATION_FINAL_REPORT;
+            case SKIP_NOTE -> MessageEvent.USER_NOTE_INPUT_VALIDATE;
             default -> null;
         };
         stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE.name(), message.text());
@@ -49,7 +50,7 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
     @Override
     public void handleUserInput(Long chatId, String userInput) {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
-        log.info("Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
+        log.info("Start handle UserInput.Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
         CreateReportState stateLog = stateMachine.getState().getId();
         MessageEvent messageEvent = null;
         log.info("User input = [{}]", userInput);
@@ -65,12 +66,16 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
                 variables.put(ContextVariable.REPORT_TIME.name(), userInput);
                 messageEvent = MessageEvent.USER_TIME_INPUT_VALIDATE;
             }
+            case USER_NOTE_INPUTTING -> {
+                variables.put(ContextVariable.REPORT_NOTE.name(), userInput);
+                messageEvent = MessageEvent.USER_NOTE_INPUT_VALIDATE;
+            }
         }
 
         Optional.ofNullable(messageEvent)
                 .ifPresent(stateMachine::sendEvent);
 
-        log.info("Current state = [{}]. User input = [{}] -> MessageEvent = [{}]", stateLog, userInput, messageEvent);
+        log.info("After handle UserInput/updateStateMachine. Current state = [{}]. User input = [{}] -> MessageEvent = [{}]", stateMachine.getState().getId(), userInput, messageEvent);
 
     }
 

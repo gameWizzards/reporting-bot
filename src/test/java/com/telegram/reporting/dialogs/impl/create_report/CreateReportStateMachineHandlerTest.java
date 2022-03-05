@@ -32,10 +32,8 @@ class CreateReportStateMachineHandlerTest {
     public void testGreenWay() {
         stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.sendEvent(MessageEvent.USER_DATE_INPUT_VALIDATE);
-        stateMachine.sendEvent(MessageEvent.VALID_DATE);
         stateMachine.sendEvent(MessageEvent.CHOICE_REPORT_CATEGORY);
         stateMachine.sendEvent(MessageEvent.USER_TIME_INPUT_VALIDATE);
-        stateMachine.sendEvent(MessageEvent.VALID_TIME);
         stateMachine.sendEvent(MessageEvent.DECLINE_ADDITIONAL_REPORT);
         stateMachine.sendEvent(MessageEvent.CONFIRM_CREATION_FINAL_REPORT);
 

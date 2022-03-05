@@ -24,10 +24,9 @@ public class RequestAdditionalReportAction implements Action<CreateReportState, 
 
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.REQUEST_TO_ADDITIONAL_REPORT.text());
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.REQUEST_ADDITIONAL_REPORT.text());
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.CONFIRM_ADDITIONAL_REPORT.text(), Message.DECLINE_ADDITIONAL_REPORT.text());
 
-        sendMessage.setReplyMarkup(KeyboardUtils.createKeyboardMarkup(firstRow));
-        sendBotMessageService.sendMessage(sendMessage);
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(firstRow));
     }
 }
