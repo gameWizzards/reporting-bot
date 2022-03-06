@@ -1,13 +1,9 @@
 package com.telegram.reporting.command.impl;
 
-import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -23,11 +19,8 @@ public non-sealed class StartCommand implements Command {
 
     private final SendBotMessageService sendBotMessageService;
 
-    private final TelegramUserService telegramUserService;
-
-    public StartCommand(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
+    public StartCommand(SendBotMessageService sendBotMessageService) {
         this.sendBotMessageService = sendBotMessageService;
-        this.telegramUserService = telegramUserService;
     }
 
     @Override

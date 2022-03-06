@@ -15,8 +15,13 @@ import org.springframework.context.annotation.Lazy;
 public class CommandsConfiguration {
 
     @Bean
-    public CommandContainer commandContainer(@Lazy SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
-       return new CommandContainer(sendBotMessageService, telegramUserService);
+    public AddUserCommand addUserCommand(@Lazy SendBotMessageService sendBotMessageService) {
+        return new AddUserCommand(sendBotMessageService);
+    }
+
+    @Bean
+    public StartCommand startCommand(@Lazy SendBotMessageService sendBotMessageService) {
+        return new StartCommand(sendBotMessageService);
     }
 
 }

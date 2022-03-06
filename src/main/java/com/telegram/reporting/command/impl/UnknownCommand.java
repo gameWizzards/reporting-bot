@@ -11,8 +11,8 @@ import static com.telegram.reporting.utils.TelegramUtils.currentChatId;
 public non-sealed class UnknownCommand implements Command {
 
     public static final String UNKNOWN_MESSAGE = """
-            test
-            test
+            Введена неверная команда.
+            Доступные команды: /start, /adduser
             """;
 
     private final SendBotMessageService sendBotMessageService;

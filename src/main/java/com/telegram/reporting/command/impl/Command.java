@@ -1,5 +1,8 @@
 package com.telegram.reporting.command.impl;
 
+import com.telegram.reporting.command.impl.AddUserCommand;
+import com.telegram.reporting.command.impl.StartCommand;
+import com.telegram.reporting.command.impl.UnknownCommand;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**

@@ -2,9 +2,7 @@ package com.telegram.reporting.command.impl;
 
 import com.telegram.reporting.command.annotation.AdminCommand;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.TelegramUtils;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
@@ -19,11 +17,9 @@ public non-sealed class AddUserCommand implements Command {
             """;
 
     private final SendBotMessageService sendBotMessageService;
-    private final TelegramUserService telegramUserService;
 
-    public AddUserCommand(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
+    public AddUserCommand(SendBotMessageService sendBotMessageService) {
         this.sendBotMessageService = sendBotMessageService;
-        this.telegramUserService = telegramUserService;
     }
 
     @Override
