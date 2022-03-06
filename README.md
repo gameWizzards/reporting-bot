@@ -14,7 +14,7 @@ docker-compose -f docker-compose-test.yml up -d
 2. Configure and run Spring Boot Application:
 
 - Setup two env vars: `bot.token=${BOT_TOKEN};bot.username=${BOT_USERNAME}`
-- Add VM Options: `-Dspring.profiles.active=test `
+- Add VM Options: `-Dspring.profiles.active=test`
 
 With these configurations - run SpringBoot main method.
 

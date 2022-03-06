@@ -5,7 +5,9 @@ import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -15,8 +17,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 public non-sealed class StartCommand implements Command {
 
     public final static String START_MESSAGE = """
-            Окей.
-            Давай создадим отчет за сегодня.
+            Добро пожаловать!
+            Нажмите на кнопку ниже чтобы верифицировать вас как сотрудника.
             """;
 
     private final SendBotMessageService sendBotMessageService;
@@ -38,10 +40,10 @@ public non-sealed class StartCommand implements Command {
         SendMessage message = new SendMessage();
         message.setChatId(TelegramUtils.currentChatId(update).toString());
         message.setText(START_MESSAGE);
-        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT.text(), Message.DELETE_REPORT.text());
 
-        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
+        KeyboardRow shareContact = KeyboardUtils.createButton("Поделится номером телефона");
+        shareContact.get(0).setRequestContact(true);
+        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(shareContact));
     }
 
 }

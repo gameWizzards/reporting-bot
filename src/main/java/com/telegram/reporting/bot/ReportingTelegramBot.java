@@ -1,6 +1,11 @@
 package com.telegram.reporting.bot;
 
+import com.telegram.reporting.command.CommandContainer;
+import com.telegram.reporting.command.impl.StartCommand;
+import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
+import com.telegram.reporting.service.SendBotMessageService;
+import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.TelegramUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -17,20 +22,30 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
     private String token;
 
     private final DialogRouterService dialogRouterService;
+    private final TelegramUserService telegramUserService;
+    private final CommandContainer commandContainer;
 
-    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService) {
+    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService, TelegramUserService telegramUserService, CommandContainer commandContainer) {
         this.dialogRouterService = dialogRouterService;
+        this.telegramUserService = telegramUserService;
+        this.commandContainer = commandContainer;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
+        if (update.getMessage().hasContact()) {
+            User user = telegramUserService.verifyContact(update.getMessage());
+            if (user == null) {
+                throw new RuntimeException("TODO");
+            }
+            dialogRouterService.startFlow(user);
+            return;
+        }
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String message = update.getMessage().getText().trim();
-            String username = update.getMessage().getFrom().getUserName();
+            String message = TelegramUtils.getMessage(update);
+
             if (message.startsWith(TelegramUtils.COMMAND_PREFIX)) {
-                String commandIdentifier = getCommandIdentifier(message);
-                dialogRouterService.handleBeginningBotDialog(commandIdentifier, username, update);
-//                commandContainer.findCommand(commandIdentifier, username).execute(update);
+                commandContainer.findCommand(TelegramUtils.getCommandIdentifier(message), update.getMessage().getFrom().getUserName()).execute(update);
             } else {
                 dialogRouterService.handleTelegramUpdateEvent(update);
             }
@@ -45,10 +60,6 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return token;
-    }
-
-    private String getCommandIdentifier(String message) {
-        return message.split(" ")[0].toLowerCase();
     }
 
 }

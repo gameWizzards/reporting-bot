@@ -2,6 +2,7 @@ package com.telegram.reporting.service;
 
 import com.telegram.reporting.repository.entity.User;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,4 +28,6 @@ public interface TelegramUserService {
     Optional<User> findByChatId(Long chatId);
 
     List<User> findAll();
+
+    User verifyContact(Message message);
 }

@@ -3,7 +3,7 @@ package com.telegram.reporting.command;
 import com.telegram.reporting.command.annotation.AdminCommand;
 import com.telegram.reporting.command.impl.Command;
 import com.telegram.reporting.command.impl.StartCommand;
-import com.telegram.reporting.command.impl.StopCommand;
+import com.telegram.reporting.command.impl.AddUserCommand;
 import com.telegram.reporting.command.impl.UnknownCommand;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
@@ -21,7 +21,7 @@ import static java.util.Objects.nonNull;
  * Container of the {@link Command}s, which are using for handling telegram commands.
  */
 public class CommandContainer {
-    @Value("#{'${bot.admins}'.split(',')}")
+    @Value("${bot.admins}")
     private List<String> admins;
     private final Map<String, Command> commandMap;
     private final Command unknownCommand;
@@ -29,7 +29,7 @@ public class CommandContainer {
     public CommandContainer(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
         commandMap = Stream.of(
                 new StartCommand(sendBotMessageService, telegramUserService),
-                new StopCommand(sendBotMessageService, telegramUserService)
+                new AddUserCommand(sendBotMessageService, telegramUserService)
         ).collect(Collectors.toUnmodifiableMap(Command::alias, Function.identity()));
 
         unknownCommand = new UnknownCommand(sendBotMessageService);

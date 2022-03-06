@@ -104,4 +104,11 @@
         />
     </changeSet>
 
+    <changeSet author="miha_phoenix" id="drop user notNull constraints">
+        <dropNotNullConstraint tableName="user" columnName="name"/>
+        <dropNotNullConstraint tableName="user" columnName="surname"/>
+        <dropNotNullConstraint tableName="user" columnName="chat_id"/>
+        <dropNotNullConstraint tableName="user" columnName="phone"/>
+    </changeSet>
+
 </databaseChangeLog>

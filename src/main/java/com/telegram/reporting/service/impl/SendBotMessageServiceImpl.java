@@ -24,11 +24,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class SendBotMessageServiceImpl implements SendBotMessageService {
 
     private final ReportingTelegramBot reportingTelegramBot;
-    private final CommandContainer commandContainer;
 
     public SendBotMessageServiceImpl(TelegramUserService telegramUserService, ReportingTelegramBot reportingTelegramBot) {
         this.reportingTelegramBot = reportingTelegramBot;
-        this.commandContainer = new CommandContainer(this, telegramUserService);
     }
 
     @SneakyThrows
@@ -70,8 +68,4 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         sendMessage(String.valueOf(chatId), messages);
     }
 
-    @Override
-    public void sendCommand(String commandIdentifier, String username, Update update) {
-        commandContainer.findCommand(commandIdentifier, username).execute(update);
-    }
 }

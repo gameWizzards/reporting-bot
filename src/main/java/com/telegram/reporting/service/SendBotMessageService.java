@@ -35,5 +35,4 @@ public interface SendBotMessageService {
 
     void sendMessage(String chatId, List<String> message);
 
-    void sendCommand(String commandIdentifier, String username, Update update);
 }

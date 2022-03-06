@@ -1,5 +1,6 @@
 package com.telegram.reporting.utils;
 
+import com.telegram.reporting.command.impl.StartCommand;
 import org.springframework.statemachine.StateContext;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -32,5 +33,9 @@ public class TelegramUtils {
      */
     public static String getMessage(Update update) {
         return update.getMessage().getText().trim();
+    }
+
+    public static String getCommandIdentifier(String message) {
+        return message.split(" ")[0].toLowerCase();
     }
 }

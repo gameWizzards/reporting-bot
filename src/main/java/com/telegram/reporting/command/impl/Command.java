@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  * Command interface for handling telegram-bot commands.
  */
 public sealed interface Command
-        permits StartCommand, StopCommand, UnknownCommand {
+        permits StartCommand, AddUserCommand, UnknownCommand {
 
     String alias();
 

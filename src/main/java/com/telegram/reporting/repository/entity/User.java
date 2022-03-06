@@ -23,13 +23,13 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "chat_id", nullable = false)
+    @Column(name = "chat_id")
     private Long chatId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "surname", nullable = false)
+    @Column(name = "surname")
     private String surname;
 
     @Column(name = "phone", nullable = false)
