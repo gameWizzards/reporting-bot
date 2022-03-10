@@ -126,4 +126,13 @@
                         newDataType="bigserial"/>
     </changeSet>
 
+    <changeSet id="add_autoincrement_category_id" author="cyberdyne_systems">
+        <addAutoIncrement schemaName="public"
+                          tableName="category"
+                          columnDataType="bigserial"
+                          columnName="id"
+                          incrementBy="1"
+                          startWith="1"/>
+    </changeSet>
+
 </databaseChangeLog>
