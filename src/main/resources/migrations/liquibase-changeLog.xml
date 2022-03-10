@@ -135,4 +135,14 @@
                           startWith="1"/>
     </changeSet>
 
+    <changeSet id="init_categories" author="cyberdyne_systems">
+        <sql dbms="postgresql">
+            INSERT INTO "public"."category" ("name", "description")
+            VALUES ('На складе', 'Подготовка заказа, изготвление декораций, прочее'),
+                   ('На заказе', 'Работы на объекте клиента '),
+                   ('На офисе', 'Работы связанные с деятельность пространства Серпантин'),
+                   ('На координации', 'Работа координатора на мероприятии');
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
