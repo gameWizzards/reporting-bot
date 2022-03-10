@@ -119,4 +119,11 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="change_category_id_type" author="cyberdyne_systems">
+        <modifyDataType schemaName="public"
+                        tableName="category"
+                        columnName="id"
+                        newDataType="bigserial"/>
+    </changeSet>
+
 </databaseChangeLog>
