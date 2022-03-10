@@ -111,4 +111,12 @@
         <dropNotNullConstraint tableName="user" columnName="phone"/>
     </changeSet>
 
+    <changeSet id="add_column_user_table" author="cyberdyne_systems">
+        <addColumn schemaName="public" tableName="user">
+            <column name="deleted" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

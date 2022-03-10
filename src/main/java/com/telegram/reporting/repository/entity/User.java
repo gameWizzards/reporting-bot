@@ -2,17 +2,17 @@ package com.telegram.reporting.repository.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
-/**
- * Telegram User entity.
- */
 @Data
 @Entity
 @Table(name = "user", schema = "public")
@@ -35,7 +35,12 @@ public class User {
     @Column(name = "phone", nullable = false)
     private String phone;
 
-    @OneToMany
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted;
+
+    @OneToMany(mappedBy = "user",
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Report> reports;
 
     public String getFullName() {
