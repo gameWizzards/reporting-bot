@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class HandleDateCategoryAction implements Action<CreateReportState, MessageEvent> {
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {
-        String reportCategoryType = (String) context.getExtendedState().getVariables().get(ContextVariable.MESSAGE.name());
-        context.getExtendedState().getVariables().put(ContextVariable.REPORT_CATEGORY_TYPE.name(), reportCategoryType);
+        String reportCategoryType = (String) context.getExtendedState().getVariables().get(ContextVariable.MESSAGE);
+        context.getExtendedState().getVariables().put(ContextVariable.REPORT_CATEGORY_TYPE, reportCategoryType);
     }
 }

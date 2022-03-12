@@ -2,12 +2,14 @@ package com.telegram.reporting.repository.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.boot.context.properties.bind.DefaultValue;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -20,6 +22,7 @@ import java.util.List;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -38,9 +41,10 @@ public class User {
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user",
-    fetch = FetchType.LAZY,
-    cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Report> reports;
 
     public String getFullName() {

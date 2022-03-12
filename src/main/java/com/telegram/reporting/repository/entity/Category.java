@@ -5,12 +5,11 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * Telegram User entity.
- */
 @Data
 @Entity
 @Table(name = "category", schema = "public")
@@ -18,6 +17,7 @@ import javax.persistence.Table;
 public class Category {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

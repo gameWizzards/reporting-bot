@@ -1,6 +1,7 @@
 package com.telegram.reporting.utils;
 
 import com.telegram.reporting.command.impl.StartCommand;
+import com.telegram.reporting.dialogs.ContextVariable;
 import org.springframework.statemachine.StateContext;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -22,7 +23,7 @@ public class TelegramUtils {
     }
 
     public static String currentChatId(StateContext context) {
-        return String.valueOf(context.getExtendedState().getVariables().get("chat_id"));
+        return String.valueOf(context.getExtendedState().getVariables().get(ContextVariable.CHAT_ID));
     }
 
     /**

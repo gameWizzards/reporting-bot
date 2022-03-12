@@ -145,4 +145,19 @@
         </sql>
     </changeSet>
 
+    <changeSet id="change_date_type_report" author="cyberdyne_systems">
+        <modifyDataType schemaName="public"
+                        tableName="report"
+                        columnName="date"
+                        newDataType="DATE"/>
+    </changeSet>
+
+    <changeSet id="change_column_name_timerecord" author="cyberdyne_systems">
+        <renameColumn schemaName="public" tableName="time_record" oldColumnName="description" newColumnName="note"/>
+    </changeSet>
+
+    <changeSet id="remove_unused_column" author="cyberdyne_systems">
+        <dropColumn schemaName="public" tableName="report" columnName="created"/>
+    </changeSet>
+
 </databaseChangeLog>

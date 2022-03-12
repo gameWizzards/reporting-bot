@@ -23,15 +23,9 @@ import java.util.Optional;
 public class DialogRouterServiceImpl implements DialogRouterService {
     private final Map<Long, StateMachineHandler> stateMachineHandlers;
 
-    //    @Autowired
-//    @Qualifier("CreateReportStateMachineHandler")
     private final StateMachineHandler createReportHandler;
-
-    //    @Autowired
-//    @Qualifier("DeleteReportStateMachineHandler")
-    private StateMachineHandler deleteReportHandler;
-
-    private SendBotMessageService sendBotMessageService;
+    private final StateMachineHandler deleteReportHandler;
+    private final SendBotMessageService sendBotMessageService;
 
     public DialogRouterServiceImpl(@Qualifier("CreateReportStateMachineHandler") StateMachineHandler createReportHandler,
                                    @Qualifier("DeleteReportStateMachineHandler") StateMachineHandler deleteReportHandler,
@@ -62,7 +56,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
     public final static String START_FLOW_MESSAGE = """
             Окей.
-            Давай создадим отчет за сегодня.
+            Выбери диалог.
             """;
 
     @Override

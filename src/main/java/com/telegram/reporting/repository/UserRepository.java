@@ -10,7 +10,7 @@ import java.util.Optional;
  * {@link Repository} for handling with {@link User} entity.
  */
 @Repository
-public interface TelegramUserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByPhone(String phoneNumber);
 

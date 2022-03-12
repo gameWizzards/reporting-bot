@@ -1,12 +1,15 @@
 package com.telegram.reporting.dialogs.create_report;
 
+import com.telegram.reporting.dialogs.SendDialogStartButtonsAction;
+import com.telegram.reporting.dialogs.create_report.action.DeclineSendReportAction;
 import com.telegram.reporting.dialogs.create_report.action.EndDialogAction;
 import com.telegram.reporting.dialogs.create_report.action.HandleDateCategoryAction;
 import com.telegram.reporting.dialogs.create_report.action.HandleUserDateInputAction;
 import com.telegram.reporting.dialogs.create_report.action.HandleUserNoteInputAction;
 import com.telegram.reporting.dialogs.create_report.action.HandleUserTimeInputAction;
+import com.telegram.reporting.dialogs.create_report.action.PrepareTimeRecordAction;
 import com.telegram.reporting.dialogs.create_report.action.RequestAdditionalReportAction;
-import com.telegram.reporting.dialogs.create_report.action.RequestConfirmationReport;
+import com.telegram.reporting.dialogs.create_report.action.RequestConfirmationReportAction;
 import com.telegram.reporting.dialogs.create_report.action.RequestInputDateAction;
 import com.telegram.reporting.dialogs.create_report.action.RequestInputNoteAction;
 import com.telegram.reporting.dialogs.create_report.action.RequestInputTimeAction;
@@ -30,7 +33,6 @@ import java.util.EnumSet;
 @EnableStateMachineFactory(name = "CreateReportDialogStateMachineFactory")
 public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<CreateReportState, MessageEvent> {
 
-
     private final RequestInputDateAction requestInputDateAction;
     private final HandleUserDateInputAction handleUserDateInputAction;
     private final SendCategoryButtonsAction sendCategoryButtonsAction;
@@ -38,10 +40,13 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
     private final RequestInputTimeAction requestInputTimeAction;
     private final HandleUserTimeInputAction handleUserTimeInputAction;
     private final RequestAdditionalReportAction requestAdditionalReportAction;
-    private final RequestConfirmationReport requestConfirmationReport;
+    private final RequestConfirmationReportAction requestConfirmationReportAction;
     private final EndDialogAction endDialogAction;
     private final RequestInputNoteAction requestInputNoteAction;
     private final HandleUserNoteInputAction handleUserNoteInputAction;
+    private final PrepareTimeRecordAction prepareTimeRecordAction;
+    private final SendDialogStartButtonsAction sendDialogStartButtonsAction;
+    private final DeclineSendReportAction declineSendReportAction;
 
     private final ValidateDateGuard validateDateGuard;
     private final ValidateTimeGuard validateTimeGuard;
@@ -49,15 +54,16 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
 
     @Autowired
     public CreateReportDialogStateMachineFactory(@Lazy RequestInputDateAction requestInputDateAction, @Lazy HandleUserDateInputAction handleUserDateInputAction,
-                                                 @Lazy SendCategoryButtonsAction sendCategoryButtonsAction,
-                                                 @Lazy HandleDateCategoryAction handleDateCategoryAction, @Lazy RequestInputTimeAction requestInputTimeAction,
-                                                  @Lazy HandleUserTimeInputAction handleUserTimeInputAction,
-                                                 @Lazy RequestAdditionalReportAction requestAdditionalReportAction, @Lazy RequestConfirmationReport requestConfirmationReport,
+                                                 @Lazy SendCategoryButtonsAction sendCategoryButtonsAction, @Lazy HandleDateCategoryAction handleDateCategoryAction,
+                                                 @Lazy RequestInputTimeAction requestInputTimeAction, @Lazy HandleUserTimeInputAction handleUserTimeInputAction,
+                                                 @Lazy RequestAdditionalReportAction requestAdditionalReportAction, @Lazy RequestConfirmationReportAction requestConfirmationReportAction,
                                                  @Lazy EndDialogAction endDialogAction, @Lazy RequestInputNoteAction requestInputNoteAction,
-                                                 @Lazy HandleUserNoteInputAction handleUserNoteInputAction,
+                                                 @Lazy HandleUserNoteInputAction handleUserNoteInputAction, @Lazy PrepareTimeRecordAction prepareTimeRecordAction,
+                                                 @Lazy SendDialogStartButtonsAction sendDialogStartButtonsAction, @Lazy DeclineSendReportAction declineSendReportAction,
 
                                                  @Lazy ValidateDateGuard validateDateGuard, @Lazy ValidateTimeGuard validateTimeGuard,
                                                  @Lazy ValidateNoteGuard validateNoteGuard) {
+
         this.requestInputDateAction = requestInputDateAction;
         this.handleUserDateInputAction = handleUserDateInputAction;
         this.sendCategoryButtonsAction = sendCategoryButtonsAction;
@@ -65,10 +71,13 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
         this.requestInputTimeAction = requestInputTimeAction;
         this.handleUserTimeInputAction = handleUserTimeInputAction;
         this.requestAdditionalReportAction = requestAdditionalReportAction;
-        this.requestConfirmationReport = requestConfirmationReport;
+        this.requestConfirmationReportAction = requestConfirmationReportAction;
         this.endDialogAction = endDialogAction;
         this.requestInputNoteAction = requestInputNoteAction;
         this.handleUserNoteInputAction = handleUserNoteInputAction;
+        this.prepareTimeRecordAction = prepareTimeRecordAction;
+        this.sendDialogStartButtonsAction = sendDialogStartButtonsAction;
+        this.declineSendReportAction = declineSendReportAction;
 
         this.validateDateGuard = validateDateGuard;
         this.validateTimeGuard = validateTimeGuard;
@@ -129,10 +138,9 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .target(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .guard(validateNoteGuard)
                 .action(handleUserNoteInputAction)
+                .action(prepareTimeRecordAction)
                 .action(requestAdditionalReportAction)
-                // TODO add step - "Additional info"
 
-//TODO add handling multi reporting
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.CONFIRM_ADDITIONAL_REPORT)
@@ -143,19 +151,21 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.DECLINE_ADDITIONAL_REPORT)
                 .target(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
-                .action(requestConfirmationReport)
+                .action(requestConfirmationReportAction)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.CONFIRM_CREATION_FINAL_REPORT)
                 .target(CreateReportState.END_DIALOG)
                 .action(endDialogAction)
+                .action(sendDialogStartButtonsAction)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.DECLINE_CREATION_FINAL_REPORT)
                 .target(CreateReportState.USER_DATE_INPUTTING)
-                .action(endDialogAction);
+                .action(declineSendReportAction)
+                .action(sendDialogStartButtonsAction);
 
 
         // Handling CANCEL button

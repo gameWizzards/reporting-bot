@@ -25,7 +25,7 @@ public class ValidateDateGuard implements Guard<CreateReportState, MessageEvent>
     @Override
     public boolean evaluate(StateContext<CreateReportState, MessageEvent> context) {
         String chatId = TelegramUtils.currentChatId(context);
-        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_DATE.name());
+        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_DATE);
 
         if (userInput.matches(".*\\d+.*")) {
             return true;

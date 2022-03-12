@@ -29,12 +29,12 @@ public class HandleUserNoteInputAction implements Action<CreateReportState, Mess
         String userMessage;
         Map<Object, Object> variables = context.getExtendedState().getVariables();
 
-        String userInput = (String) variables.get(ContextVariable.REPORT_NOTE.name());
-        String lastButtonText = (String) variables.get(ContextVariable.MESSAGE.name());
+        String userInput = (String) variables.get(ContextVariable.REPORT_NOTE);
+        String lastButtonText = (String) variables.get(ContextVariable.MESSAGE);
 
         if (Message.SKIP_NOTE.text().equals(lastButtonText)) {
             userMessage = "Вы создали отчет без примечания";
-            variables.put(ContextVariable.REPORT_NOTE.name(), note);
+            variables.put(ContextVariable.REPORT_NOTE, note);
         } else {
             userMessage = String.format("Примечание принято = \"%s\"", userInput);
         }

@@ -5,6 +5,7 @@ import com.telegram.reporting.dialogs.create_report.CreateReportState;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.messages.MessageEvent;
 import com.telegram.reporting.service.SendBotMessageService;
+import com.telegram.reporting.utils.DateTimeUtils;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;
@@ -12,7 +13,6 @@ import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class HandleUserDateInputAction implements Action<CreateReportState, Mess
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {
         final LocalDate localDate = LocalDate.now();
-        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_DATE.name());
+        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_DATE);
         //handle user input to date
         Integer[] parsedDate = parseUserInput(userInput);
         LocalDate reportDate = switch (parsedDate.length) {
@@ -39,10 +39,10 @@ public class HandleUserDateInputAction implements Action<CreateReportState, Mess
             default -> localDate;
         };
 
-        String formattedReportDate = reportDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        String formattedReportDate = DateTimeUtils.toDefaultFormat(reportDate);
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), List.of("Дата отчета принята = " + formattedReportDate, Message.SEPARATOR.text()));
         // сохранить дату в контекст
-        context.getExtendedState().getVariables().put(ContextVariable.REPORT_DATE.name(), formattedReportDate);
+        context.getExtendedState().getVariables().put(ContextVariable.REPORT_DATE, formattedReportDate);
     }
 
     private Integer[] parseUserInput(String userInput) {

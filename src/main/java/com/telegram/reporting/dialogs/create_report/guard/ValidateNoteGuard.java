@@ -24,8 +24,8 @@ public class ValidateNoteGuard implements Guard<CreateReportState, MessageEvent>
     public boolean evaluate(StateContext<CreateReportState, MessageEvent> context) {
         int minNoteLength = 5;
         String chatId = TelegramUtils.currentChatId(context);
-        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_NOTE.name());
-        String lastButtonText = (String) context.getExtendedState().getVariables().get(ContextVariable.MESSAGE.name());
+        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_NOTE);
+        String lastButtonText = (String) context.getExtendedState().getVariables().get(ContextVariable.MESSAGE);
         boolean isSkipNote = Message.SKIP_NOTE.text().equals(lastButtonText.trim());
 
         if (isSkipNote || (userInput != null && userInput.trim().length() >= minNoteLength)) {

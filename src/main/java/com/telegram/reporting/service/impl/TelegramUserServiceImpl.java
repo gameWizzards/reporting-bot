@@ -1,6 +1,6 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.repository.TelegramUserRepository;
+import com.telegram.reporting.repository.UserRepository;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.TelegramUserService;
 import org.springframework.stereotype.Service;
@@ -16,25 +16,25 @@ import java.util.Optional;
 @Service
 public class TelegramUserServiceImpl implements TelegramUserService {
 
-    private final TelegramUserRepository telegramUserRepository;
+    private final UserRepository userRepository;
 
-    public TelegramUserServiceImpl(TelegramUserRepository telegramUserRepository) {
-        this.telegramUserRepository = telegramUserRepository;
+    public TelegramUserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public void save(User user) {
-        telegramUserRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public Optional<User> findByChatId(Long chatId) {
-        return telegramUserRepository.findById(chatId);
+        return Optional.ofNullable(userRepository.findByChatId(chatId));
     }
 
     @Override
     public List<User> findAll() {
-        return telegramUserRepository.findAll();
+        return userRepository.findAll();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         }
         Contact contact = message.getContact();
 
-        User user = telegramUserRepository.findByPhone(contact.getPhoneNumber());
+        User user = userRepository.findByPhone(contact.getPhoneNumber());
         if (user == null) {
             return null;
         }
@@ -53,6 +53,6 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         user.setName(contact.getFirstName());
         user.setSurname(contact.getLastName());
 
-        return telegramUserRepository.save(user);
+        return userRepository.save(user);
     }
 }

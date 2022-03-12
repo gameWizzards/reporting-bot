@@ -41,7 +41,7 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
             case SKIP_NOTE -> MessageEvent.USER_NOTE_INPUT_VALIDATE;
             default -> null;
         };
-        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE.name(), message.text());
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, message.text());
         log.info("Current state = [{}]. Message = [{}] -> MessageEvent = [{}]", stateMachine.getState().getId(), message, messageEvent);
         stateMachine.sendEvent(messageEvent);
         log.info("Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
@@ -59,15 +59,15 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
 
         switch (currentState) {
             case USER_DATE_INPUTTING -> {
-                variables.put(ContextVariable.REPORT_DATE.name(), userInput);
+                variables.put(ContextVariable.REPORT_DATE, userInput);
                 messageEvent = MessageEvent.USER_DATE_INPUT_VALIDATE;
             }
             case USER_TIME_INPUTTING -> {
-                variables.put(ContextVariable.REPORT_TIME.name(), userInput);
+                variables.put(ContextVariable.REPORT_TIME, userInput);
                 messageEvent = MessageEvent.USER_TIME_INPUT_VALIDATE;
             }
             case USER_NOTE_INPUTTING -> {
-                variables.put(ContextVariable.REPORT_NOTE.name(), userInput);
+                variables.put(ContextVariable.REPORT_NOTE, userInput);
                 messageEvent = MessageEvent.USER_NOTE_INPUT_VALIDATE;
             }
         }
@@ -82,7 +82,7 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
     @Override
     public StateMachineHandler initStateMachine(Long chatId) {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachineFactory.getStateMachine();
-        stateMachine.getExtendedState().getVariables().put("chat_id", chatId);
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.CHAT_ID, chatId);
         stateMachines.put(chatId, stateMachine);
         return this;
     }

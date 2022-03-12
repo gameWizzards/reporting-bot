@@ -24,7 +24,7 @@ public class RequestInputTimeAction implements Action<CreateReportState, Message
 
     @Override
     public void execute(StateContext<CreateReportState, MessageEvent> context) {
-        String reportCategoryType =  (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_CATEGORY_TYPE.name());
+        String reportCategoryType =  (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_CATEGORY_TYPE);
         String userMessageCategoryAccepted = String.format("Вы выбрали категорию отчета - \"%s\". Категория принята.", reportCategoryType);
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), List.of(userMessageCategoryAccepted, Message.USER_TIME_INPUT.text()));
     }
