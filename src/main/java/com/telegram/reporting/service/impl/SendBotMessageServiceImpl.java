@@ -25,7 +25,7 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
 
     private final ReportingTelegramBot reportingTelegramBot;
 
-    public SendBotMessageServiceImpl(TelegramUserService telegramUserService, ReportingTelegramBot reportingTelegramBot) {
+    public SendBotMessageServiceImpl(ReportingTelegramBot reportingTelegramBot) {
         this.reportingTelegramBot = reportingTelegramBot;
     }
 
