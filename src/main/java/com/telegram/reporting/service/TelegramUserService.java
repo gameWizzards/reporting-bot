@@ -17,7 +17,7 @@ public interface TelegramUserService {
      *
      * @param user provided telegram user.
      */
-    void save(User user);
+    User save(User user);
 
     /**
      * Find {@link User} by chatId.

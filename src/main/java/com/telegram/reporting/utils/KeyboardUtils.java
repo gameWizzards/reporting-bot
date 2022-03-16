@@ -1,6 +1,7 @@
 package com.telegram.reporting.utils;
 
 import com.telegram.reporting.messages.Message;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -37,6 +38,21 @@ public class KeyboardUtils {
         replyKeyboardMarkup.setOneTimeKeyboard(false);
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         return replyKeyboardMarkup;
+    }
+
+    public static SendMessage createRootMenuMessage(String chatId) {
+        Objects.requireNonNull(chatId, "Can't create root menu buttons! ChatId is required");
+        final String startFlowMessage = """
+                Окей.
+                Выбери диалог.
+                """;
+
+        SendMessage sendMessage = new SendMessage(chatId, startFlowMessage);
+        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT_START_MESSAGE.text());
+        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT_START_MESSAGE.text(), Message.DELETE_REPORT_START_MESSAGE.text());
+        sendMessage.setReplyMarkup(KeyboardUtils.createKeyboardMarkup(false, firstRow, secondRow));
+
+        return sendMessage;
     }
 // TODO implement configured keys generator
 

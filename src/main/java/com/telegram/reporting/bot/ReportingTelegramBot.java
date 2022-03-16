@@ -1,10 +1,9 @@
 package com.telegram.reporting.bot;
 
 import com.telegram.reporting.command.CommandContainer;
-import com.telegram.reporting.command.impl.StartCommand;
+import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.TelegramUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +35,7 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
         if (update.getMessage().hasContact()) {
             User user = telegramUserService.verifyContact(update.getMessage());
             if (user == null) {
-                throw new RuntimeException("TODO");
+                throw new TelegramUserException(String.format("This user is not registered yet! Phone = +%s. ChatId = %s.", update.getMessage().getContact().getPhoneNumber(), TelegramUtils.currentChatId(update)));
             }
             dialogRouterService.startFlow(user.getChatId().toString());
             return;

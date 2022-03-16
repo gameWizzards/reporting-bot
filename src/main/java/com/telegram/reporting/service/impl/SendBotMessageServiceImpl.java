@@ -1,13 +1,10 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.bot.ReportingTelegramBot;
-import com.telegram.reporting.command.CommandContainer;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
@@ -29,11 +26,17 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         this.reportingTelegramBot = reportingTelegramBot;
     }
 
+    @Override
     @SneakyThrows
+    public void sendMessageWithKeys(SendMessage message) {
+        reportingTelegramBot.execute(message);
+    }
+
+    @Override
     public void sendMessageWithKeys(SendMessage message, ReplyKeyboardMarkup keyboardMarkup) {
         Objects.requireNonNull(keyboardMarkup, "Keyboard markup is require!");
         message.setReplyMarkup(keyboardMarkup);
-        reportingTelegramBot.execute(message);
+        sendMessageWithKeys(message);
     }
 
     @Override

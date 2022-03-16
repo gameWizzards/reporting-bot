@@ -2,7 +2,6 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.messages.Message;
-import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.KeyboardUtils;
@@ -10,9 +9,7 @@ import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,10 +50,10 @@ public class DialogRouterServiceImpl implements DialogRouterService {
                 createStateMachineHandler(chatId, message);
             }
 
-            if (Message.MAIN_MENU.equals(message)){
+            if (Message.MAIN_MENU.equals(message)) {
                 startFlow(chatId.toString());
             }
-                stateMachineHandlers.get(chatId).handleMessage(chatId, message);
+            stateMachineHandlers.get(chatId).handleMessage(chatId, message);
         } else {
             stateMachineHandlers.get(chatId).handleUserInput(chatId, input);
         }
@@ -64,13 +61,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
     @Override
     public void startFlow(String chatId) {
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(START_FLOW_MESSAGE);
-
-        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT_START_MESSAGE.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT_START_MESSAGE.text(), Message.DELETE_REPORT_START_MESSAGE.text());
-        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(false, firstRow, secondRow));
+        sendBotMessageService.sendMessageWithKeys(KeyboardUtils.createRootMenuMessage(chatId));
     }
 
     private StateMachineHandler createStateMachineHandler(Long chatId, Message message) {
