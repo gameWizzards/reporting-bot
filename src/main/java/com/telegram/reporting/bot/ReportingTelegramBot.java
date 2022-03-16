@@ -38,7 +38,7 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
             if (user == null) {
                 throw new RuntimeException("TODO");
             }
-            dialogRouterService.startFlow(user);
+            dialogRouterService.startFlow(user.getChatId().toString());
             return;
         }
         if (update.hasMessage() && update.getMessage().hasText()) {

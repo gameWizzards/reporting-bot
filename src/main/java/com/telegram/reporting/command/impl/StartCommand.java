@@ -36,7 +36,7 @@ public non-sealed class StartCommand implements Command {
 
         KeyboardRow shareContact = KeyboardUtils.createButton("Поделится номером телефона");
         shareContact.get(0).setRequestContact(true);
-        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(shareContact));
+        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(false, shareContact));
     }
 
 }

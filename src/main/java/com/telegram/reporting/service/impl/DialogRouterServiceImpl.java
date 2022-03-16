@@ -21,6 +21,10 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class DialogRouterServiceImpl implements DialogRouterService {
+    public final static String START_FLOW_MESSAGE = """
+            Окей.
+            Выбери диалог.
+            """;
     private final Map<Long, StateMachineHandler> stateMachineHandlers;
 
     private final StateMachineHandler createReportHandler;
@@ -48,26 +52,25 @@ public class DialogRouterServiceImpl implements DialogRouterService {
             if (Message.startMessages().contains(message)) {
                 createStateMachineHandler(chatId, message);
             }
-            stateMachineHandlers.get(chatId).handleMessage(chatId, message);
+
+            if (Message.MAIN_MENU.equals(message)){
+                startFlow(chatId.toString());
+            }
+                stateMachineHandlers.get(chatId).handleMessage(chatId, message);
         } else {
             stateMachineHandlers.get(chatId).handleUserInput(chatId, input);
         }
     }
 
-    public final static String START_FLOW_MESSAGE = """
-            Окей.
-            Выбери диалог.
-            """;
-
     @Override
-    public void startFlow(User user) {
+    public void startFlow(String chatId) {
         SendMessage message = new SendMessage();
-        message.setChatId(user.getChatId().toString());
+        message.setChatId(chatId);
         message.setText(START_FLOW_MESSAGE);
 
-        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT.text(), Message.DELETE_REPORT.text());
-        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
+        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT_START_MESSAGE.text());
+        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT_START_MESSAGE.text(), Message.DELETE_REPORT_START_MESSAGE.text());
+        sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(false, firstRow, secondRow));
     }
 
     private StateMachineHandler createStateMachineHandler(Long chatId, Message message) {
@@ -77,8 +80,8 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
     private StateMachineHandler getStateMachineHandler(Long chatId, Message message) {
         return switch (message) {
-            case CREATE_REPORT -> createReportHandler.initStateMachine(chatId);
-            case DELETE_REPORT -> deleteReportHandler.initStateMachine(chatId);
+            case CREATE_REPORT_START_MESSAGE -> createReportHandler.initStateMachine(chatId);
+            case DELETE_REPORT_START_MESSAGE -> deleteReportHandler.initStateMachine(chatId);
             default -> null;
         };
     }

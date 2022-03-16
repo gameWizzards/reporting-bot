@@ -29,7 +29,7 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
     public void handleMessage(Long chatId, Message message) {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
         MessageEvent messageEvent = switch (message) {
-            case CREATE_REPORT -> MessageEvent.CREATE_REPORT_EVENT;
+            case CREATE_REPORT_START_MESSAGE -> MessageEvent.CREATE_REPORT_EVENT;
             case REPORT_CATEGORY_ON_STORAGE,
                     REPORT_CATEGORY_ON_ORDER,
                     REPORT_CATEGORY_ON_OFFICE,

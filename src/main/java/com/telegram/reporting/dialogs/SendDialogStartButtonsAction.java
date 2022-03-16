@@ -30,9 +30,9 @@ public class SendDialogStartButtonsAction implements Action<CreateReportState, M
     public void execute(StateContext<CreateReportState, MessageEvent> context) {
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), START_FLOW_MESSAGE);
 
-        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT.text(), Message.DELETE_REPORT.text());
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
+        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT_START_MESSAGE.text());
+        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT_START_MESSAGE.text(), Message.DELETE_REPORT_START_MESSAGE.text());
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow, secondRow));
 
     }
 }

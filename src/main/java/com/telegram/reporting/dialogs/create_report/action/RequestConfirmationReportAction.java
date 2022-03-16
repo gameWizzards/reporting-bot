@@ -56,7 +56,7 @@ public class RequestConfirmationReportAction implements Action<CreateReportState
 
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.CONFIRM_CREATION_FINAL_REPORT.text(), Message.DECLINE_CREATION_FINAL_REPORT.text());
 
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(firstRow));
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
     }
 
     private String convertTimeRecordToMessage(TimeRecordTO timeRecordTO) {

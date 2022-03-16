@@ -28,6 +28,6 @@ public class SendCategoryButtonsAction implements Action<CreateReportState, Mess
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.REPORT_CATEGORY_ON_STORAGE.text(), Message.REPORT_CATEGORY_ON_ORDER.text());
         KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.REPORT_CATEGORY_ON_OFFICE.text(), Message.REPORT_CATEGORY_ON_COORDINATION.text());
 
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(firstRow, secondRow));
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow, secondRow));
     }
 }

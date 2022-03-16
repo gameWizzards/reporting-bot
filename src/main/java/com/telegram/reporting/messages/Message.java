@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 public enum Message {
-    CREATE_REPORT("Создать отчет"),
+    CREATE_REPORT_START_MESSAGE("Создать отчет"),
 
     USER_DATE_INPUT("Введите дату для создния отчета (Допустимо - день, день.месяц, день.месяц.год)"),
 
@@ -32,7 +32,9 @@ public enum Message {
 
     SEPARATOR(".\n[º_º]\b-\bREPORTING BOT\b-\b[º_º]\n."),
 
-    DELETE_REPORT("Удалить отчет"), UPDATE_REPORT("Изменить отчет")
+    DELETE_REPORT_START_MESSAGE("Удалить отчет"), UPDATE_REPORT_START_MESSAGE("Изменить отчет"),
+
+    MAIN_MENU("Главное меню")
     ;
     private final String text;
 
@@ -47,7 +49,7 @@ public enum Message {
     }
 
     public static List<Message> startMessages() {
-        return Arrays.asList(CREATE_REPORT, DELETE_REPORT, UPDATE_REPORT);
+        return Arrays.asList(CREATE_REPORT_START_MESSAGE, DELETE_REPORT_START_MESSAGE, UPDATE_REPORT_START_MESSAGE);
     }
 
     public String text() {

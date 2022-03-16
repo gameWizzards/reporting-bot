@@ -38,7 +38,8 @@ class JsonUtilsTest {
     void deserializeListItems_inputValidData() {
         String json = """
                 [{"id":null,"hours":2,"created":"08-03-2022 17:47:23","note":"Time record note","category":{"name":"Category name","description":"Category description"}},
-                {"id":null,"hours":4,"created":"09-03-2022 12:20:20","note":"Second time record note ","category":{"name":"Second category name","description":"Second category description"}}]
+                {"id":null,"hours":4,"created":"09-03-2022 12:20:20","note":"Second time record note ","category":{"name":"Second category name","description":"Second category description"}}
+                ]
                 """;
         List<TimeRecordTO> listItems = JsonUtils.deserializeListItems(json, TimeRecordTO.class);
         TimeRecordTO timeRecordTO = listItems.get(0);

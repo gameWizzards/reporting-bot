@@ -44,7 +44,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         }
         Contact contact = message.getContact();
 
-        User user = userRepository.findByPhone(contact.getPhoneNumber());
+        User user = userRepository.findByPhone(contact.getPhoneNumber().replaceAll(" ", ""));
         if (user == null) {
             return null;
         }

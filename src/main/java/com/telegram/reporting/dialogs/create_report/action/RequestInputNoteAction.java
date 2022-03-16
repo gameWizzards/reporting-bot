@@ -27,6 +27,6 @@ public class RequestInputNoteAction implements Action<CreateReportState, Message
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.REQUEST_ADD_NOTE_REPORT.text());
         KeyboardRow row = KeyboardUtils.createRowButtons(Message.SKIP_NOTE.text());
 
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(row));
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, row));
     }
 }
