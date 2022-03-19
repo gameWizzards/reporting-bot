@@ -40,7 +40,6 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     }
 
     @Override
-    @SneakyThrows
     public void sendMessage(Long chatId, String message) {
         sendMessage(String.valueOf(chatId), message);
     }

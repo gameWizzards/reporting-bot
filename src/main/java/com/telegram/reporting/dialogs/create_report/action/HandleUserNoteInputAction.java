@@ -11,7 +11,6 @@ import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -39,6 +38,6 @@ public class HandleUserNoteInputAction implements Action<CreateReportState, Mess
             userMessage = String.format("Примечание принято = \"%s\"", userInput);
         }
 
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), List.of(userMessage, Message.SEPARATOR.text()));
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), userMessage);
     }
 }

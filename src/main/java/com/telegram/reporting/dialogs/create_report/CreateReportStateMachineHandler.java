@@ -43,7 +43,8 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
         };
         stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, message.text());
         log.info("Current state = [{}]. Message = [{}] -> MessageEvent = [{}]", stateMachine.getState().getId(), message, messageEvent);
-        stateMachine.sendEvent(messageEvent);
+        Optional.ofNullable(messageEvent)
+                .ifPresent(stateMachine::sendEvent);
         log.info("Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
     }
 

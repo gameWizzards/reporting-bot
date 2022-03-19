@@ -40,7 +40,7 @@ public class HandleUserDateInputAction implements Action<CreateReportState, Mess
         };
 
         String formattedReportDate = DateTimeUtils.toDefaultFormat(reportDate);
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), List.of("Дата отчета принята = " + formattedReportDate, Message.SEPARATOR.text()));
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Дата отчета принята = " + formattedReportDate);
         // сохранить дату в контекст
         context.getExtendedState().getVariables().put(ContextVariable.REPORT_DATE, formattedReportDate);
     }

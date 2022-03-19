@@ -24,6 +24,10 @@ public class KeyboardUtils {
         return button;
     }
 
+    public static ReplyKeyboardMarkup createMainMenuButtonMarkup() {
+        return createKeyboardMarkup(true, new KeyboardRow());
+    }
+
     public static ReplyKeyboardMarkup createKeyboardMarkup(boolean addMainMenuButton, KeyboardRow... rows) {
         Objects.requireNonNull(rows, "Can't create keyboard markup without keyboard rows");
         List<KeyboardRow> keyboardRows = new ArrayList<>(List.of(rows));
