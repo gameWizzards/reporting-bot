@@ -54,7 +54,7 @@ public class EndDialogAction implements Action<CreateReportState, MessageEvent> 
         Optional<User> user = telegramUserService.findByChatId(chatId);
 
         Report report = new Report();
-        report.setDate(DateTimeUtils.parseLocalDate(date));
+        report.setDate(DateTimeUtils.parseDefaultDate(date));
         report.setUser(user.orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = " + chatId)));
 
         report.setTimeRecords(convertToTimeRecordEntities(timeRecordJson, report));

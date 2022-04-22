@@ -3,45 +3,52 @@ package com.telegram.reporting.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.telegram.reporting.exception.HandleTimeRecordException;
+import com.telegram.reporting.exception.JsonUtilsException;
+import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
     public static String serializeItem(Object item) {
-        if (item == null) {
-            return "";
-        }
-        try {
-            return mapper.writeValueAsString(item);
-        } catch (JsonProcessingException e) {
-            throw new HandleTimeRecordException(e.getMessage(), e.getCause());
-        }
-    }
-
-    public static <T> T deserializeItem(String item, Class<T> clazz) {
         try {
             if (item == null) {
-                return clazz.getDeclaredConstructor().newInstance();
+                throw new NullPointerException("Can't serialize NULL");
             }
-            return mapper.readValue(item, clazz);
-        } catch (JsonProcessingException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new HandleTimeRecordException(e.getMessage(), e.getCause());
+
+            return mapper.writeValueAsString(item);
+        } catch (JsonProcessingException | NullPointerException e) {
+            throw new JsonUtilsException(e.getMessage(), e.getCause());
         }
     }
 
-    public static <T> List<T> deserializeListItems(String item, Class<T> clazz) {
-        if (item == null) {
-            return new ArrayList<>();
-        }
+    public static <T> T deserializeItem(String json, Class<T> clazz) {
         try {
-            return mapper.readValue(item, TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
-        } catch (JsonProcessingException e) {
-            throw new HandleTimeRecordException(e.getMessage(), e.getCause());
+            checkInputBeforeDeserialize(json, clazz);
+
+            return mapper.readValue(json, clazz);
+        } catch (JsonProcessingException | NullPointerException e) {
+            throw new JsonUtilsException(e.getMessage(), e.getCause());
+        }
+    }
+
+    public static <T> List<T> deserializeListItems(String json, Class<T> clazz) {
+        try {
+            checkInputBeforeDeserialize(json, clazz);
+
+            return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
+        } catch (JsonProcessingException | NullPointerException e) {
+            throw new JsonUtilsException(e.getMessage(), e.getCause());
+        }
+    }
+
+    private static <T> void checkInputBeforeDeserialize(String json, Class<T> clazz) {
+        if (StringUtils.isBlank(json)) {
+            throw new NullPointerException("Can't deserialize json without value");
+        }
+        if (clazz == null) {
+            throw new NullPointerException("Can't deserialize json without class type. Json: " + json);
         }
     }
 }
