@@ -1,0 +1,22 @@
+# DB configurations:
+spring:
+  datasource:
+    url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/reporting?sslmode=require
+    driver-class-name: org.postgresql.Driver
+    username: ${BOT_DB_USERNAME}
+    password: ${BOT_DB_PASSWORD}
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+  liquibase:
+    change-log: classpath:/migrations/liquibase-changeLog.xml
+  date:
+    redis:
+      repositories:
+        enabled: false
+
+# TelegramBot configurations:
+bot:
+  username: ${BOT_USERNAME}
+  token: ${BOT_TOKEN}
+  admins: miha_phoenix,Markovskyi_Serhii
