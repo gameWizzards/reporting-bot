@@ -20,3 +20,10 @@ bot:
   username: ${BOT_USERNAME}
   token: ${BOT_TOKEN}
   admins: miha_phoenix,Markovskyi_Serhii
+
+---
+
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/${BOT_DB_NAME}
