@@ -1,6 +1,7 @@
 package com.telegram.reporting.utils;
 
 import com.telegram.reporting.messages.Message;
+import org.apache.commons.lang3.Validate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -9,16 +10,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class KeyboardUtils {
 
     public static KeyboardRow createButton(String name) {
-        Objects.requireNonNull(name, "Can't create button without name");
+        Validate.notBlank(name, "Can't create button without name");
         return createRowButtons(name);
     }
 
     public static KeyboardRow createRowButtons(String... names) {
-        Objects.requireNonNull(names, "Can't create row of buttons without names");
+        Validate.noNullElements(names, "Can't create row of buttons. Array of names contains NULL element");
+        Stream.of(names).forEach(name -> Validate.notBlank(name, "Can't create row of button. There is no name for the button"));
         KeyboardRow button = new KeyboardRow();
         button.addAll(Arrays.asList(names));
         return button;
