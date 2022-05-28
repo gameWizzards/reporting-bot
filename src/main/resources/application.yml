@@ -22,7 +22,7 @@ bot:
   admins: miha_phoenix,Markovskyi_Serhii
 
 ---
-
+# Dev profile without sslMode
 spring:
   profiles: dev
   datasource:
