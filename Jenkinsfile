@@ -22,11 +22,6 @@ pipeline {
                 sshCommand remote: remote, command: "mvn package -DskipTests -f $TESTDIR/$APPDIR"
             }
         }
-        stage('Sonarqube_analyzing') {
-            steps{
-                echo 'Here will be to do a static code analyze with the Sonarqube analyzer'
-            }
-        }
         stage('Unit_tests') {
             steps {
                 sshCommand remote: remote, command: "mvn test -f $TESTDIR/$APPDIR"
