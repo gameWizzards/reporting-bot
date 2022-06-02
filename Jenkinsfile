@@ -28,7 +28,7 @@ pipeline {
             }
 
         }
-        stage('Integrational_tests') {
+        stage('Integration_tests') {
             steps{
                 echo "Doesn't have integration tests"
             }
