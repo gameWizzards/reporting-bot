@@ -1,6 +1,9 @@
 def remote = [name: 'reporting-bot', host: 'reporting-bot', user: 'root', password: 'ssh-passwd', allowAnyHosts: true]
 pipeline {
     agent any
+     options {
+        skipDefaultCheckout true
+      }
     environment {
         BUILDDIR = "/var/reporting-bot"
         WORKDIR = "${BUILDDIR}/workdir"
