@@ -1,4 +1,4 @@
-def remote = [name: 'reporting-bot', host: 'reporting-bot', user: 'root', password: 'ssh-passwd', allowAnyHosts: true]
+def remote = [name: 'reporting-bot', host: '139.59.174.8', user: 'reporting-bot', password: '123456', allowAnyHosts: true]
 pipeline {
     agent any
      options {
@@ -15,19 +15,20 @@ pipeline {
     stages{
         stage('Checkout') {
             steps{
-                sshCommand remote: remote, command: "mkdir -p $TESTDIR"
-                sshCommand remote: remote, command: "rm -rf $TESTDIR/*"
-                sshCommand remote: remote, command: "cd $TESTDIR/;  git clone -b master https://github.com/gameWizzards/reporting-bot.git"
+                sshCommand remote: remote, command: "docker exec reporting-bot mkdir -p $TESTDIR"
+                sshCommand remote: remote, command: "docker exec reporting-bot rm -rf $TESTDIR/$APPDIR/"
+                sshCommand remote: remote, command: "docker exec reporting-bot mkdir $TESTDIR/$APPDIR/"
+                sshCommand remote: remote, command: "docker exec reporting-bot git clone -b master https://github.com/gameWizzards/reporting-bot.git $TESTDIR/$APPDIR/"
             }
         }
         stage('Build') {
             steps{
-                sshCommand remote: remote, command: "mvn package -DskipTests -f $TESTDIR/$APPDIR"
+                sshCommand remote: remote, command: "docker exec reporting-bot mvn package -DskipTests -f $TESTDIR/$APPDIR"
             }
         }
         stage('Unit_tests') {
             steps {
-                sshCommand remote: remote, command: "mvn test -f $TESTDIR/$APPDIR"
+                sshCommand remote: remote, command: "docker exec reporting-bot mvn test -f $TESTDIR/$APPDIR"
             }
 
         }
@@ -38,10 +39,10 @@ pipeline {
         }
         stage('Deploy') {
             steps{
-                sshCommand remote: remote, command: "mkdir -p $WORKDIR"
-                sshCommand remote: remote, command: "cp $TESTDIR/$APPDIR/target/$APPNAME $WORKDIR/"
-                sshCommand remote: remote, command: "ps -ef | grep java | grep -v grep | awk '{print \$2}' | xargs -r kill"
-                sshCommand remote: remote, command: "java -Dspring.profiles.active=$SPRING_PROFILE -jar $WORKDIR/$APPNAME >/dev/null 2>&1 &"
+                sshCommand remote: remote, command: "docker exec reporting-bot mkdir -p $WORKDIR"
+                sshCommand remote: remote, command: "docker exec reporting-bot cp $TESTDIR/$APPDIR/target/$APPNAME $WORKDIR/"
+                sshCommand remote: remote, command: "docker exec reporting-bot ps -ef | grep java | grep -v grep | awk '{print \$2}' | docker exec -i reporting-bot xargs -r kill"
+                sshCommand remote: remote, command: "docker exec reporting-bot java -Dspring.profiles.active=$SPRING_PROFILE -jar $WORKDIR/$APPNAME >/dev/null 2>&1 &"
             }
         }
     }
