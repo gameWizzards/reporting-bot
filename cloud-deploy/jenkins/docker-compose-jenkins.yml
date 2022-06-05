@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  jenkins:
+    image: jenkins-bo
+    container_name: jenkins
+    hostname: jenkins
+    restart: unless-stopped
+    tty: true
+    environment:
+      DOCKER_CERT_PATH: "/certs/client"
+      DOCKER_TLS_VERIFY: 1
+      TZ: Europe/Kiev
+    ports:
+      - "8008:8080"
+      - "50000:50000"
+    volumes:
+      - /home/jenkins/volume/jenkins_home:/var/jenkins_home
+      - /home/jenkins/volume/certs:/certs/client:ro
+    networks:
+      - reporting-bot-network
+
+networks:
+  reporting-bot-network:
+    external: true

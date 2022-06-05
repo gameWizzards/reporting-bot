@@ -1,0 +1,57 @@
+version: '3.9'
+services:
+
+  reporting-bot:
+    build:
+      context: .
+      dockerfile: reporting-bot.Dockerfile
+# variables for jenkins agent ssh connection environment
+      args:
+        BOT_DB_NAME: ${BOT_DB_NAME}
+        BOT_DB_USERNAME: ${BOT_DB_USERNAME}
+        BOT_DB_PASSWORD: ${BOT_DB_PASSWORD}
+        BOT_DB_HOST: ${BOT_DB_HOST}
+        BOT_DB_PORT: ${BOT_DB_PORT}
+        BOT_USERNAME: ${BOT_USERNAME}
+        BOT_TOKEN: ${BOT_TOKEN}
+        JENKINS_SSH_PSWD: ${JENKINS_SSH_PSWD}
+    image: reporting-bot
+
+    container_name: reporting-bot
+    hostname: reporting-bot
+    privileged: true
+    stdin_open: true
+# variables for docker environment
+    environment:
+      TZ: Europe/Kiev
+      BOT_DB_NAME: ${BOT_DB_NAME}
+      BOT_DB_USERNAME: ${BOT_DB_USERNAME}
+      BOT_DB_PASSWORD: ${BOT_DB_PASSWORD}
+      BOT_DB_HOST: ${BOT_DB_HOST}
+      BOT_DB_PORT: ${BOT_DB_PORT}
+      BOT_USERNAME: ${BOT_USERNAME}
+      BOT_TOKEN: ${BOT_TOKEN}
+    volumes:
+      - ${BOT_VOLUME_PATH}:/root/.m2/
+    networks:
+      - reporting-bot-network
+
+  reporting-bot-db:
+    image: postgres:14
+    container_name: reporting-bot-db
+    hostname: reporting-bot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${BOT_DB_NAME}
+      POSTGRES_USER: ${BOT_DB_USERNAME}
+      POSTGRES_PASSWORD: ${BOT_DB_PASSWORD}
+      TZ: Europe/Kiev
+    volumes:
+      - ${BOT_DB_VOLUME_PATH}:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - reporting-bot-network
+networks:
+  reporting-bot-network:
+    external: true
