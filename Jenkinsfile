@@ -1,4 +1,4 @@
-def remote = [name: 'reporting-bot', host: '139.59.174.8', user: 'reporting-bot', password: '123456', allowAnyHosts: true]
+def remote = [name: env.BOT_NAME, host: env.BOT_HOST, user: env.BOT_LOGIN, password: env.BOT_SECRET, allowAnyHosts: true]
 pipeline {
     agent any
      options {
