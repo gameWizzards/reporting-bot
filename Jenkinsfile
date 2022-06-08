@@ -9,6 +9,7 @@ pipeline {
         skipDefaultCheckout true
         disableConcurrentBuilds()
         timeout(time:10, unit: 'MINUTES')
+        timestamps()
         buildDiscarder(logRotator(artifactDaysToKeepStr: '7', artifactNumToKeepStr: '10', daysToKeepStr: '7', numToKeepStr: '50'))
       }
     environment {
@@ -23,6 +24,7 @@ pipeline {
     stages{
         stage('Checkout') {
             steps{
+                checkout scm
                 script{
                     withCredentials([usernamePassword(credentialsId: 'RepoBotHostDOCreds', passwordVariable: 'USER_SECRET', usernameVariable: 'USER_LOGIN')]) {
                         remote.user = USER_LOGIN
