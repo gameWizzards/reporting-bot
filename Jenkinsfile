@@ -19,7 +19,6 @@ pipeline {
         APPDIR = "reporting-bot"
         APPNAME = "reporting-telegrambot-1.0.0.jar"
         SPRING_PROFILE = "dev"
-
     }
     stages{
         stage('Checkout') {
@@ -48,7 +47,7 @@ pipeline {
                 sshCommand remote: remote, command: 'docker exec reporting-bot mvn verify -f ' + "$TESTDIR/$APPDIR"
             }
         }
-        stage('Deploy') {
+        stage('Deploy_bot') {
             when {
                 expression {
                     return params.enable_step_DEPLOY
