@@ -111,6 +111,8 @@ class KeyboardUtilsTest {
 
 
     @Test
-    public void createRootMenuMessage() {
+    public void createRootMenuMessage_failedTest() {
+        fail();
+
     }
 }
