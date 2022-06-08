@@ -108,11 +108,4 @@ class KeyboardUtilsTest {
         markup.getOneTimeKeyboard();
     }
 
-
-
-    @Test
-    public void createRootMenuMessage_failedTest() {
-        fail();
-
-    }
 }
