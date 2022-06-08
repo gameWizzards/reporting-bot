@@ -44,10 +44,11 @@ pipeline {
         }
         stage('Integration_tests') {
             steps{
-                sshCommand remote: remote, command: 'docker exec reporting-bot mvn verify -f ' + "$TESTDIR/$APPDIR"
+                echo 'Here will be integration tests'
+                //sshCommand remote: remote, command: 'docker exec reporting-bot mvn verify -f ' + "$TESTDIR/$APPDIR"
             }
         }
-        stage('Deploy_bot') {
+        stage('Deploy') {
             when {
                 expression {
                     return params.enable_step_DEPLOY
