@@ -38,7 +38,9 @@ pipeline {
         }
         stage('Unit_tests') {
             steps {
-                sshCommand remote: remote, command: 'docker exec reporting-bot mvn test -f ' + "$TESTDIR/$APPDIR"
+                //sshCommand remote: remote, command: 'docker exec reporting-bot mvn test -f ' + "$TESTDIR/$APPDIR"
+                // For generating an artifact, is needed to use 'verify'
+                sshCommand remote: remote, command: 'docker exec reporting-bot mvn verify -f ' + "$TESTDIR/$APPDIR"
             }
 
         }
