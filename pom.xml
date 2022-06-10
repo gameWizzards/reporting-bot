@@ -23,14 +23,21 @@
         <statemachine.version>3.0.1</statemachine.version>
         <jackson-datatype.version>2.13.2</jackson-datatype.version>
         <liquibase.version>4.6.2</liquibase.version>
+
+        <log4j2.version>2.17.2</log4j2.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-spring-boot-starter</artifactId>
@@ -45,6 +52,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <!-- Exclude logback -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Include log4j2 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
 
         <dependency>
@@ -89,11 +109,11 @@
             <version>${statemachine.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.statemachine</groupId>-->
-<!--            <artifactId>spring-statemachine-data-redis</artifactId>-->
-<!--            <version>${statemachine.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.statemachine</groupId>-->
+        <!--            <artifactId>spring-statemachine-data-redis</artifactId>-->
+        <!--            <version>${statemachine.version}</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.statemachine</groupId>

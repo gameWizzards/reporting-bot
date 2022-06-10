@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO">
+
+<Configuration>
+
+    <!-- Setting up log path and log file name -->
+    <Properties>
+        <property name="LOG_PATH" value="/tmp/reporting-bot-logs/" />
+        <property name="LOG_FILE_NAME" value="repobot-logs" />
+    </Properties>
+
+    <!-- Setting up logging pattern for console logging -->
     <Appenders>
-        <Console name="console" target="SYSTEM_OUT">
+        <Console name="ConsoleOutput" target="SYSTEM_OUT">
             <PatternLayout
-                    pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
+                    pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}  %highlight{%-5p} [%-.30C] (%t) -> %m%n%wEx"
+                    disableAnsi="false" />
         </Console>
+
+        <!-- Setting the filename and logging pattern for log file. Also setting
+            up a rolling policy with rolling done daily and when file size is 10MB -->
+        <RollingFile name="LogFile"
+                     fileName="${LOG_PATH}/${LOG_FILE_NAME}.log"
+                     filePattern="${LOG_PATH}/$${date:yyyy-MM}/${LOG_FILE_NAME}}-%d{dd-MMMM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%-.30C] (%t) -> %m%n%wEx
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
     </Appenders>
+
     <Loggers>
-        <Root level="debug" additivity="false">
-            <AppenderRef ref="console"/>
+
+        <!-- Logging at INFO level -->
+        <Root level="info">
+            <AppenderRef ref="ConsoleOutput" />
+            <AppenderRef ref="LogFile" />
         </Root>
+
     </Loggers>
+
 </Configuration>
