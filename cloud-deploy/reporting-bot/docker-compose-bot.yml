@@ -33,6 +33,7 @@ services:
       BOT_TOKEN: ${BOT_TOKEN}
     volumes:
       - ${BOT_VOLUME_PATH}:/root/.m2/
+      - /home/reporting-bot/reporting-bot-logs/:/tmp/reporting-bot-logs/
     networks:
       - reporting-bot-network
 
