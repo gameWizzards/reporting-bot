@@ -1,5 +1,4 @@
 repoBotPasswd="123456"
-jenkinsPasswd="jenkins"
 
 exist=1
 notExist=0
@@ -42,25 +41,17 @@ if [ $(docker --version 2> /dev/null | grep -c "version") -eq $exist ]
     sudo groupadd -f docker
     sudo usermod -aG docker $USER
 
-
     echo "__ Adding reporting-bot user"
     sudo useradd reporting-bot -m -G docker -s /bin/bash ; echo "reporting-bot:$repoBotPasswd" | sudo chpasswd \
     && echo "__ Adding reporting-bot necessary dirs"; sudo install -m 0755 -o reporting-bot -g reporting-bot -d /home/reporting-bot/db-volume /home/reporting-bot/bot-volume /home/reporting-bot/deploy-files \
-    && echo "__ Copping reporting-bot deploy files"; sudo cp -r ~/reporting-bot-deploy/reporting-bot/. /home/reporting-bot/deploy-files/
+    && echo "__ Copping reporting-bot deploy files"; sudo cp -r ~/reporting-bot-deploy/. /home/reporting-bot/deploy-files/
 
-    echo "__ Adding jenkins user"
-    sudo useradd jenkins -m -G sudo,docker -s /bin/bash ; echo "jenkins:$jenkinsPasswd" | sudo chpasswd \
-    && sudo groupmod -g 7000 jenkins \
-    && echo "__ Adding jenkins necessary dirs"; sudo install -m 0775 -o jenkins -g jenkins -d /home/jenkins/volume/jenkins_home /home/jenkins/volume/certs /home/jenkins/deploy-files \
-    && echo "__ Copping jenkins deploy files"; sudo cp -r ~/reporting-bot-deploy/jenkins/. /home/jenkins/deploy-files/ \
-    && echo "__ Remove deploy files from home/$USER"; sudo rm -rf ~/reporting-bot-deploy
-
-    echo "__ Create necessary Docker network"
+    echo "__ Creating necessary Docker network"
     sudo docker network create reporting-bot-network
 
     echo "__ Congratulations!!! All configurations have done successfully!"
 
     # Required to be the last operation, after that no one command will not be executed
-    echo "__ Activate the changes to Docker group"
+    echo "__ Activating changes to Docker group"
     newgrp docker
 fi
