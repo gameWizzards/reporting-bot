@@ -1,6 +1,5 @@
 package com.telegram.reporting.dialogs.create_report;
 
-import com.telegram.reporting.dialogs.LoggingExceptionAction;
 import com.telegram.reporting.messages.MessageEvent;
 import com.telegram.reporting.service.CreateReportActionService;
 import com.telegram.reporting.service.GeneralActionService;
@@ -23,18 +22,15 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
     private final GeneralActionService generalActionService;
     private final CreateReportActionService createReportActionService;
     private final GuardService guardService;
-    private final LoggingExceptionAction loggingExceptionAction;
 
     @Autowired
     public CreateReportDialogStateMachineFactory(@Lazy CreateReportActionService createReportActionService,
                                                  @Lazy GeneralActionService generalActionService,
-                                                 @Lazy GuardService guardService,
-                                                 @Lazy LoggingExceptionAction loggingExceptionAction) {
+                                                 @Lazy GuardService guardService) {
 
         this.createReportActionService = createReportActionService;
         this.generalActionService = generalActionService;
         this.guardService = guardService;
-        this.loggingExceptionAction = loggingExceptionAction;
     }
 
     @Override
