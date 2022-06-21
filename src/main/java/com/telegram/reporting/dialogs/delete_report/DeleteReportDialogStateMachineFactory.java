@@ -1,7 +1,9 @@
 package com.telegram.reporting.dialogs.delete_report;
 
 import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.service.GuardService;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -13,7 +15,11 @@ import java.util.EnumSet;
 @Configuration
 @EnableStateMachineFactory(name = "DeleteReportDialogStateMachineFactory")
 public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<DeleteReportState, MessageEvent> {
+    private final GuardService guardService;
 
+    public DeleteReportDialogStateMachineFactory(@Lazy GuardService guardService) {
+        this.guardService = guardService;
+    }
     @Override
     public void configure(StateMachineConfigurationConfigurer<DeleteReportState, MessageEvent> config) throws Exception {
         config.withConfiguration()
@@ -38,6 +44,7 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .target(DeleteReportState.DATE_VALIDATION)
 //                .event(MessageEvent.USER_DATE_INPUT)
 //                .action(reservedAction(), errorAction())
+                .guard(guardService::validateDate)
 
                 .and().withExternal()
                 .source(DeleteReportState.DATE_VALIDATION)

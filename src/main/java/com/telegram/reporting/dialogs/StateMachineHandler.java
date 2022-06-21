@@ -1,6 +1,7 @@
 package com.telegram.reporting.dialogs;
 
 import com.telegram.reporting.messages.Message;
+import org.telegram.telegrambots.meta.api.objects.Contact;
 
 public interface StateMachineHandler {
 
@@ -8,5 +9,5 @@ public interface StateMachineHandler {
 
     void handleUserInput(Long chatId, String userInput);
 
-    StateMachineHandler initStateMachine(Long chatId);
+    StateMachineHandler initStateMachine(Long chatId, String telegramNickname);
 }

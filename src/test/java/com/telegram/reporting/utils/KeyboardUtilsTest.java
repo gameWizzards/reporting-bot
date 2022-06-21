@@ -108,4 +108,8 @@ class KeyboardUtilsTest {
         markup.getOneTimeKeyboard();
     }
 
+    @Test
+    public void createKeyboardMarkup_kulls_provideCustomErrorMessage() {
+        String state = "CreateReportState".replaceAll("State", "");
+    }
 }

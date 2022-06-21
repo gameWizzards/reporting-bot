@@ -4,6 +4,7 @@ import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
@@ -42,25 +43,20 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
             default -> null;
         };
         stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, message.text());
-        log.info("Current state = [{}]. Message = [{}] -> MessageEvent = [{}]", stateMachine.getState().getId(), message, messageEvent);
         Optional.ofNullable(messageEvent)
                 .ifPresent(stateMachine::sendEvent);
-        log.info("Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
     }
 
     @Override
     public void handleUserInput(Long chatId, String userInput) {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
-        log.info("Start handle UserInput.Current state = [{}]. StateMachineId = {}", stateMachine.getState().getId(), stateMachine.getUuid());
-        CreateReportState stateLog = stateMachine.getState().getId();
         MessageEvent messageEvent = null;
-        log.info("User input = [{}]", userInput);
         CreateReportState currentState = stateMachine.getState().getId();
         Map<Object, Object> variables = stateMachine.getExtendedState().getVariables();
 
         switch (currentState) {
             case USER_DATE_INPUTTING -> {
-                variables.put(ContextVariable.REPORT_DATE, userInput);
+                variables.put(ContextVariable.DATE, userInput);
                 messageEvent = MessageEvent.USER_DATE_INPUT_VALIDATE;
             }
             case USER_TIME_INPUTTING -> {
@@ -76,14 +72,13 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
         Optional.ofNullable(messageEvent)
                 .ifPresent(stateMachine::sendEvent);
 
-        log.info("After handle UserInput/updateStateMachine. Current state = [{}]. User input = [{}] -> MessageEvent = [{}]", stateMachine.getState().getId(), userInput, messageEvent);
-
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
+    public StateMachineHandler initStateMachine(Long chatId, String telegramNickname) {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.getExtendedState().getVariables().put(ContextVariable.CHAT_ID, chatId);
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.LOG_PREFIX, TelegramUtils.createLogPrefix("Create_report", telegramNickname));
         stateMachines.put(chatId, stateMachine);
         return this;
     }

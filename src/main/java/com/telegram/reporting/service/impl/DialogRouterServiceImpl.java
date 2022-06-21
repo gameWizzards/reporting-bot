@@ -41,13 +41,14 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     public void handleTelegramUpdateEvent(Update update) {
         String input = TelegramUtils.getMessage(update);
         Long chatId = TelegramUtils.currentChatId(update);
+        String telegramNickname = update.getMessage().getFrom().getUserName();
 
         Optional<Message> messageOptional = Message.getByText(input);
         if (messageOptional.isPresent()) {
             Message message = messageOptional.get();
 
             if (Message.startMessages().contains(message)) {
-                createStateMachineHandler(chatId, message);
+                createStateMachineHandler(chatId, message, telegramNickname);
             }
 
             if (Message.MAIN_MENU.equals(message)) {
@@ -64,15 +65,15 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         sendBotMessageService.sendMessageWithKeys(KeyboardUtils.createRootMenuMessage(chatId));
     }
 
-    private StateMachineHandler createStateMachineHandler(Long chatId, Message message) {
-        stateMachineHandlers.put(chatId, getStateMachineHandler(chatId, message));
+    private StateMachineHandler createStateMachineHandler(Long chatId, Message message, String telegramNickname) {
+        stateMachineHandlers.put(chatId, getStateMachineHandler(chatId, message, telegramNickname));
         return stateMachineHandlers.get(chatId);
     }
 
-    private StateMachineHandler getStateMachineHandler(Long chatId, Message message) {
+    private StateMachineHandler getStateMachineHandler(Long chatId, Message message, String telegramNickname) {
         return switch (message) {
-            case CREATE_REPORT_START_MESSAGE -> createReportHandler.initStateMachine(chatId);
-            case DELETE_REPORT_START_MESSAGE -> deleteReportHandler.initStateMachine(chatId);
+            case CREATE_REPORT_START_MESSAGE -> createReportHandler.initStateMachine(chatId, telegramNickname);
+            case DELETE_REPORT_START_MESSAGE -> deleteReportHandler.initStateMachine(chatId, telegramNickname);
             default -> null;
         };
     }

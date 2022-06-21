@@ -1,11 +1,11 @@
 package com.telegram.reporting.dialogs.delete_report;
 
+import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.dialogs.create_report.CreateReportState;
 import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.stereotype.Component;
@@ -47,8 +47,11 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
-        stateMachines.put(chatId, stateMachineFactory.getStateMachine());
+    public StateMachineHandler initStateMachine(Long chatId, String telegramNickname) {
+        StateMachine<DeleteReportState, MessageEvent> stateMachine = stateMachineFactory.getStateMachine();
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.CHAT_ID, chatId);
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.LOG_PREFIX, TelegramUtils.createLogPrefix("Delete_report", telegramNickname));
+        stateMachines.put(chatId, stateMachine);
         return this;
     }
 }
