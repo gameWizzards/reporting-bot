@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 public class DateTimeUtils {
     public static final String DEFAULT_DATE_FORMAT = "dd.MM.yyyy";
     public static final String DEFAULT_DATE_TIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
-    private static final String DEFAULT_DATE_PATTERN = "((\\d{2}).(\\d{2}).(\\d{4}))";
-    private static final String DEFAULT_DATE_TIME_PATTERN = "((\\d{2}).(\\d{2}).(\\d{4}) (\\d{2}):(\\d{2}):(\\d{2}))";
+    public static final String DEFAULT_DATE_PATTERN = "(\\d{2})\\.(\\d{2})\\.(\\d{4})";
+    public static final String DEFAULT_DATE_TIME_PATTERN = "(\\d{2})\\.(\\d{2})\\.(\\d{4}) (\\d{2}):(\\d{2}):(\\d{2})";
     private static final String DATE_TYPE = "Date";
     private static final String DATE_TIME_TYPE = "DateTime";
 

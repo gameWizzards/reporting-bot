@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class DateTimeUtilsTest {
     private String expectedErrorMessage;
-    private String validDate = "12-02-2012";
-    private String validDateTime = "12-02-2012 04:35:15";
+    private String validDate = "12.02.2012";
+    private String validDateTime = "12.02.2012 04:35:15";
 
 
     @Test
@@ -69,15 +69,14 @@ class DateTimeUtilsTest {
 
     @Test
     void toDefaultFormat_inputDateValid_success() {
-        // regex to match of Date format  'dd-MM-yyyy'
-        var regexDatePattern = "((\\d{2})-(\\d{2})-(\\d{4}))";
+        var regexDatePattern = DateTimeUtils.DEFAULT_DATE_PATTERN;
 
         var date = DateTimeUtils.toDefaultFormat(LocalDate.now());
 
         var pattern = Pattern.compile(regexDatePattern);
         var matcher = pattern.matcher(date);
 
-        assertTrue(matcher.matches(), "Wrong Date format! Expected: 'dd-MM-yyyy'. Current: " + date);
+        assertTrue(matcher.matches(), "Wrong Date format! Expected: 'dd.MM.yyyy'. Current: " + date);
     }
 
     @Test
@@ -91,15 +90,14 @@ class DateTimeUtilsTest {
 
     @Test
     void toDefaultFormat_inputDateTimeValid_success() {
-        // regex to match of DateTime format  'dd-MM-yyyy HH:mm:ss'
-        var regexDateTimePattern = "((\\d{2})-(\\d{2})-(\\d{4}) (\\d{2}):(\\d{2}):(\\d{2}))";
+        var regexDateTimePattern = DateTimeUtils.DEFAULT_DATE_TIME_PATTERN;
 
         var date = DateTimeUtils.toDefaultFormat(LocalDateTime.now());
 
         var pattern = Pattern.compile(regexDateTimePattern);
         var matcher = pattern.matcher(date);
 
-        assertTrue(matcher.matches(), "Wrong DateTime format! Expected: 'dd-MM-yyyy HH:mm:ss'. Current: " + date);
+        assertTrue(matcher.matches(), "Wrong DateTime format! Expected: 'dd.MM.yyyy HH:mm:ss'. Current: " + date);
     }
 
     @Test
