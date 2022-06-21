@@ -24,7 +24,7 @@ public enum Message {
 
     REQUEST_CONFIRMATION_REPORT("Убедись что отчет коректный. Отправить отчет?"),
     CONFIRM_CREATION_FINAL_REPORT("Отправить отчет"),
-    DECLINE_CREATION_FINAL_REPORT("Отменить отчет"),
+    DECLINE_CREATION_FINAL_REPORT("Отменить"),
 
     ADD_NEW_USER("Добавить пользователя"),
     CANCEL("Отмена"),

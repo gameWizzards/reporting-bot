@@ -1,23 +1,10 @@
 package com.telegram.reporting.dialogs.create_report;
 
-import com.telegram.reporting.dialogs.SendDialogStartButtonsAction;
-import com.telegram.reporting.dialogs.create_report.action.DeclineSendReportAction;
-import com.telegram.reporting.dialogs.create_report.action.EndDialogAction;
-import com.telegram.reporting.dialogs.create_report.action.HandleDateCategoryAction;
-import com.telegram.reporting.dialogs.create_report.action.HandleUserDateInputAction;
-import com.telegram.reporting.dialogs.create_report.action.HandleUserNoteInputAction;
-import com.telegram.reporting.dialogs.create_report.action.HandleUserTimeInputAction;
-import com.telegram.reporting.dialogs.create_report.action.PrepareTimeRecordAction;
-import com.telegram.reporting.dialogs.create_report.action.RequestAdditionalReportAction;
-import com.telegram.reporting.dialogs.create_report.action.RequestConfirmationReportAction;
-import com.telegram.reporting.dialogs.create_report.action.RequestInputDateAction;
-import com.telegram.reporting.dialogs.create_report.action.RequestInputNoteAction;
-import com.telegram.reporting.dialogs.create_report.action.RequestInputTimeAction;
-import com.telegram.reporting.dialogs.create_report.action.SendCategoryButtonsAction;
-import com.telegram.reporting.dialogs.create_report.guard.ValidateDateGuard;
-import com.telegram.reporting.dialogs.create_report.guard.ValidateNoteGuard;
-import com.telegram.reporting.dialogs.create_report.guard.ValidateTimeGuard;
+import com.telegram.reporting.dialogs.LoggingExceptionAction;
 import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.service.CreateReportActionService;
+import com.telegram.reporting.service.GeneralActionService;
+import com.telegram.reporting.service.GuardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -33,55 +20,21 @@ import java.util.EnumSet;
 @EnableStateMachineFactory(name = "CreateReportDialogStateMachineFactory")
 public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<CreateReportState, MessageEvent> {
 
-    private final RequestInputDateAction requestInputDateAction;
-    private final HandleUserDateInputAction handleUserDateInputAction;
-    private final SendCategoryButtonsAction sendCategoryButtonsAction;
-    private final HandleDateCategoryAction handleDateCategoryAction;
-    private final RequestInputTimeAction requestInputTimeAction;
-    private final HandleUserTimeInputAction handleUserTimeInputAction;
-    private final RequestAdditionalReportAction requestAdditionalReportAction;
-    private final RequestConfirmationReportAction requestConfirmationReportAction;
-    private final EndDialogAction endDialogAction;
-    private final RequestInputNoteAction requestInputNoteAction;
-    private final HandleUserNoteInputAction handleUserNoteInputAction;
-    private final PrepareTimeRecordAction prepareTimeRecordAction;
-    private final SendDialogStartButtonsAction sendDialogStartButtonsAction;
-    private final DeclineSendReportAction declineSendReportAction;
-
-    private final ValidateDateGuard validateDateGuard;
-    private final ValidateTimeGuard validateTimeGuard;
-    private final ValidateNoteGuard validateNoteGuard;
+    private final GeneralActionService generalActionService;
+    private final CreateReportActionService createReportActionService;
+    private final GuardService guardService;
+    private final LoggingExceptionAction loggingExceptionAction;
 
     @Autowired
-    public CreateReportDialogStateMachineFactory(@Lazy RequestInputDateAction requestInputDateAction, @Lazy HandleUserDateInputAction handleUserDateInputAction,
-                                                 @Lazy SendCategoryButtonsAction sendCategoryButtonsAction, @Lazy HandleDateCategoryAction handleDateCategoryAction,
-                                                 @Lazy RequestInputTimeAction requestInputTimeAction, @Lazy HandleUserTimeInputAction handleUserTimeInputAction,
-                                                 @Lazy RequestAdditionalReportAction requestAdditionalReportAction, @Lazy RequestConfirmationReportAction requestConfirmationReportAction,
-                                                 @Lazy EndDialogAction endDialogAction, @Lazy RequestInputNoteAction requestInputNoteAction,
-                                                 @Lazy HandleUserNoteInputAction handleUserNoteInputAction, @Lazy PrepareTimeRecordAction prepareTimeRecordAction,
-                                                 @Lazy SendDialogStartButtonsAction sendDialogStartButtonsAction, @Lazy DeclineSendReportAction declineSendReportAction,
+    public CreateReportDialogStateMachineFactory(@Lazy CreateReportActionService createReportActionService,
+                                                 @Lazy GeneralActionService generalActionService,
+                                                 @Lazy GuardService guardService,
+                                                 @Lazy LoggingExceptionAction loggingExceptionAction) {
 
-                                                 @Lazy ValidateDateGuard validateDateGuard, @Lazy ValidateTimeGuard validateTimeGuard,
-                                                 @Lazy ValidateNoteGuard validateNoteGuard) {
-
-        this.requestInputDateAction = requestInputDateAction;
-        this.handleUserDateInputAction = handleUserDateInputAction;
-        this.sendCategoryButtonsAction = sendCategoryButtonsAction;
-        this.handleDateCategoryAction = handleDateCategoryAction;
-        this.requestInputTimeAction = requestInputTimeAction;
-        this.handleUserTimeInputAction = handleUserTimeInputAction;
-        this.requestAdditionalReportAction = requestAdditionalReportAction;
-        this.requestConfirmationReportAction = requestConfirmationReportAction;
-        this.endDialogAction = endDialogAction;
-        this.requestInputNoteAction = requestInputNoteAction;
-        this.handleUserNoteInputAction = handleUserNoteInputAction;
-        this.prepareTimeRecordAction = prepareTimeRecordAction;
-        this.sendDialogStartButtonsAction = sendDialogStartButtonsAction;
-        this.declineSendReportAction = declineSendReportAction;
-
-        this.validateDateGuard = validateDateGuard;
-        this.validateTimeGuard = validateTimeGuard;
-        this.validateNoteGuard = validateNoteGuard;
+        this.createReportActionService = createReportActionService;
+        this.generalActionService = generalActionService;
+        this.guardService = guardService;
+        this.loggingExceptionAction = loggingExceptionAction;
     }
 
     @Override
@@ -107,65 +60,65 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .source(CreateReportState.START_DIALOG)
                 .event(MessageEvent.CREATE_REPORT_EVENT)
                 .target(CreateReportState.USER_DATE_INPUTTING)
-                .action(requestInputDateAction) //errorAction())
+                .action(createReportActionService::requestInputDate) //errorAction())
 
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_INPUTTING)
                 .event(MessageEvent.USER_DATE_INPUT_VALIDATE)
                 .target(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-                .guard(validateDateGuard)
-                .action(handleUserDateInputAction)
-                .action(sendCategoryButtonsAction)
+                .guard(guardService::validateDate)
+                .action(generalActionService::handleUserDateInput)
+                .action(createReportActionService::sendCategoryButtons)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
                 .event(MessageEvent.CHOICE_REPORT_CATEGORY)
                 .target(CreateReportState.USER_TIME_INPUTTING)
-                .action(handleDateCategoryAction)
-                .action(requestInputTimeAction)
+                .action(createReportActionService::handleCategory)
+                .action(createReportActionService::requestInputTime)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_TIME_INPUTTING)
                 .event(MessageEvent.USER_TIME_INPUT_VALIDATE)
                 .target(CreateReportState.USER_NOTE_INPUTTING)
-                .guard(validateTimeGuard)
-                .action(handleUserTimeInputAction)
-                .action(requestInputNoteAction)
+                .guard(guardService::validateTime)
+                .action(generalActionService::handleUserTimeInput)
+                .action(generalActionService::requestInputNote)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_NOTE_INPUTTING)
                 .event(MessageEvent.USER_NOTE_INPUT_VALIDATE)
                 .target(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
-                .guard(validateNoteGuard)
-                .action(handleUserNoteInputAction)
-                .action(prepareTimeRecordAction)
-                .action(requestAdditionalReportAction)
+                .guard(guardService::validateNote)
+                .action(generalActionService::handleUserNoteInput)
+                .action(generalActionService::prepareTimeRecord)
+                .action(createReportActionService::requestAdditionalReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.CONFIRM_ADDITIONAL_REPORT)
                 .target(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-                .action(sendCategoryButtonsAction)
+                .action(createReportActionService::sendCategoryButtons)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.DECLINE_ADDITIONAL_REPORT)
                 .target(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
-                .action(requestConfirmationReportAction)
+                .action(createReportActionService::requestConfirmationReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.CONFIRM_CREATION_FINAL_REPORT)
                 .target(CreateReportState.END_DIALOG)
-                .action(endDialogAction)
-                .action(sendDialogStartButtonsAction)
+                .action(createReportActionService::persistReport)
+                .action(generalActionService::sendRootMenuButtons)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.DECLINE_CREATION_FINAL_REPORT)
                 .target(CreateReportState.USER_DATE_INPUTTING)
-                .action(declineSendReportAction)
-                .action(sendDialogStartButtonsAction);
+                .action(generalActionService::declinePersistReport)
+                .action(generalActionService::sendRootMenuButtons);
 
 
         // Handling CANCEL button
