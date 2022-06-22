@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component("DeleteReportStateMachineHandler")
@@ -29,21 +30,38 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
     @Override
     public void handleMessage(Long chatId, Message message) {
         StateMachine<DeleteReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
-        log.info("Delete report handler do [handle message]. Bean reference: [{}]", this);
-        log.info("DeleteStateMachine reference: [{}]", stateMachine.getUuid());
-//        log.info("CreateStateMachine reference: [{}]", stateMachineCreate.getUuid());
-
-//        stateMachine.sendEvent()
+        MessageEvent messageEvent = switch (message) {
+            case DELETE_REPORT_START_MESSAGE -> MessageEvent.RUN_DELETE_REPORT_DIALOG;
+            case CONFIRM_CREATION_FINAL_REPORT -> MessageEvent.CONFIRM_DELETE_TIME_RECORD;
+            case CANCEL -> MessageEvent.DECLINE_DELETE_TIME_RECORD;
+            default -> null;
+        };
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, message.text());
+        Optional.ofNullable(messageEvent)
+                .ifPresent(stateMachine::sendEvent);
     }
 
     @Override
     public void handleUserInput(Long chatId, String userInput) {
         StateMachine<DeleteReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
-        log.info("Delete report handler do [handle USER input]. Bean reference: [{}]", this);
-        // check current state
-        // choice event DATE_INPUT or TIME_INPUT
-        // update state machine
-        // send to action user input
+        MessageEvent messageEvent = null;
+        DeleteReportState currentState = stateMachine.getState().getId();
+        Map<Object, Object> variables = stateMachine.getExtendedState().getVariables();
+
+        switch (currentState) {
+            case USER_DATE_INPUTTING -> {
+                variables.put(ContextVariable.DATE, userInput);
+                messageEvent = MessageEvent.VALIDATE_USER_DATE_INPUT;
+            }
+            case USER_TIME_RECORD_CHOICE -> {
+                variables.put(ContextVariable.TIME_RECORD_CHOICE, userInput);
+                messageEvent = MessageEvent.CHOOSE_TIME_RECORD;
+            }
+        }
+
+        Optional.ofNullable(messageEvent)
+                .ifPresent(stateMachine::sendEvent);
+
     }
 
     @Override

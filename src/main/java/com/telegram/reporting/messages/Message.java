@@ -24,13 +24,16 @@ public enum Message {
 
     REQUEST_CONFIRMATION_REPORT("Убедись что отчет коректный. Отправить отчет?"),
     CONFIRM_CREATION_FINAL_REPORT("Отправить отчет"),
-    DECLINE_CREATION_FINAL_REPORT("Отменить"),
 
     ADD_NEW_USER("Добавить пользователя"),
     CANCEL("Отмена"),
     RETURN_TO_MAIN_MENU("Вернутся в меню"),
 
-    DELETE_REPORT_START_MESSAGE("Удалить отчет"), UPDATE_REPORT_START_MESSAGE("Изменить отчет"),
+    DELETE_REPORT_START_MESSAGE("Удалить отчет"),
+    REQUEST_DELETE_CONFIRMATION_REPORT("Вы точно хотите удалить отчет?"),
+    CONFIRM_DELETE_TIME_RECORD("Удалить отчет"),
+
+    UPDATE_REPORT_START_MESSAGE("Изменить отчет"),
 
     MAIN_MENU("Главное меню");
     private final String text;

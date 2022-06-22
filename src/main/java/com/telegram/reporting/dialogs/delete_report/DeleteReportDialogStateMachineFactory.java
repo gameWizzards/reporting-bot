@@ -1,6 +1,8 @@
 package com.telegram.reporting.dialogs.delete_report;
 
 import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.service.DeleteReportActionService;
+import com.telegram.reporting.service.GeneralActionService;
 import com.telegram.reporting.service.GuardService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -16,10 +18,17 @@ import java.util.EnumSet;
 @EnableStateMachineFactory(name = "DeleteReportDialogStateMachineFactory")
 public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<DeleteReportState, MessageEvent> {
     private final GuardService guardService;
+    private final GeneralActionService generalActionService;
+    private final DeleteReportActionService deleteReportActionService;
 
-    public DeleteReportDialogStateMachineFactory(@Lazy GuardService guardService) {
+    public DeleteReportDialogStateMachineFactory(@Lazy GuardService guardService,
+                                                 @Lazy GeneralActionService generalActionService,
+                                                 @Lazy DeleteReportActionService deleteReportActionService) {
         this.guardService = guardService;
+        this.generalActionService = generalActionService;
+        this.deleteReportActionService = deleteReportActionService;
     }
+
     @Override
     public void configure(StateMachineConfigurationConfigurer<DeleteReportState, MessageEvent> config) throws Exception {
         config.withConfiguration()
@@ -31,8 +40,8 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
     @Override
     public void configure(StateMachineStateConfigurer<DeleteReportState, MessageEvent> states) throws Exception {
         states.withStates()
-                .initial(DeleteReportState.USER_DATE_INPUTTING)
-                .end(DeleteReportState.END_DIALOG)
+                .initial(DeleteReportState.START_DELETE_REPORT_DIALOG)
+                .end(DeleteReportState.END_DELETE_REPORT_DIALOG)
                 .states(EnumSet.allOf(DeleteReportState.class));
 
     }
@@ -40,64 +49,37 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
     @Override
     public void configure(StateMachineTransitionConfigurer<DeleteReportState, MessageEvent> transitions) throws Exception {
         transitions.withExternal()
+                .source(DeleteReportState.START_DELETE_REPORT_DIALOG)
+                .event(MessageEvent.RUN_DELETE_REPORT_DIALOG)
+                .target(DeleteReportState.USER_DATE_INPUTTING)
+                .action(deleteReportActionService::requestInputDate)
+
+                .and().withExternal()
                 .source(DeleteReportState.USER_DATE_INPUTTING)
-                .target(DeleteReportState.DATE_VALIDATION)
-//                .event(MessageEvent.USER_DATE_INPUT)
-//                .action(reservedAction(), errorAction())
+                .event(MessageEvent.VALIDATE_USER_DATE_INPUT)
+                .target(DeleteReportState.USER_TIME_RECORD_CHOICE)
                 .guard(guardService::validateDate)
+                .action(generalActionService::handleUserDateInput)
+                .action(generalActionService::sendListTimeRecords)
 
                 .and().withExternal()
-                .source(DeleteReportState.DATE_VALIDATION)
-                .target(DeleteReportState.LIST_TIME_RECORDS_TO_CHOOSE)
-//                .event(MessageEvent.VALID_DATE)
-//                .guard(hideGuard())
-//                .action(reservedAction(), errorAction())
-
-                .and().withExternal()
-                .source(DeleteReportState.LIST_TIME_RECORDS_TO_CHOOSE)
-                .target(DeleteReportState.USER_TIME_RECORD_CHOOSE)
-//                .event(MessageEvent.INVALID_DATE)
-//                .action(reservedAction(), errorAction())
-
-                .and().withExternal()
-                .source(DeleteReportState.USER_TIME_RECORD_CHOOSE)
+                .source(DeleteReportState.USER_TIME_RECORD_CHOICE)
+                .event(MessageEvent.CHOOSE_TIME_RECORD)
                 .target(DeleteReportState.USER_DELETE_CONFIRMATION)
-//                .event(MessageEvent.CHOICE_REPORT_CATEGORY)
-//                .action(reservedAction(), errorAction())
+                .action(generalActionService::handleTimeRecord)
+                .action(deleteReportActionService::requestDeleteConfirmation)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_DELETE_CONFIRMATION)
-                .target(DeleteReportState.END_DIALOG)
-                .event(MessageEvent.CONFIRM_CREATION_FINAL_REPORT)
-//                .action(reservedAction(), errorAction())
-
-                // Handling CANCEL button
-                .and().withExternal()
-                .source(DeleteReportState.LIST_TIME_RECORDS_TO_CHOOSE)
-                .target(DeleteReportState.USER_DATE_INPUTTING)
-                .event(MessageEvent.CANCEL)
-//                .action(reservedAction(), errorAction())
-
-                .and().withExternal()
-                .source(DeleteReportState.USER_TIME_RECORD_CHOOSE)
-                .target(DeleteReportState.USER_DATE_INPUTTING)
-                .event(MessageEvent.CANCEL)
-//                .action(reservedAction(), errorAction())
+                .event(MessageEvent.CONFIRM_DELETE_TIME_RECORD)
+                .target(DeleteReportState.USER_TIME_RECORD_CHOICE)
+                .action(deleteReportActionService::removeTimeRecord)
+                .action(generalActionService::sendListTimeRecords)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_DELETE_CONFIRMATION)
-                .target(DeleteReportState.USER_DATE_INPUTTING)
-                .event(MessageEvent.CANCEL)
-//                .action(reservedAction(), errorAction())
-
-
-                // Handling RETURN_TO_MAIN_MENU button
-                .and().withExternal()
-                .source(DeleteReportState.USER_DATE_INPUTTING)
-                .target(DeleteReportState.END_DIALOG)
-                .event(MessageEvent.RETURN_TO_MAIN_MENU);
-//                .action(reservedAction(), errorAction());
-
-
+                .event(MessageEvent.DECLINE_DELETE_TIME_RECORD)
+                .target(DeleteReportState.USER_TIME_RECORD_CHOICE)
+                .action(generalActionService::sendListTimeRecords);
     }
 }

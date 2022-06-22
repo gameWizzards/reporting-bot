@@ -8,5 +8,6 @@ public enum ContextVariable {
     REPORT_NOTE,
     TIME_RECORDS_JSON,
     CHAT_ID,
+    TIME_RECORD_CHOICE,
     LOG_PREFIX
 }

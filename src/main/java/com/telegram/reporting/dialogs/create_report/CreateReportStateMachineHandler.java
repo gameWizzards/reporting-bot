@@ -30,16 +30,16 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
     public void handleMessage(Long chatId, Message message) {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
         MessageEvent messageEvent = switch (message) {
-            case CREATE_REPORT_START_MESSAGE -> MessageEvent.CREATE_REPORT_EVENT;
+            case CREATE_REPORT_START_MESSAGE -> MessageEvent.RUN_CREATE_REPORT_DIALOG;
             case REPORT_CATEGORY_ON_STORAGE,
                     REPORT_CATEGORY_ON_ORDER,
                     REPORT_CATEGORY_ON_OFFICE,
-                    REPORT_CATEGORY_ON_COORDINATION -> MessageEvent.CHOICE_REPORT_CATEGORY;
+                    REPORT_CATEGORY_ON_COORDINATION -> MessageEvent.CHOOSE_REPORT_CATEGORY;
             case CONFIRM_ADDITIONAL_REPORT -> MessageEvent.CONFIRM_ADDITIONAL_REPORT;
             case DECLINE_ADDITIONAL_REPORT -> MessageEvent.DECLINE_ADDITIONAL_REPORT;
             case CONFIRM_CREATION_FINAL_REPORT -> MessageEvent.CONFIRM_CREATION_FINAL_REPORT;
-            case DECLINE_CREATION_FINAL_REPORT -> MessageEvent.DECLINE_CREATION_FINAL_REPORT;
-            case SKIP_NOTE -> MessageEvent.USER_NOTE_INPUT_VALIDATE;
+            case CANCEL -> MessageEvent.DECLINE_CREATION_FINAL_REPORT;
+            case SKIP_NOTE -> MessageEvent.VALIDATE_USER_NOTE_INPUT;
             default -> null;
         };
         stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, message.text());
@@ -57,15 +57,15 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
         switch (currentState) {
             case USER_DATE_INPUTTING -> {
                 variables.put(ContextVariable.DATE, userInput);
-                messageEvent = MessageEvent.USER_DATE_INPUT_VALIDATE;
+                messageEvent = MessageEvent.VALIDATE_USER_DATE_INPUT;
             }
             case USER_TIME_INPUTTING -> {
                 variables.put(ContextVariable.REPORT_TIME, userInput);
-                messageEvent = MessageEvent.USER_TIME_INPUT_VALIDATE;
+                messageEvent = MessageEvent.VALIDATE_USER_TIME_INPUT;
             }
             case USER_NOTE_INPUTTING -> {
                 variables.put(ContextVariable.REPORT_NOTE, userInput);
-                messageEvent = MessageEvent.USER_NOTE_INPUT_VALIDATE;
+                messageEvent = MessageEvent.VALIDATE_USER_NOTE_INPUT;
             }
         }
 

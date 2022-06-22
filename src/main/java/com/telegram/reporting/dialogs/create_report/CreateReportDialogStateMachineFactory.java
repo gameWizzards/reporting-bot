@@ -44,8 +44,8 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
     @Override
     public void configure(StateMachineStateConfigurer<CreateReportState, MessageEvent> states) throws Exception {
         states.withStates()
-                .initial(CreateReportState.START_DIALOG)
-                .end(CreateReportState.END_DIALOG)
+                .initial(CreateReportState.START_CREATE_REPORT_DIALOG)
+                .end(CreateReportState.END_CREATE_REPORT_DIALOG)
                 .states(EnumSet.allOf(CreateReportState.class));
 
     }
@@ -53,29 +53,29 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
     @Override
     public void configure(StateMachineTransitionConfigurer<CreateReportState, MessageEvent> transitions) throws Exception {
         transitions.withExternal()
-                .source(CreateReportState.START_DIALOG)
-                .event(MessageEvent.CREATE_REPORT_EVENT)
+                .source(CreateReportState.START_CREATE_REPORT_DIALOG)
+                .event(MessageEvent.RUN_CREATE_REPORT_DIALOG)
                 .target(CreateReportState.USER_DATE_INPUTTING)
-                .action(createReportActionService::requestInputDate) //errorAction())
+                .action(createReportActionService::requestInputDate)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_INPUTTING)
-                .event(MessageEvent.USER_DATE_INPUT_VALIDATE)
-                .target(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
+                .event(MessageEvent.VALIDATE_USER_DATE_INPUT)
+                .target(CreateReportState.USER_DATE_CATEGORY_CHOICE)
                 .guard(guardService::validateDate)
                 .action(generalActionService::handleUserDateInput)
                 .action(createReportActionService::sendCategoryButtons)
 
                 .and().withExternal()
-                .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-                .event(MessageEvent.CHOICE_REPORT_CATEGORY)
+                .source(CreateReportState.USER_DATE_CATEGORY_CHOICE)
+                .event(MessageEvent.CHOOSE_REPORT_CATEGORY)
                 .target(CreateReportState.USER_TIME_INPUTTING)
                 .action(createReportActionService::handleCategory)
                 .action(createReportActionService::requestInputTime)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_TIME_INPUTTING)
-                .event(MessageEvent.USER_TIME_INPUT_VALIDATE)
+                .event(MessageEvent.VALIDATE_USER_TIME_INPUT)
                 .target(CreateReportState.USER_NOTE_INPUTTING)
                 .guard(guardService::validateTime)
                 .action(generalActionService::handleUserTimeInput)
@@ -83,7 +83,7 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
 
                 .and().withExternal()
                 .source(CreateReportState.USER_NOTE_INPUTTING)
-                .event(MessageEvent.USER_NOTE_INPUT_VALIDATE)
+                .event(MessageEvent.VALIDATE_USER_NOTE_INPUT)
                 .target(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .guard(guardService::validateNote)
                 .action(generalActionService::handleUserNoteInput)
@@ -93,7 +93,7 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.CONFIRM_ADDITIONAL_REPORT)
-                .target(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
+                .target(CreateReportState.USER_DATE_CATEGORY_CHOICE)
                 .action(createReportActionService::sendCategoryButtons)
 
                 .and().withExternal()
@@ -105,7 +105,7 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.CONFIRM_CREATION_FINAL_REPORT)
-                .target(CreateReportState.END_DIALOG)
+                .target(CreateReportState.END_CREATE_REPORT_DIALOG)
                 .action(createReportActionService::persistReport)
                 .action(generalActionService::sendRootMenuButtons)
 

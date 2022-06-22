@@ -16,4 +16,8 @@ public interface GeneralActionService {
     <S, E> void prepareTimeRecord(StateContext<S, E> context);
 
     <S, E> void declinePersistReport(StateContext<S, E> context);
+
+    <S, E> void sendListTimeRecords(StateContext<S, E> context);
+
+    <S, E> void handleTimeRecord(StateContext<S, E> context);
 }

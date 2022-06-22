@@ -125,6 +125,16 @@ public class GeneralActionServiceImpl implements GeneralActionService {
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Вы отменили отправку отчета.");
     }
 
+    @Override
+    public <S, E> void sendListTimeRecords(StateContext<S, E> context) {
+        log.warn("sendListTimeRecords");
+    }
+
+    @Override
+    public <S, E> void handleTimeRecord(StateContext<S, E> context) {
+        log.warn("handleTimeRecord");
+    }
+
 
     private Integer[] parseUserInput(String userInput) {
         String[] date = userInput

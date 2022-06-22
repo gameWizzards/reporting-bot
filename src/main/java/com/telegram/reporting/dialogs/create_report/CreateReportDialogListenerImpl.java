@@ -36,7 +36,7 @@ public class CreateReportDialogListenerImpl implements StateMachineListener<Crea
         log.error("{} Invalid transition! Current step = {}. Invalid event {}.",
                 TelegramUtils.getLogPrefix(stateMachine),
                 stateMachine.getState().getId(),
-                message);
+                message.getPayload());
     }
 
     @Override

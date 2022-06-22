@@ -118,7 +118,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), String.format(message, date, timeRecordMessage, Message.REQUEST_CONFIRMATION_REPORT.text()));
 
-        KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.CONFIRM_CREATION_FINAL_REPORT.text(), Message.DECLINE_CREATION_FINAL_REPORT.text());
+        KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.CONFIRM_CREATION_FINAL_REPORT.text(), Message.CANCEL.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
     }
