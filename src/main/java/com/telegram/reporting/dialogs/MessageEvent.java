@@ -1,4 +1,4 @@
-package com.telegram.reporting.messages;
+package com.telegram.reporting.dialogs;
 
 public enum MessageEvent {
     RUN_CREATE_REPORT_DIALOG,

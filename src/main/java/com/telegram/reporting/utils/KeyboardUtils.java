@@ -1,6 +1,6 @@
 package com.telegram.reporting.utils;
 
-import com.telegram.reporting.messages.Message;
+import com.telegram.reporting.dialogs.ButtonValue;
 import org.apache.commons.lang3.Validate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -35,7 +35,7 @@ public class KeyboardUtils {
         Objects.requireNonNull(rows, "Can't create keyboard markup without keyboard rows");
         List<KeyboardRow> keyboardRows = new ArrayList<>(List.of(rows));
         if (addMainMenuButton) {
-            KeyboardRow mainMenuButton = createButton(Message.MAIN_MENU.text());
+            KeyboardRow mainMenuButton = createButton(ButtonValue.MAIN_MENU.text());
             keyboardRows.add(mainMenuButton);
         }
 
@@ -55,8 +55,8 @@ public class KeyboardUtils {
                 """;
 
         SendMessage sendMessage = new SendMessage(chatId, startFlowMessage);
-        KeyboardRow firstRow = KeyboardUtils.createButton(Message.CREATE_REPORT_START_MESSAGE.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.UPDATE_REPORT_START_MESSAGE.text(), Message.DELETE_REPORT_START_MESSAGE.text());
+        KeyboardRow firstRow = KeyboardUtils.createButton(ButtonValue.CREATE_REPORT_START_DIALOG.text());
+        KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.UPDATE_REPORT_START_DIALOG.text(), ButtonValue.DELETE_REPORT_START_DIALOG.text());
         sendMessage.setReplyMarkup(KeyboardUtils.createKeyboardMarkup(false, firstRow, secondRow));
 
         return sendMessage;

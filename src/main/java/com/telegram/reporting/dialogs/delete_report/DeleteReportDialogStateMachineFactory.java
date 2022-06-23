@@ -1,6 +1,6 @@
 package com.telegram.reporting.dialogs.delete_report;
 
-import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.service.DeleteReportActionService;
 import com.telegram.reporting.service.GeneralActionService;
 import com.telegram.reporting.service.GuardService;

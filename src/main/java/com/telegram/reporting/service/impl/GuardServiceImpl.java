@@ -1,7 +1,8 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
-import com.telegram.reporting.messages.Message;
+import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.service.GuardService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.TelegramUtils;
@@ -65,7 +66,7 @@ public class GuardServiceImpl implements GuardService {
         String chatId = TelegramUtils.currentChatId(context);
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_NOTE);
         String lastButtonText = (String) context.getExtendedState().getVariables().get(ContextVariable.MESSAGE);
-        boolean isSkipNote = Message.SKIP_NOTE.text().equals(lastButtonText.trim());
+        boolean isSkipNote = ButtonValue.SKIP_NOTE.text().equals(lastButtonText.trim());
 
         if (isSkipNote || (userInput != null && userInput.trim().length() >= minNoteLength)) {
             return true;

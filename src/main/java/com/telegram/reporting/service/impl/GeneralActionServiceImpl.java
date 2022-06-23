@@ -1,7 +1,8 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
-import com.telegram.reporting.messages.Message;
+import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.service.GeneralActionService;
 import com.telegram.reporting.service.SendBotMessageService;
@@ -69,7 +70,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
     @Override
     public <S, E> void requestInputNote(StateContext<S, E> context) {
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.REQUEST_ADD_NOTE_REPORT.text());
-        KeyboardRow row = KeyboardUtils.createRowButtons(Message.SKIP_NOTE.text());
+        KeyboardRow row = KeyboardUtils.createRowButtons(ButtonValue.SKIP_NOTE.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, row));
 
@@ -83,8 +84,9 @@ public class GeneralActionServiceImpl implements GeneralActionService {
 
         String userInput = (String) variables.get(ContextVariable.REPORT_NOTE);
         String lastButtonText = (String) variables.get(ContextVariable.MESSAGE);
+        boolean isSkipNote = ButtonValue.SKIP_NOTE.text().equals(lastButtonText.trim());
 
-        if (Message.SKIP_NOTE.text().equals(lastButtonText)) {
+        if (isSkipNote) {
             userMessage = "Вы создали отчет без примечания";
             variables.put(ContextVariable.REPORT_NOTE, note);
         } else {
@@ -143,7 +145,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
                     вернись в главное меню.
                     """;
             SendMessage sendMessage = new SendMessage(chatId, String.format(message, date));
-            KeyboardRow rowButtons = KeyboardUtils.createRowButtons(Message.INPUT_NEW_DATE.text());
+            KeyboardRow rowButtons = KeyboardUtils.createRowButtons(ButtonValue.INPUT_NEW_DATE.text());
             sendBotMessageService.sendMessageWithKeys(sendMessage,
                     KeyboardUtils.createKeyboardMarkup(true, rowButtons));
             return;

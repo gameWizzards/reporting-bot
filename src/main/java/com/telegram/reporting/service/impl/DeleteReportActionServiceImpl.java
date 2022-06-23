@@ -1,9 +1,10 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.delete_report.DeleteReportState;
-import com.telegram.reporting.messages.Message;
-import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.dialogs.Message;
+import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.service.DeleteReportActionService;
 import com.telegram.reporting.service.SendBotMessageService;
@@ -58,7 +59,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
         String timeRecordMessage = TimeRecordUtils.convertTimeRecordToMessage(trTO);
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), String.format(message, date, timeRecordMessage, Message.REQUEST_DELETE_CONFIRMATION_REPORT.text()));
-        KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.CONFIRM_DELETE_TIME_RECORD.text(), Message.CANCEL.text());
+        KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CONFIRM_DELETE_TIME_RECORD.text(), ButtonValue.CANCEL.text());
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
     }
 

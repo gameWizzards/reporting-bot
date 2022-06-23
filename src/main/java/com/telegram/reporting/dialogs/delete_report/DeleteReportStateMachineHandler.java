@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.delete_report;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
+import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.messages.Message;
-import com.telegram.reporting.messages.MessageEvent;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateMachine;
@@ -28,16 +28,16 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public void handleMessage(Long chatId, Message message) {
+    public void handleMessage(Long chatId, ButtonValue buttonValue) {
         StateMachine<DeleteReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
-        MessageEvent messageEvent = switch (message) {
-            case DELETE_REPORT_START_MESSAGE -> MessageEvent.RUN_DELETE_REPORT_DIALOG;
+        MessageEvent messageEvent = switch (buttonValue) {
+            case DELETE_REPORT_START_DIALOG -> MessageEvent.RUN_DELETE_REPORT_DIALOG;
             case INPUT_NEW_DATE -> MessageEvent.RETURN_TO_USER_DATE_INPUTTING;
             case CONFIRM_DELETE_TIME_RECORD -> MessageEvent.CONFIRM_DELETE_TIME_RECORD;
             case CANCEL -> MessageEvent.DECLINE_DELETE_TIME_RECORD;
             default -> null;
         };
-        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, message.text());
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, buttonValue.text());
         Optional.ofNullable(messageEvent)
                 .ifPresent(stateMachine::sendEvent);
     }

@@ -1,11 +1,12 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.create_report.CreateReportState;
 import com.telegram.reporting.exception.MismatchCategoryException;
 import com.telegram.reporting.exception.TelegramUserException;
-import com.telegram.reporting.messages.Message;
-import com.telegram.reporting.messages.MessageEvent;
+import com.telegram.reporting.dialogs.Message;
+import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.Report;
@@ -50,8 +51,8 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
     @Override
     public void sendCategoryButtons(StateContext<CreateReportState, MessageEvent> context) {
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.CHOICE_REPORT_CATEGORY.text());
-        KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.REPORT_CATEGORY_ON_STORAGE.text(), Message.REPORT_CATEGORY_ON_ORDER.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(Message.REPORT_CATEGORY_ON_OFFICE.text(), Message.REPORT_CATEGORY_ON_COORDINATION.text());
+        KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.REPORT_CATEGORY_ON_STORAGE.text(), ButtonValue.REPORT_CATEGORY_ON_ORDER.text());
+        KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.REPORT_CATEGORY_ON_OFFICE.text(), ButtonValue.REPORT_CATEGORY_ON_COORDINATION.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow, secondRow));
     }
@@ -83,7 +84,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
     @Override
     public void requestAdditionalReport(StateContext<CreateReportState, MessageEvent> context) {
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.REQUEST_ADDITIONAL_REPORT.text());
-        KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.CONFIRM_ADDITIONAL_REPORT.text(), Message.DECLINE_ADDITIONAL_REPORT.text());
+        KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.YES.text(), ButtonValue.NO.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
 
@@ -115,7 +116,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), String.format(message, date, timeRecordMessage, Message.REQUEST_CONFIRMATION_REPORT.text()));
 
-        KeyboardRow firstRow = KeyboardUtils.createRowButtons(Message.CONFIRM_CREATION_FINAL_REPORT.text(), Message.CANCEL.text());
+        KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CONFIRM_CREATION_FINAL_REPORT.text(), ButtonValue.CANCEL.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
     }

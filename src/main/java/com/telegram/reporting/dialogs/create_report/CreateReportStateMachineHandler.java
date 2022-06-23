@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.create_report;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
+import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.messages.Message;
-import com.telegram.reporting.messages.MessageEvent;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateMachine;
@@ -27,22 +27,22 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public void handleMessage(Long chatId, Message message) {
+    public void handleMessage(Long chatId, ButtonValue buttonValue) {
         StateMachine<CreateReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
-        MessageEvent messageEvent = switch (message) {
-            case CREATE_REPORT_START_MESSAGE -> MessageEvent.RUN_CREATE_REPORT_DIALOG;
+        MessageEvent messageEvent = switch (buttonValue) {
+            case CREATE_REPORT_START_DIALOG -> MessageEvent.RUN_CREATE_REPORT_DIALOG;
             case REPORT_CATEGORY_ON_STORAGE,
                     REPORT_CATEGORY_ON_ORDER,
                     REPORT_CATEGORY_ON_OFFICE,
                     REPORT_CATEGORY_ON_COORDINATION -> MessageEvent.CHOOSE_REPORT_CATEGORY;
-            case CONFIRM_ADDITIONAL_REPORT -> MessageEvent.CONFIRM_ADDITIONAL_REPORT;
-            case DECLINE_ADDITIONAL_REPORT -> MessageEvent.DECLINE_ADDITIONAL_REPORT;
+            case YES -> MessageEvent.CONFIRM_ADDITIONAL_REPORT;
+            case NO -> MessageEvent.DECLINE_ADDITIONAL_REPORT;
             case CONFIRM_CREATION_FINAL_REPORT -> MessageEvent.CONFIRM_CREATION_FINAL_REPORT;
             case CANCEL -> MessageEvent.DECLINE_CREATION_FINAL_REPORT;
             case SKIP_NOTE -> MessageEvent.VALIDATE_USER_NOTE_INPUT;
             default -> null;
         };
-        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, message.text());
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, buttonValue.text());
         Optional.ofNullable(messageEvent)
                 .ifPresent(stateMachine::sendEvent);
     }
