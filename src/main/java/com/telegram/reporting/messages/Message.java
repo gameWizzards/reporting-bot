@@ -7,7 +7,7 @@ import java.util.Optional;
 public enum Message {
     CREATE_REPORT_START_MESSAGE("Создать отчет"),
 
-    USER_DATE_INPUT("Введи дату для создния отчета (Допустимо - день, день.месяц, день.месяц.год)"),
+    USER_DATE_INPUT_CREATE_REPORT("Введи дату для создния отчета (Допустимо - день, день.месяц, день.месяц.год)"),
 
     CHOICE_REPORT_CATEGORY("Выбери категорию отчета"),
     REPORT_CATEGORY_ON_STORAGE("На складе"), REPORT_CATEGORY_ON_ORDER("На заказе"),
@@ -30,8 +30,11 @@ public enum Message {
     RETURN_TO_MAIN_MENU("Вернутся в меню"),
 
     DELETE_REPORT_START_MESSAGE("Удалить отчет"),
+    USER_DATE_INPUT_DELETE_REPORT("Введи дату для поиска отчетов за этот день (Допустимо - день, день.месяц, день.месяц.год)"),
     REQUEST_DELETE_CONFIRMATION_REPORT("Вы точно хотите удалить отчет?"),
-    CONFIRM_DELETE_TIME_RECORD("Удалить отчет"),
+    CONFIRM_DELETE_TIME_RECORD("Удалить запись"),
+
+    INPUT_NEW_DATE("Ввести новую дату"),
 
     UPDATE_REPORT_START_MESSAGE("Изменить отчет"),
 

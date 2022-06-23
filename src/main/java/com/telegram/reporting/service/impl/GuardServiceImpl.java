@@ -21,18 +21,18 @@ public class GuardServiceImpl implements GuardService {
 
     @Override
     public <S, E> boolean validateDate(StateContext<S, E> context) {
-        var regexDay = "^([1-9]|0[1-9]|1\\d|2\\d|3[01])$";
-        var regexDayMonth = "^([1-9]|0[1-9]|1\\d|2\\d|3[01]).(0[1-9]|1[0-2])$";
-        var regexFullDate = "^([1-9]|0[1-9]|1\\d|2\\d|3[01]).(0[1-9]|1[0-2]).(19|20)\\d{2}$";
+        String regexDay = "^([1-9]|0[1-9]|1\\d|2\\d|3[01])$";
+        String regexDayMonth = "^([1-9]|0[1-9]|1\\d|2\\d|3[01]).(0[1-9]|1[0-2])$";
+        String regexFullDate = "^([1-9]|0[1-9]|1\\d|2\\d|3[01]).(0[1-9]|1[0-2]).(19|20)\\d{2}$";
 
-        var chatId = TelegramUtils.currentChatId(context);
-        var userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.DATE);
+        String chatId = TelegramUtils.currentChatId(context);
+        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.DATE);
 
         if (userInput.matches(regexDay) || userInput.matches(regexDayMonth) || userInput.matches(regexFullDate)) {
             return true;
         }
 
-        var dateErrorMessage = """
+        String dateErrorMessage = """
                 Вы не верно ввели дату.
                 Попробуйте еще раз в формате - 29.08.1997.
                 Также допустимо - 29 или 29.08
@@ -51,7 +51,7 @@ public class GuardServiceImpl implements GuardService {
             return true;
         }
 
-        var timeErrorMessage = """
+        String timeErrorMessage = """
                 Вы не верно ввели время.
                 Допустимые значения - положительные числа в пределах 24 часов
                 """;
@@ -71,7 +71,7 @@ public class GuardServiceImpl implements GuardService {
             return true;
         }
 
-        var noteErrorMessage = """
+        String noteErrorMessage = """
                 Ваше примечание слишком лаконичное))
                 попробуйте написать больше БУКАВ))
                 Минимальное количество ->""" + minNoteLength;

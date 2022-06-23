@@ -32,7 +32,8 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
         StateMachine<DeleteReportState, MessageEvent> stateMachine = stateMachines.get(chatId);
         MessageEvent messageEvent = switch (message) {
             case DELETE_REPORT_START_MESSAGE -> MessageEvent.RUN_DELETE_REPORT_DIALOG;
-            case CONFIRM_CREATION_FINAL_REPORT -> MessageEvent.CONFIRM_DELETE_TIME_RECORD;
+            case INPUT_NEW_DATE -> MessageEvent.RETURN_TO_USER_DATE_INPUTTING;
+            case CONFIRM_DELETE_TIME_RECORD -> MessageEvent.CONFIRM_DELETE_TIME_RECORD;
             case CANCEL -> MessageEvent.DECLINE_DELETE_TIME_RECORD;
             default -> null;
         };

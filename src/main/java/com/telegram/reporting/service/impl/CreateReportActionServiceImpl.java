@@ -12,10 +12,7 @@ import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.*;
-import com.telegram.reporting.utils.DateTimeUtils;
-import com.telegram.reporting.utils.JsonUtils;
-import com.telegram.reporting.utils.KeyboardUtils;
-import com.telegram.reporting.utils.TelegramUtils;
+import com.telegram.reporting.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Service;
@@ -46,7 +43,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
     @Override
     public void requestInputDate(StateContext<CreateReportState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.USER_DATE_INPUT.text());
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.USER_DATE_INPUT_CREATE_REPORT.text());
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
     }
 
@@ -95,12 +92,12 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
     @Override
     public void requestConfirmationReport(StateContext<CreateReportState, MessageEvent> context) {
 
-        var message = """
+        String message = """
                 Вы хотите отправить отчет за - %s.
-                
+                                
                  Отчеты: \n
                   %s
-                
+                                
                   %s
                 """;
 
@@ -113,7 +110,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
         List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);
 
         String timeRecordMessage = trTOS.stream()
-                .map(this::convertTimeRecordToMessage)
+                .map(TimeRecordUtils::convertTimeRecordToMessage)
                 .collect(Collectors.joining("\n"));
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), String.format(message, date, timeRecordMessage, Message.REQUEST_CONFIRMATION_REPORT.text()));
@@ -140,6 +137,8 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
         report.setTimeRecords(convertToTimeRecordEntities(timeRecordJson, report));
         reportService.save(report);
 
+        log.info("{} report saved - {}", variables.get(ContextVariable.LOG_PREFIX), report);
+
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Вы успешно создали отчет!");
     }
 
@@ -154,14 +153,5 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
             entities.add(timeRecord);
         }
         return entities;
-    }
-
-    private String convertTimeRecordToMessage(TimeRecordTO timeRecordTO) {
-        var timeRecordMessage = """
-                Категория рабочего времени - "%s".
-                Затраченное время - %s ч.
-                Примечание - "%s."
-                 """;
-        return String.format(timeRecordMessage, timeRecordTO.getCategoryName(), timeRecordTO.getHours(), timeRecordTO.getNote());
     }
 }

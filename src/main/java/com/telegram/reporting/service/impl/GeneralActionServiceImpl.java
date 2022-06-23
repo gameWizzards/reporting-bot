@@ -5,14 +5,13 @@ import com.telegram.reporting.messages.Message;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.service.GeneralActionService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.utils.DateTimeUtils;
-import com.telegram.reporting.utils.JsonUtils;
-import com.telegram.reporting.utils.KeyboardUtils;
-import com.telegram.reporting.utils.TelegramUtils;
+import com.telegram.reporting.service.TimeRecordService;
+import com.telegram.reporting.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -27,9 +26,12 @@ import java.util.Map;
 @Service
 public class GeneralActionServiceImpl implements GeneralActionService {
     private final SendBotMessageService sendBotMessageService;
+    private final TimeRecordService timeRecordsService;
 
-    public GeneralActionServiceImpl(SendBotMessageService sendBotMessageService) {
+    public GeneralActionServiceImpl(SendBotMessageService sendBotMessageService,
+                                    TimeRecordService timeRecordsService) {
         this.sendBotMessageService = sendBotMessageService;
+        this.timeRecordsService = timeRecordsService;
     }
 
     @Override
@@ -92,6 +94,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), userMessage);
     }
 
+    //TODO make check to limit of timeRecord for one report with AOP
     @Override
     public <S, E> void prepareTimeRecord(StateContext<S, E> context) {
         List<TimeRecordTO> trTOs;
@@ -127,12 +130,73 @@ public class GeneralActionServiceImpl implements GeneralActionService {
 
     @Override
     public <S, E> void sendListTimeRecords(StateContext<S, E> context) {
-        log.warn("sendListTimeRecords");
+        Map<Object, Object> variables = context.getExtendedState().getVariables();
+        String chatId = TelegramUtils.currentChatId(context);
+        String date = (String) variables.get(ContextVariable.DATE);
+
+        List<TimeRecordTO> trTOs = timeRecordsService.getTimeRecordTOs(date, chatId);
+
+        if (CollectionUtils.isEmpty(trTOs)) {
+            String message = """
+                    Нет отчетов за - %s.
+                    Выбери другую дату или
+                    вернись в главное меню.
+                    """;
+            SendMessage sendMessage = new SendMessage(chatId, String.format(message, date));
+            KeyboardRow rowButtons = KeyboardUtils.createRowButtons(Message.INPUT_NEW_DATE.text());
+            sendBotMessageService.sendMessageWithKeys(sendMessage,
+                    KeyboardUtils.createKeyboardMarkup(true, rowButtons));
+            return;
+        }
+
+        Long ordinalNumber = 1L;
+        List<String> buttons = new ArrayList<>();
+        StringBuilder timeRecordMessage = new StringBuilder();
+
+        String message = """
+                Вот доступные отчеты за - %s.
+                                
+                 Отчеты: \n
+                  %s
+                                
+                Выберите отчет для удаления.
+                """;
+
+        for (TimeRecordTO timeRecordTO : trTOs) {
+            timeRecordTO.setOrdinalNumber(ordinalNumber);
+            String trMessage = TimeRecordUtils.convertTimeRecordToMessage(timeRecordTO);
+            timeRecordMessage.append(ordinalNumber)
+                    .append(". ")
+                    .append(trMessage)
+                    .append("\n");
+            buttons.add(String.valueOf(ordinalNumber));
+            ordinalNumber++;
+        }
+
+        String timeRecordsJson = JsonUtils.serializeItem(trTOs);
+        variables.put(ContextVariable.TIME_RECORDS_JSON, timeRecordsJson);
+
+        SendMessage sendMessage = new SendMessage(chatId, String.format(message, date, timeRecordMessage));
+        KeyboardRow rowButtons = KeyboardUtils.createRowButtons(buttons.toArray(new String[0]));
+
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, rowButtons));
     }
 
     @Override
     public <S, E> void handleTimeRecord(StateContext<S, E> context) {
-        log.warn("handleTimeRecord");
+        Map<Object, Object> variables = context.getExtendedState().getVariables();
+        Long ordinalNumberTR = Long.parseLong((String) variables.get(ContextVariable.TIME_RECORD_CHOICE));
+
+        String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
+        List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);
+
+        TimeRecordTO timeRecordTO = trTOS.stream()
+                .filter(tr -> tr.getOrdinalNumber().equals(ordinalNumberTR))
+                .findFirst()
+                .orElse(null);
+
+        String json = timeRecordTO != null ? JsonUtils.serializeItem(timeRecordTO) : "";
+        variables.put(ContextVariable.TIME_RECORDS_JSON, json);
     }
 
 

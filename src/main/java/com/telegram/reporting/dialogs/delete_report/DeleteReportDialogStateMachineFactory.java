@@ -62,6 +62,13 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .action(generalActionService::handleUserDateInput)
                 .action(generalActionService::sendListTimeRecords)
 
+                // if report doesn't exist
+                .and().withExternal()
+                .source(DeleteReportState.USER_TIME_RECORD_CHOICE)
+                .event(MessageEvent.RETURN_TO_USER_DATE_INPUTTING)
+                .target(DeleteReportState.USER_DATE_INPUTTING)
+                .action(deleteReportActionService::requestInputDate)
+
                 .and().withExternal()
                 .source(DeleteReportState.USER_TIME_RECORD_CHOICE)
                 .event(MessageEvent.CHOOSE_TIME_RECORD)

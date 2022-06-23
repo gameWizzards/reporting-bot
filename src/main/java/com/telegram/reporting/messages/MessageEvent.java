@@ -21,5 +21,6 @@ public enum MessageEvent {
     RUN_ADD_NEW_USER_DIALOG,
 
     CANCEL,
+    RETURN_TO_USER_DATE_INPUTTING,
     RETURN_TO_MAIN_MENU
 }

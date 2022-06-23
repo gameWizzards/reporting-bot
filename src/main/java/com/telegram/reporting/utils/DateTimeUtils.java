@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DateTimeUtils {
@@ -38,8 +39,8 @@ public class DateTimeUtils {
     private static void checkStringInputFormat(String input, String regexPattern, String handleType) {
         Objects.requireNonNull(input, handleType + " string is required! Non null!");
 
-        var pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
-        var matcher = pattern.matcher(input);
+        Pattern pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(input);
 
         if (!matcher.matches()) {
             String format = getFormat(handleType);
