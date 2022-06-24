@@ -64,6 +64,7 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .target(CreateReportState.USER_DATE_CATEGORY_CHOICE)
                 .guard(guardService::validateDate)
                 .action(generalActionService::handleUserDateInput)
+                .action(createReportActionService::sendExistedTimeRecords)
                 .action(createReportActionService::sendCategoryButtons)
 
                 .and().withExternal()

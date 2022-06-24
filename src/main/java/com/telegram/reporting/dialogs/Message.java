@@ -11,7 +11,7 @@ public enum Message {
     REQUEST_CONFIRMATION_REPORT("Убедись что отчет коректный. Отправить отчет?"),
 
     //delete report dialog
-    REQUEST_DELETE_CONFIRMATION_REPORT("Вы точно хотите удалить отчет?"),
+    REQUEST_DELETE_CONFIRMATION_REPORT("Уверен что хочешь удалить этот отчет?"),
 
     // general
     USER_DATE_INPUT_DELETE_REPORT("Введи дату для поиска отчетов за этот день (Допустимо - день, день.месяц, день.месяц.год)"),

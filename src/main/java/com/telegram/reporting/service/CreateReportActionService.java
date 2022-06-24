@@ -7,6 +7,8 @@ import org.springframework.statemachine.StateContext;
 public interface CreateReportActionService {
     void requestInputDate(StateContext<CreateReportState, MessageEvent> context);
 
+    void sendExistedTimeRecords(StateContext<CreateReportState, MessageEvent> context);
+
     void sendCategoryButtons(StateContext<CreateReportState, MessageEvent> context);
 
     void handleCategory(StateContext<CreateReportState, MessageEvent> context);

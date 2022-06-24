@@ -27,6 +27,36 @@ public class KeyboardUtils {
         return button;
     }
 
+    public static KeyboardRow[] createButtonsWithRows(List<String> buttonNames, int buttonsInRow) {
+        Validate.notEmpty(buttonNames, "Can't create buttons with rows. List of names empty or NULL");
+        Validate.noNullElements(buttonNames, "Can't create buttons with rows. List of names contains NULL element");
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        List<String> listBN = new ArrayList<>(buttonNames);
+
+        final int requiredMinQuantity = 2;
+        if (buttonsInRow < requiredMinQuantity) {
+            buttonsInRow = requiredMinQuantity;
+        }
+
+        int cycle = listBN.size() / 2;
+        int lastRowButtons = listBN.size() % buttonsInRow;
+
+        for (int i = 0; i < cycle; i++) {
+            List<String> subBNs = new ArrayList<>(listBN.subList(0, buttonsInRow));
+            KeyboardRow button = KeyboardUtils.createRowButtons(subBNs.toArray(new String[0]));
+            subBNs.forEach(listBN::remove);
+
+            keyboardRows.add(button);
+        }
+
+        if (lastRowButtons != 0) {
+            keyboardRows.add(KeyboardUtils.createRowButtons(listBN.toArray(new String[0])));
+        }
+
+        return keyboardRows.toArray(new KeyboardRow[0]);
+    }
+
     public static ReplyKeyboardMarkup createMainMenuButtonMarkup() {
         return createKeyboardMarkup(true, new KeyboardRow());
     }

@@ -1,8 +1,8 @@
 package com.telegram.reporting.dialogs;
 
 public enum MessageEvent {
+    // create report dialog
     RUN_CREATE_REPORT_DIALOG,
-    VALIDATE_USER_DATE_INPUT,
     CHOOSE_REPORT_CATEGORY,
     VALIDATE_USER_TIME_INPUT,
     VALIDATE_USER_NOTE_INPUT,
@@ -11,16 +11,19 @@ public enum MessageEvent {
     CONFIRM_CREATION_FINAL_REPORT,
     DECLINE_CREATION_FINAL_REPORT,
 
-    RUN_UPDATE_REPORT_DIALOG,
-
+    // delete report dialog
     RUN_DELETE_REPORT_DIALOG,
     CHOOSE_TIME_RECORD,
     CONFIRM_DELETE_TIME_RECORD,
     DECLINE_DELETE_TIME_RECORD,
 
+    // update report dialog
+    RUN_UPDATE_REPORT_DIALOG,
+
+    // add new user dialog
     RUN_ADD_NEW_USER_DIALOG,
 
-    CANCEL,
+    //general
     RETURN_TO_USER_DATE_INPUTTING,
-    RETURN_TO_MAIN_MENU
+    VALIDATE_USER_DATE_INPUT,
 }

@@ -1,9 +1,9 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.repository.ReportRepository;
 import com.telegram.reporting.repository.TimeRecordRepository;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.TimeRecord;
+import com.telegram.reporting.service.ReportService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +20,12 @@ import java.util.List;
 @Service
 public class TimeRecordServiceImpl implements TimeRecordService {
     private final TimeRecordRepository timeRecordRepository;
-    private final ReportRepository reportRepository;
+    private final ReportService reportService;
 
     public TimeRecordServiceImpl(TimeRecordRepository timeRecordRepository,
-                                 ReportRepository reportRepository) {
+                                 ReportService reportService) {
         this.timeRecordRepository = timeRecordRepository;
-        this.reportRepository = reportRepository;
+        this.reportService = reportService;
     }
 
     @Override
@@ -49,14 +49,14 @@ public class TimeRecordServiceImpl implements TimeRecordService {
     @Transactional
     public void deleteByTimeRecordTO(TimeRecordTO timeRecordTO) {
         Validate.notNull(timeRecordTO, "Required not null TimeRecordTO object to remove time record");
-        String nullIdsMessage = String.format("Required to have reportId and timeRecordId when make remove. %s", timeRecordTO);
-        Validate.noNullElements(new Long[]{timeRecordTO.getReportId(), timeRecordTO.getId()}, nullIdsMessage);
+        String errorMessage = String.format("Required to have timeRecordId when make remove. %s", timeRecordTO);
+        Validate.notNull(timeRecordTO.getId(), errorMessage);
 
         long timeRecordCount = timeRecordRepository.countTimeRecordsInReport(timeRecordTO.getReportId());
         boolean isLastElement = timeRecordCount == 1;
 
         if (isLastElement) {
-            reportRepository.delete(timeRecordTO.getReportId());
+            reportService.delete(timeRecordTO.getReportId());
             return;
         }
 

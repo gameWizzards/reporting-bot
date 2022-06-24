@@ -2,11 +2,11 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
+import com.telegram.reporting.dialogs.Message;
+import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.create_report.CreateReportState;
 import com.telegram.reporting.exception.MismatchCategoryException;
 import com.telegram.reporting.exception.TelegramUserException;
-import com.telegram.reporting.dialogs.Message;
-import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.Report;
@@ -17,6 +17,7 @@ import com.telegram.reporting.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,13 +35,16 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
     private final TelegramUserService telegramUserService;
     private final CategoryService categoryService;
     private final ReportService reportService;
+    private final TimeRecordService timeRecordService;
 
     public CreateReportActionServiceImpl(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService,
-                                         CategoryService categoryService, ReportService reportService) {
+                                         CategoryService categoryService, ReportService reportService,
+                                         TimeRecordService timeRecordService) {
         this.sendBotMessageService = sendBotMessageService;
         this.telegramUserService = telegramUserService;
         this.categoryService = categoryService;
         this.reportService = reportService;
+        this.timeRecordService = timeRecordService;
     }
 
     @Override
@@ -49,12 +54,65 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
     }
 
     @Override
-    public void sendCategoryButtons(StateContext<CreateReportState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.CHOICE_REPORT_CATEGORY.text());
-        KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.REPORT_CATEGORY_ON_STORAGE.text(), ButtonValue.REPORT_CATEGORY_ON_ORDER.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.REPORT_CATEGORY_ON_OFFICE.text(), ButtonValue.REPORT_CATEGORY_ON_COORDINATION.text());
+    public void sendExistedTimeRecords(StateContext<CreateReportState, MessageEvent> context) {
+        Map<Object, Object> variables = context.getExtendedState().getVariables();
+        String chatId = TelegramUtils.currentChatId(context);
+        String date = (String) variables.get(ContextVariable.DATE);
 
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow, secondRow));
+        List<TimeRecordTO> trTOs = timeRecordService.getTimeRecordTOs(date, chatId);
+
+        if (CollectionUtils.isEmpty(trTOs)) {
+            return;
+        }
+
+        StringBuilder timeRecordMessage = new StringBuilder();
+
+        String message = """
+                Ранее созданные отчеты за - %s.
+                                
+                 Отчеты: \n
+                  %s
+                ВАЖНО! IMPORTANT! ACHTUNG!
+                Ты сможешь добавить только новые 
+                категории к этому отчету!
+                Если хочешь изменить ранее созданные,
+                тогда переходи в диалог "Изменить отчет".
+                """;
+
+        for (TimeRecordTO timeRecordTO : trTOs) {
+            String trMessage = TimeRecordUtils.convertTimeRecordToMessage(timeRecordTO);
+            timeRecordMessage
+                    .append(trMessage)
+                    .append("\n");
+        }
+
+        String timeRecordsJson = JsonUtils.serializeItem(trTOs);
+        variables.put(ContextVariable.TIME_RECORDS_JSON, timeRecordsJson);
+
+        sendBotMessageService.sendMessage(chatId, String.format(message, date, timeRecordMessage, date));
+    }
+
+    @Override
+    public void sendCategoryButtons(StateContext<CreateReportState, MessageEvent> context) {
+        String timeRecordsJson = (String) context.getExtendedState().getVariables().get(ContextVariable.TIME_RECORDS_JSON);
+
+        String chatId = TelegramUtils.currentChatId(context);
+
+        List<String> buttons = ButtonValue.categoryButtons().stream()
+                .map(ButtonValue::text)
+                .filter(Predicate.not(Optional.ofNullable(timeRecordsJson).orElse("")::contains))
+                .toList();
+
+        if (buttons.isEmpty()) {
+            sendBotMessageService.sendMessage(chatId, "Все доступные категории для этого отчета заполнены");
+            context.getStateMachine()
+                    .sendEvent(MessageEvent.DECLINE_ADDITIONAL_REPORT);
+        }
+
+        SendMessage sendMessage = new SendMessage(chatId, Message.CHOICE_REPORT_CATEGORY.text());
+        KeyboardRow[] buttonsWithRows = KeyboardUtils.createButtonsWithRows(buttons, 2);
+
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, buttonsWithRows));
     }
 
     @Override
@@ -69,7 +127,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
         String reportCategoryType = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_CATEGORY_TYPE);
 
         String userMessageCategoryAccepted = String.format("""
-                        Вы выбрали категорию отчета - "%s". Категория принята.
+                        Ты выбрал категорию отчета - "%s". Категория принята.
                                         
                         %s
                         """,
@@ -94,7 +152,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
     public void requestConfirmationReport(StateContext<CreateReportState, MessageEvent> context) {
 
         String message = """
-                Вы хотите отправить отчет за - %s.
+                Хочешь отправить отчет за - %s.
                                 
                  Отчеты: \n
                   %s
@@ -129,18 +187,22 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
         String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
         Long chatId = (Long) variables.get(ContextVariable.CHAT_ID);
 
-        Optional<User> user = telegramUserService.findByChatId(chatId);
+        Report report = reportService.getReport(DateTimeUtils.parseDefaultDate(date));
 
-        Report report = new Report();
-        report.setDate(DateTimeUtils.parseDefaultDate(date));
-        report.setUser(user.orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = " + chatId)));
+        if (report == null) {
+            report = new Report();
+
+            Optional<User> user = telegramUserService.findByChatId(chatId);
+            report.setDate(DateTimeUtils.parseDefaultDate(date));
+            report.setUser(user.orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = " + chatId)));
+        }
 
         report.setTimeRecords(convertToTimeRecordEntities(timeRecordJson, report));
         reportService.save(report);
 
         log.info("{} report saved - {}", variables.get(ContextVariable.LOG_PREFIX), report);
 
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Вы успешно создали отчет!");
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Отчет успешно создан!");
     }
 
     private List<TimeRecord> convertToTimeRecordEntities(String timeRecordJson, Report report) {
@@ -149,6 +211,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
         for (TimeRecordTO trTO : trTOS) {
             Optional<Category> categoryOptional = categoryService.getByName(trTO.getCategoryName());
             TimeRecord timeRecord = new TimeRecord(trTO);
+            timeRecord.setId(trTO.getId());
             timeRecord.setCategory(categoryOptional.orElseThrow(() -> new MismatchCategoryException("Can't find category by name = " + trTO.getCategoryName())));
             timeRecord.setReport(report);
             entities.add(timeRecord);

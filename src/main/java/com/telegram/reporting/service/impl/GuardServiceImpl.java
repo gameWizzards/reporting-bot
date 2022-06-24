@@ -34,8 +34,8 @@ public class GuardServiceImpl implements GuardService {
         }
 
         String dateErrorMessage = """
-                Вы не верно ввели дату.
-                Попробуйте еще раз в формате - 29.08.1997.
+                Ты не верно ввел дату.
+                Попробуй еще раз в формате - 29.08.1997.
                 Также допустимо - 29 или 29.08
                 """;
         sendBotMessageService.sendMessage(chatId, dateErrorMessage);
@@ -53,7 +53,7 @@ public class GuardServiceImpl implements GuardService {
         }
 
         String timeErrorMessage = """
-                Вы не верно ввели время.
+                Ты не верно ввел время.
                 Допустимые значения - положительные числа в пределах 24 часов
                 """;
         sendBotMessageService.sendMessage(chatId, timeErrorMessage);

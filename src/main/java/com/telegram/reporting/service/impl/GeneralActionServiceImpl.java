@@ -87,7 +87,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
         boolean isSkipNote = ButtonValue.SKIP_NOTE.text().equals(lastButtonText.trim());
 
         if (isSkipNote) {
-            userMessage = "Вы создали отчет без примечания";
+            userMessage = "Отчет создан без примечания";
             variables.put(ContextVariable.REPORT_NOTE, note);
         } else {
             userMessage = String.format("Примечание принято = \"%s\"", userInput);
@@ -127,7 +127,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
 
     @Override
     public <S, E> void declinePersistReport(StateContext<S, E> context) {
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Вы отменили отправку отчета.");
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Отправка отчета отменена!");
     }
 
     @Override

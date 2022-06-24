@@ -48,7 +48,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
         String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
 
         String message = """
-                Вы хотите удалить отчет за - %s.
+                Хочешь удалить отчет за - %s.
                                 
                   %s
                       
@@ -70,7 +70,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
         String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
 
         if (StringUtils.isBlank(timeRecordJson)) {
-            sendBotMessageService.sendMessage(chatId, "Что-то пошло не так. Отчет не удален");
+            sendBotMessageService.sendMessage(chatId, "Что-то пошло не так. Отчет не удален(");
             throw new NoSuchElementException("Can't find timeRecord to delete on Date = " + variables.get(ContextVariable.DATE));
         }
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
@@ -78,6 +78,6 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
 
         log.info("{} timeRecord removed - {}", variables.get(ContextVariable.LOG_PREFIX), timeRecordTO);
 
-        sendBotMessageService.sendMessage(chatId, "Вы успешно удалили отчет!");
+        sendBotMessageService.sendMessage(chatId, "Отчет успешно удален!");
     }
 }

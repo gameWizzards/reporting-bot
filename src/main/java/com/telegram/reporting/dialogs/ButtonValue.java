@@ -43,8 +43,13 @@ public enum ButtonValue {
                 .findFirst();
     }
 
-    public static List<ButtonValue> startMessages() {
+    public static List<ButtonValue> startDialogButtons() {
         return Arrays.asList(CREATE_REPORT_START_DIALOG, DELETE_REPORT_START_DIALOG, UPDATE_REPORT_START_DIALOG);
+    }
+
+    public static List<ButtonValue> categoryButtons() {
+        return Arrays.asList(REPORT_CATEGORY_ON_STORAGE, REPORT_CATEGORY_ON_ORDER,
+                REPORT_CATEGORY_ON_OFFICE, REPORT_CATEGORY_ON_COORDINATION);
     }
 
     public String text() {

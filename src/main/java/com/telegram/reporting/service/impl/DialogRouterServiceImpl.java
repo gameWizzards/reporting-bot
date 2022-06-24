@@ -55,7 +55,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
             }
 
             // create new handler when buttonValue contains name of particular dialog
-            if (ButtonValue.startMessages().contains(buttonValue)) {
+            if (ButtonValue.startDialogButtons().contains(buttonValue)) {
                 createStateMachineHandler(chatId, buttonValue, telegramNickname);
             }
 
