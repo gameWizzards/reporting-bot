@@ -14,7 +14,10 @@ public enum Message {
     REQUEST_DELETE_CONFIRMATION_REPORT("Вы точно хотите удалить отчет?"),
 
     // general
-    USER_DATE_INPUT_DELETE_REPORT("Введи дату для поиска отчетов за этот день (Допустимо - день, день.месяц, день.месяц.год)");
+    USER_DATE_INPUT_DELETE_REPORT("Введи дату для поиска отчетов за этот день (Допустимо - день, день.месяц, день.месяц.год)"),
+    GENERAL_ERROR_MESSAGE("Упс))) Что-то пошло не так, попробуй начать новый диалог."),
+
+    ;
 
     private final String text;
 

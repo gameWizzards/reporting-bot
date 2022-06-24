@@ -1,5 +1,6 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.service.DialogRouterService;
@@ -47,15 +48,36 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         if (messageOptional.isPresent()) {
             ButtonValue buttonValue = messageOptional.get();
 
+            // return to root menu when click 'main menu' button
+            if (ButtonValue.MAIN_MENU.equals(buttonValue)) {
+                startFlow(chatId.toString());
+                return;
+            }
+
+            // create new handler when buttonValue contains name of particular dialog
             if (ButtonValue.startMessages().contains(buttonValue)) {
                 createStateMachineHandler(chatId, buttonValue, telegramNickname);
             }
 
-            if (ButtonValue.MAIN_MENU.equals(buttonValue)) {
+
+            // when dialog in telegram remain on some step with buttons but app was reloaded
+            // that means that there is no handler for the dialog - start from root menu
+            if (!stateMachineHandlers.containsKey(chatId)) {
+                sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
                 startFlow(chatId.toString());
+                return;
             }
+
             stateMachineHandlers.get(chatId).handleMessage(chatId, buttonValue);
         } else {
+
+            // when dialog in telegram remain on some step with user input but app was reloaded
+            // that means that is no handler for the dialog - start from root menu
+            if (!stateMachineHandlers.containsKey(chatId)) {
+                sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
+                startFlow(chatId.toString());
+                return;
+            }
             stateMachineHandlers.get(chatId).handleUserInput(chatId, input);
         }
     }
