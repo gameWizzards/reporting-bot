@@ -139,9 +139,9 @@
         <sql dbms="postgresql">
             INSERT INTO "public"."category" ("name", "description")
             VALUES ('На складе', 'Подготовка заказа, изготвление декораций, прочее'),
-                   ('На заказе', 'Работы на объекте клиента '),
-                   ('На офисе', 'Работы связанные с деятельность пространства Серпантин'),
-                   ('На координации', 'Работа координатора на мероприятии');
+            ('На заказе', 'Работы на объекте клиента '),
+            ('На офисе', 'Работы связанные с деятельность пространства Серпантин'),
+            ('На координации', 'Работа координатора на мероприятии');
         </sql>
     </changeSet>
 
@@ -158,6 +158,30 @@
 
     <changeSet id="remove_unused_column" author="cyberdyne_systems">
         <dropColumn schemaName="public" tableName="report" columnName="created"/>
+    </changeSet>
+
+    <changeSet id="unique_constraint_report_user_id_date" author="cyberdyne_systems">
+        <addUniqueConstraint
+                schemaName="public"
+                tableName="report"
+                columnNames="user_id, date"
+                constraintName="user_id_date_report_unique_const"
+                initiallyDeferred="true"
+                deferrable="true"
+                disabled="false"
+        />
+    </changeSet>
+
+    <changeSet id="unique_constraint_timerecord_report_id_category_id" author="cyberdyne_systems">
+        <addUniqueConstraint
+                schemaName="public"
+                tableName="time_record"
+                columnNames="report_id, category_id"
+                constraintName="report_id_category_id_time_record_unique_const"
+                initiallyDeferred="true"
+                deferrable="true"
+                disabled="false"
+        />
     </changeSet>
 
 </databaseChangeLog>
