@@ -40,9 +40,11 @@ public class CreateReportStateMachineHandler implements StateMachineHandler {
             case CONFIRM_CREATION_FINAL_REPORT -> MessageEvent.CONFIRM_CREATION_FINAL_REPORT;
             case CANCEL -> MessageEvent.DECLINE_CREATION_FINAL_REPORT;
             case SKIP_NOTE -> MessageEvent.VALIDATE_USER_NOTE_INPUT;
+            case INPUT_NEW_DATE -> MessageEvent.RETURN_TO_USER_DATE_INPUTTING;
+            case LIST_TIME_RECORDS -> MessageEvent.GO_TO_USER_FINAL_REPORT_CONFIRMATION;
             default -> null;
         };
-        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, buttonValue.text());
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.BUTTON_VALUE, buttonValue.text());
         Optional.ofNullable(messageEvent)
                 .ifPresent(stateMachine::sendEvent);
     }

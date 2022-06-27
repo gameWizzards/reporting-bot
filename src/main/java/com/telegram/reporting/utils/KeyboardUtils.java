@@ -6,10 +6,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class KeyboardUtils {
@@ -86,9 +84,16 @@ public class KeyboardUtils {
 
         SendMessage sendMessage = new SendMessage(chatId, startFlowMessage);
         KeyboardRow firstRow = KeyboardUtils.createButton(ButtonValue.CREATE_REPORT_START_DIALOG.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.UPDATE_REPORT_START_DIALOG.text(), ButtonValue.DELETE_REPORT_START_DIALOG.text());
+        KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.EDIT_REPORT_START_DIALOG.text(), ButtonValue.DELETE_REPORT_START_DIALOG.text());
         sendMessage.setReplyMarkup(KeyboardUtils.createKeyboardMarkup(false, firstRow, secondRow));
 
         return sendMessage;
+    }
+
+    public static List<String> getAvailableButtons(String timeRecordsJson) {
+        return ButtonValue.categoryButtons().stream()
+                .map(ButtonValue::text)
+                .filter(Predicate.not(Optional.ofNullable(timeRecordsJson).orElse("")::contains))
+                .toList();
     }
 }

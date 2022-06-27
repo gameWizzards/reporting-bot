@@ -5,7 +5,6 @@ import com.telegram.reporting.dialogs.MessageEvent;
 import org.springframework.statemachine.StateContext;
 
 public interface DeleteReportActionService {
-    void requestInputDate(StateContext<DeleteReportState, MessageEvent> context);
 
     void requestDeleteConfirmation(StateContext<DeleteReportState, MessageEvent> context);
 

@@ -13,8 +13,12 @@ public class TelegramUtils {
         return update.getMessage().getChatId();
     }
 
-    public static String currentChatId(StateContext context) {
+    public static <S, E> String currentChatId(StateContext<S, E> context) {
         return String.valueOf(context.getExtendedState().getVariables().get(ContextVariable.CHAT_ID));
+    }
+
+    public static <S, E> String getContextVariableValue(StateContext<S, E> context, ContextVariable variable) {
+        return (String) context.getExtendedState().getVariables().get(variable);
     }
 
     public static String getMessage(Update update) {

@@ -61,18 +61,32 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_INPUTTING)
                 .event(MessageEvent.VALIDATE_USER_DATE_INPUT)
-                .target(CreateReportState.USER_DATE_CATEGORY_CHOICE)
+                .target(CreateReportState.USER_CATEGORY_CHOICE)
                 .guard(guardService::validateDate)
                 .action(generalActionService::handleUserDateInput)
                 .action(createReportActionService::sendExistedTimeRecords)
                 .action(createReportActionService::sendCategoryButtons)
 
                 .and().withExternal()
-                .source(CreateReportState.USER_DATE_CATEGORY_CHOICE)
+                .source(CreateReportState.USER_CATEGORY_CHOICE)
                 .event(MessageEvent.CHOOSE_REPORT_CATEGORY)
                 .target(CreateReportState.USER_TIME_INPUTTING)
-                .action(createReportActionService::handleCategory)
+                .action(generalActionService::handleCategory)
                 .action(createReportActionService::requestInputTime)
+
+                // if all categories are occupied on USER_DATE_INPUTTING step
+                .and().withExternal()
+                .source(CreateReportState.USER_CATEGORY_CHOICE)
+                .event(MessageEvent.RETURN_TO_USER_DATE_INPUTTING)
+                .target(CreateReportState.USER_DATE_INPUTTING)
+                .action(generalActionService::generalRequestInputDate)
+
+                // if all categories are occupied on USER_CREATE_ADDITIONAL_REPORT step
+                .and().withExternal()
+                .source(CreateReportState.USER_CATEGORY_CHOICE)
+                .event(MessageEvent.GO_TO_USER_FINAL_REPORT_CONFIRMATION)
+                .target(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
+                .action(createReportActionService::requestConfirmationReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_TIME_INPUTTING)
@@ -80,7 +94,7 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .target(CreateReportState.USER_NOTE_INPUTTING)
                 .guard(guardService::validateTime)
                 .action(generalActionService::handleUserTimeInput)
-                .action(generalActionService::requestInputNote)
+                .action(createReportActionService::requestInputNote)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_NOTE_INPUTTING)
@@ -88,13 +102,13 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .target(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .guard(guardService::validateNote)
                 .action(generalActionService::handleUserNoteInput)
-                .action(generalActionService::prepareTimeRecord)
+                .action(createReportActionService::prepareTimeRecord)
                 .action(createReportActionService::requestAdditionalReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.CONFIRM_ADDITIONAL_REPORT)
-                .target(CreateReportState.USER_DATE_CATEGORY_CHOICE)
+                .target(CreateReportState.USER_CATEGORY_CHOICE)
                 .action(createReportActionService::sendCategoryButtons)
 
                 .and().withExternal()
@@ -113,30 +127,9 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.DECLINE_CREATION_FINAL_REPORT)
-                .target(CreateReportState.USER_DATE_INPUTTING)
-                .action(generalActionService::declinePersistReport)
+                .target(CreateReportState.END_CREATE_REPORT_DIALOG)
+                .action(createReportActionService::declinePersistReport)
                 .action(generalActionService::sendRootMenuButtons);
 
-
-        // Handling CANCEL button
-//                .and().withExternal()
-//                .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-//                .event(MessageEvent.CANCEL)
-//                .target(CreateReportState.USER_DATE_INPUTTING)
-//                .action(reservedAction(), errorAction())
-
-//                .and().withExternal()
-//                .source(CreateReportState.USER_TIME_INPUTTING)
-//                .event(MessageEvent.CANCEL)
-//                .target(CreateReportState.USER_DATE_INPUTTING)
-//                .action(reservedAction(), errorAction())
-
-
-        // Handling RETURN_TO_MAIN_MENU button
-//                .and().withExternal()
-//                .source(CreateReportState.USER_DATE_CATEGORY_CHOOSE)
-//                .target(CreateReportState.END_DIALOG)
-//                .event(MessageEvent.RETURN_TO_MAIN_MENU);
-//                .action(reservedAction(), errorAction());
     }
 }

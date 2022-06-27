@@ -7,10 +7,6 @@ import java.util.Optional;
 public enum ButtonValue {
     //create report dialog
     CREATE_REPORT_START_DIALOG("Создать отчет"),
-
-    REPORT_CATEGORY_ON_STORAGE("На складе"), REPORT_CATEGORY_ON_ORDER("На заказе"),
-    REPORT_CATEGORY_ON_OFFICE("На офисе"), REPORT_CATEGORY_ON_COORDINATION("На координации"),
-
     SKIP_NOTE("Пропустить примечание"),
     CONFIRM_CREATION_FINAL_REPORT("Отправить отчет"),
 
@@ -18,8 +14,14 @@ public enum ButtonValue {
     DELETE_REPORT_START_DIALOG("Удалить отчет"),
     CONFIRM_DELETE_TIME_RECORD("Удалить запись"),
 
-    // update report dialog
-    UPDATE_REPORT_START_DIALOG("Изменить отчет"),
+    // edit report dialog
+    EDIT_REPORT_START_DIALOG("Изменить отчет"),
+    SPEND_TIME("Затраченное время"),
+    CATEGORY("Категория рабочего времени"),
+    NOTE("Примичание"),
+    CONFIRM_EDIT_ADDITIONAL_DATA("Изменить еще"),
+    DECLINE_EDIT_ADDITIONAL_DATA("И так сойдет"),
+    APPLY_DATA_CHANGES("Применить изменения"),
 
     // add new user dialog
     ADD_NEW_USER_START_DIALOG("Добавить пользователя"),
@@ -29,7 +31,12 @@ public enum ButtonValue {
     NO("Нет"),
     CANCEL("Отмена"),
     MAIN_MENU("Главное меню"),
-    INPUT_NEW_DATE("Ввести новую дату");
+    INPUT_NEW_DATE("Ввести новую дату"),
+    LIST_TIME_RECORDS("Список очтетов"),
+
+    REPORT_CATEGORY_ON_STORAGE("На складе"), REPORT_CATEGORY_ON_ORDER("На заказе"),
+    REPORT_CATEGORY_ON_OFFICE("На офисе"), REPORT_CATEGORY_ON_COORDINATION("На координации"),
+    ;
 
     private final String text;
 
@@ -44,7 +51,7 @@ public enum ButtonValue {
     }
 
     public static List<ButtonValue> startDialogButtons() {
-        return Arrays.asList(CREATE_REPORT_START_DIALOG, DELETE_REPORT_START_DIALOG, UPDATE_REPORT_START_DIALOG);
+        return Arrays.asList(CREATE_REPORT_START_DIALOG, DELETE_REPORT_START_DIALOG, EDIT_REPORT_START_DIALOG);
     }
 
     public static List<ButtonValue> categoryButtons() {

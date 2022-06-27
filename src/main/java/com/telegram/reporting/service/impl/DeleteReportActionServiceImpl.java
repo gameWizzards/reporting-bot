@@ -36,16 +36,10 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
     }
 
     @Override
-    public void requestInputDate(StateContext<DeleteReportState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.USER_DATE_INPUT_DELETE_REPORT.text());
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
-    }
-
-    @Override
     public void requestDeleteConfirmation(StateContext<DeleteReportState, MessageEvent> context) {
         Map<Object, Object> variables = context.getExtendedState().getVariables();
         String date = (String) variables.get(ContextVariable.DATE);
-        String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
+        String timeRecordJson = (String) variables.get(ContextVariable.TARGET_TIME_RECORD_JSON);
 
         String message = """
                 Хочешь удалить отчет за - %s.
@@ -67,7 +61,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
     public void removeTimeRecord(StateContext<DeleteReportState, MessageEvent> context) {
         Map<Object, Object> variables = context.getExtendedState().getVariables();
         String chatId = TelegramUtils.currentChatId(context);
-        String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
+        String timeRecordJson = (String) variables.get(ContextVariable.TARGET_TIME_RECORD_JSON);
 
         if (StringUtils.isBlank(timeRecordJson)) {
             sendBotMessageService.sendMessage(chatId, "Что-то пошло не так. Отчет не удален(");

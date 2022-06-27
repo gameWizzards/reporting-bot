@@ -52,7 +52,7 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .source(DeleteReportState.START_DELETE_REPORT_DIALOG)
                 .event(MessageEvent.RUN_DELETE_REPORT_DIALOG)
                 .target(DeleteReportState.USER_DATE_INPUTTING)
-                .action(deleteReportActionService::requestInputDate)
+                .action(generalActionService::generalRequestInputDate)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_DATE_INPUTTING)
@@ -67,13 +67,13 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .source(DeleteReportState.USER_TIME_RECORD_CHOICE)
                 .event(MessageEvent.RETURN_TO_USER_DATE_INPUTTING)
                 .target(DeleteReportState.USER_DATE_INPUTTING)
-                .action(deleteReportActionService::requestInputDate)
+                .action(generalActionService::generalRequestInputDate)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_TIME_RECORD_CHOICE)
                 .event(MessageEvent.CHOOSE_TIME_RECORD)
                 .target(DeleteReportState.USER_DELETE_CONFIRMATION)
-                .action(generalActionService::handleTimeRecord)
+                .action(generalActionService::handleChoiceTimeRecord)
                 .action(deleteReportActionService::requestDeleteConfirmation)
 
                 .and().withExternal()

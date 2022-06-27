@@ -2,7 +2,6 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
-import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.service.GuardService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.TelegramUtils;
@@ -34,9 +33,8 @@ public class GuardServiceImpl implements GuardService {
         }
 
         String dateErrorMessage = """
-                Ты не верно ввел дату.
-                Попробуй еще раз в формате - 29.08.1997.
-                Также допустимо - 29 или 29.08
+                Ты не верно ввел дату!
+                Попробуй еще раз в формате - 29.08.1997. Также допустимо - 29 или 29.08
                 """;
         sendBotMessageService.sendMessage(chatId, dateErrorMessage);
 
@@ -65,7 +63,7 @@ public class GuardServiceImpl implements GuardService {
         int minNoteLength = 5;
         String chatId = TelegramUtils.currentChatId(context);
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_NOTE);
-        String lastButtonText = (String) context.getExtendedState().getVariables().get(ContextVariable.MESSAGE);
+        String lastButtonText = (String) context.getExtendedState().getVariables().get(ContextVariable.BUTTON_VALUE);
         boolean isSkipNote = ButtonValue.SKIP_NOTE.text().equals(lastButtonText.trim());
 
         if (isSkipNote || (userInput != null && userInput.trim().length() >= minNoteLength)) {
@@ -74,8 +72,8 @@ public class GuardServiceImpl implements GuardService {
 
         String noteErrorMessage = """
                 Ваше примечание слишком лаконичное))
-                попробуйте написать больше БУКАВ))
-                Минимальное количество ->""" + minNoteLength;
+                Попробуйте написать больше БУКАВ))
+                Минимальное количество -> %s""".formatted(minNoteLength);
 
         sendBotMessageService.sendMessage(chatId, noteErrorMessage);
         return false;

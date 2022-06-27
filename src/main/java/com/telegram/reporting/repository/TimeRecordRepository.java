@@ -21,4 +21,7 @@ public interface TimeRecordRepository extends JpaRepository<TimeRecord, Long> {
     @Modifying
     @Query(value = "DELETE FROM TimeRecord tr WHERE tr.id=?1")
     void delete(Long reportId);
+
+    @Query(value = "SELECT tr FROM TimeRecord tr WHERE tr.id=?1")
+    TimeRecord getById(Long id);
 }

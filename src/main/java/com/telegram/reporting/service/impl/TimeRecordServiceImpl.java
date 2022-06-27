@@ -29,6 +29,22 @@ public class TimeRecordServiceImpl implements TimeRecordService {
     }
 
     @Override
+    public TimeRecord getById(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return timeRecordRepository.getById(id);
+    }
+
+    @Override
+    public TimeRecord save(TimeRecord timeRecord) {
+        if (timeRecord == null) {
+            return null;
+        }
+        return timeRecordRepository.saveAndFlush(timeRecord);
+    }
+
+    @Override
     public List<TimeRecordTO> getTimeRecordTOs(String date, String chatId) {
         if (StringUtils.isBlank(date) || StringUtils.isBlank(chatId)) {
             return null;

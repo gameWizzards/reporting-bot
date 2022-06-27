@@ -37,7 +37,7 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
             case CANCEL -> MessageEvent.DECLINE_DELETE_TIME_RECORD;
             default -> null;
         };
-        stateMachine.getExtendedState().getVariables().put(ContextVariable.MESSAGE, buttonValue.text());
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.BUTTON_VALUE, buttonValue.text());
         Optional.ofNullable(messageEvent)
                 .ifPresent(stateMachine::sendEvent);
     }
