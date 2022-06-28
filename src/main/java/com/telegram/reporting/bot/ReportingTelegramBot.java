@@ -4,6 +4,7 @@ import com.telegram.reporting.command.CommandContainer;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
+import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.TelegramUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +22,14 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
     private String token;
 
     private final DialogRouterService dialogRouterService;
+    private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
     private final CommandContainer commandContainer;
 
-    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService, TelegramUserService telegramUserService, CommandContainer commandContainer) {
+    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService, @Lazy SendBotMessageService sendBotMessageService,
+                                TelegramUserService telegramUserService, CommandContainer commandContainer) {
         this.dialogRouterService = dialogRouterService;
+        this.sendBotMessageService = sendBotMessageService;
         this.telegramUserService = telegramUserService;
         this.commandContainer = commandContainer;
     }
@@ -35,6 +39,7 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
         if (update.getMessage().hasContact()) {
             User user = telegramUserService.verifyContact(update.getMessage());
             if (user == null) {
+                sendBotMessageService.sendMessage(TelegramUtils.currentChatId(update), "Кажеться твой номер не добавили в список разрешенных. Свяжись с тем кто может добавить твой номер в White list!");
                 throw new TelegramUserException(String.format("This user is not registered yet! Phone = +%s. ChatId = %s.", update.getMessage().getContact().getPhoneNumber(), TelegramUtils.currentChatId(update)));
             }
             dialogRouterService.startFlow(user.getChatId().toString());
