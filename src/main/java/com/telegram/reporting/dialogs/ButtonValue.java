@@ -33,6 +33,7 @@ public enum ButtonValue {
     MAIN_MENU("Главное меню"),
     INPUT_NEW_DATE("Ввести новую дату"),
     LIST_TIME_RECORDS("Список очтетов"),
+    SHARE_PHONE("Поделится номером телефона"),
 
     REPORT_CATEGORY_ON_STORAGE("На складе"), REPORT_CATEGORY_ON_ORDER("На заказе"),
     REPORT_CATEGORY_ON_OFFICE("На офисе"), REPORT_CATEGORY_ON_COORDINATION("На координации"),

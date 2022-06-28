@@ -1,5 +1,6 @@
 package com.telegram.reporting.command.impl;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
@@ -17,8 +18,8 @@ import java.util.Optional;
 public non-sealed class StartCommand implements Command {
 
     public final static String START_MESSAGE = """
-            Добро пожаловать!
-            Нажмите на кнопку ниже чтобы верифицировать вас как сотрудника.
+            Привет!
+            Для того чтобы начать диалог тебе нужно поделиться своим номером телефона. Жми на кнопку ниже "Поделится номером телефона".
             """;
 
     private final SendBotMessageService sendBotMessageService;
@@ -44,7 +45,7 @@ public non-sealed class StartCommand implements Command {
         Optional<User> user = telegramUserService.findByChatId(chatId);
 
         if (user.isEmpty()) {
-            KeyboardRow shareContact = KeyboardUtils.createButton("Поделится номером телефона");
+            KeyboardRow shareContact = KeyboardUtils.createButton(ButtonValue.SHARE_PHONE.text());
             shareContact.get(0).setRequestContact(true);
             sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(false, shareContact));
         } else {
