@@ -1,8 +1,8 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.StateMachineHandler;
-import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.KeyboardUtils;
@@ -45,7 +45,6 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     public void handleTelegramUpdateEvent(Update update) {
         String input = TelegramUtils.getMessage(update);
         Long chatId = TelegramUtils.currentChatId(update);
-        String telegramNickname = update.getMessage().getFrom().getUserName();
 
         Optional<ButtonValue> messageOptional = ButtonValue.getByText(input);
         if (messageOptional.isPresent()) {
@@ -59,7 +58,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
             // create new handler when buttonValue contains name of particular dialog
             if (ButtonValue.startDialogButtons().contains(buttonValue)) {
-                createStateMachineHandler(chatId, buttonValue, telegramNickname);
+                createStateMachineHandler(chatId, buttonValue);
             }
 
 
@@ -90,16 +89,16 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         sendBotMessageService.sendMessageWithKeys(KeyboardUtils.createRootMenuMessage(chatId));
     }
 
-    private StateMachineHandler createStateMachineHandler(Long chatId, ButtonValue buttonValue, String telegramNickname) {
-        stateMachineHandlers.put(chatId, getStateMachineHandler(chatId, buttonValue, telegramNickname));
+    private StateMachineHandler createStateMachineHandler(Long chatId, ButtonValue buttonValue) {
+        stateMachineHandlers.put(chatId, getStateMachineHandler(chatId, buttonValue));
         return stateMachineHandlers.get(chatId);
     }
 
-    private StateMachineHandler getStateMachineHandler(Long chatId, ButtonValue buttonValue, String telegramNickname) {
+    private StateMachineHandler getStateMachineHandler(Long chatId, ButtonValue buttonValue) {
         return switch (buttonValue) {
-            case CREATE_REPORT_START_DIALOG -> createReportHandler.initStateMachine(chatId, telegramNickname);
-            case DELETE_REPORT_START_DIALOG -> deleteReportHandler.initStateMachine(chatId, telegramNickname);
-            case EDIT_REPORT_START_DIALOG -> editReportHandler.initStateMachine(chatId, telegramNickname);
+            case CREATE_REPORT_START_DIALOG -> createReportHandler.initStateMachine(chatId);
+            case DELETE_REPORT_START_DIALOG -> deleteReportHandler.initStateMachine(chatId);
+            case EDIT_REPORT_START_DIALOG -> editReportHandler.initStateMachine(chatId);
             default -> null;
         };
     }

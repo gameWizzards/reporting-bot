@@ -6,5 +6,5 @@ public interface StateMachineHandler {
 
     void handleUserInput(Long chatId, String userInput);
 
-    StateMachineHandler initStateMachine(Long chatId, String telegramNickname);
+    StateMachineHandler initStateMachine(Long chatId);
 }

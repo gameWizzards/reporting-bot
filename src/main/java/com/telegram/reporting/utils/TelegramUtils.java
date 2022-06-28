@@ -29,8 +29,8 @@ public class TelegramUtils {
         return message.split(" ")[0].toLowerCase();
     }
 
-    public static String createLogPrefix(String dialogName, String telegramNickname) {
-        return String.format("%s-[%s]", telegramNickname, dialogName);
+    public static String createLogPrefix(String dialogName, Long chatId) {
+        return String.format("%s-[%s]", chatId.toString(), dialogName);
     }
 
     public static <S, E> String getLogPrefix(StateMachine<S, E> stateMachine) {

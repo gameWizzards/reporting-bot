@@ -66,10 +66,10 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId, String telegramNickname) {
+    public StateMachineHandler initStateMachine(Long chatId) {
         StateMachine<DeleteReportState, MessageEvent> stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.getExtendedState().getVariables().put(ContextVariable.CHAT_ID, chatId);
-        stateMachine.getExtendedState().getVariables().put(ContextVariable.LOG_PREFIX, TelegramUtils.createLogPrefix("Delete_report", telegramNickname));
+        stateMachine.getExtendedState().getVariables().put(ContextVariable.LOG_PREFIX, TelegramUtils.createLogPrefix("Delete_report", chatId));
         stateMachines.put(chatId, stateMachine);
         return this;
     }
