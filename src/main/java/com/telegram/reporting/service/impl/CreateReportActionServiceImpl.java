@@ -67,7 +67,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
             return;
         }
 
-        StringBuilder timeRecordMessage = new StringBuilder();
+        String timeRecordMessage = TimeRecordUtils.convertListTimeRecordsToMessage(trTOs);
 
         String message = """
                 Ранее созданные отчеты за - %s.
@@ -76,19 +76,12 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
                   %s
                 ВАЖНО! IMPORTANT! ACHTUNG!
                 Ты сможешь добавить только новые категории к этому отчету! Если хочешь изменить ранее созданные, тогда переходи в диалог "Изменить отчет".
-                """;
-
-        for (TimeRecordTO timeRecordTO : trTOs) {
-            String trMessage = TimeRecordUtils.convertTimeRecordToMessage(timeRecordTO);
-            timeRecordMessage
-                    .append(trMessage)
-                    .append("\n");
-        }
+                """.formatted(date, timeRecordMessage);
 
         String timeRecordsJson = JsonUtils.serializeItem(trTOs);
         variables.put(ContextVariable.TIME_RECORDS_JSON, timeRecordsJson);
 
-        sendBotMessageService.sendMessage(chatId, String.format(message, date, timeRecordMessage, date));
+        sendBotMessageService.sendMessage(chatId, message);
     }
 
 
@@ -99,7 +92,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
         String chatId = TelegramUtils.currentChatId(context);
         String timeRecordsJson = (String) context.getExtendedState().getVariables().get(ContextVariable.TIME_RECORDS_JSON);
-        List<String> buttons = KeyboardUtils.getAvailableButtons(timeRecordsJson);
+        List<String> buttons = KeyboardUtils.getAvailableCategoryButtons(timeRecordsJson);
         boolean isAllCategoriesOccupied = StringUtils.isNotBlank(timeRecordsJson) && buttons.isEmpty();
 
         if (isAllCategoriesOccupied) {
@@ -134,12 +127,11 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
     public void requestInputTime(StateContext<CreateReportState, MessageEvent> context) {
         String reportCategoryType = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_CATEGORY_TYPE);
 
-        String userMessageCategoryAccepted = String.format("""
+        String userMessageCategoryAccepted = """
                         Ты выбрал категорию отчета - "%s". Категория принята.
                                         
                         %s
-                        """,
-                reportCategoryType,
+                        """.formatted(reportCategoryType,
                 Message.USER_TIME_INPUT.text());
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), userMessageCategoryAccepted);
@@ -193,20 +185,9 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
     @Override
     public void requestConfirmationReport(StateContext<CreateReportState, MessageEvent> context) {
-
-        String message = """
-                Хочешь отправить отчет за - %s.
-                                
-                 Отчеты: \n
-                  %s
-                                
-                  %s
-                """;
-
         Map<Object, Object> variables = context.getExtendedState().getVariables();
 
         String date = (String) variables.get(ContextVariable.DATE);
-
         String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
 
         List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);
@@ -215,7 +196,16 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
                 .map(TimeRecordUtils::convertTimeRecordToMessage)
                 .collect(Collectors.joining("\n"));
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), String.format(message, date, timeRecordMessage, Message.REQUEST_CONFIRMATION_REPORT.text()));
+        String message = """
+                Хочешь отправить отчет за - %s.
+                                
+                 Отчеты: \n
+                  %s
+                                
+                  %s
+                """.formatted(date, timeRecordMessage, Message.REQUEST_CONFIRMATION_REPORT.text());
+
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), message);
 
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CONFIRM_CREATION_FINAL_REPORT.text(), ButtonValue.CANCEL.text());
 
@@ -237,7 +227,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
             Optional<User> user = telegramUserService.findByChatId(chatId);
             report.setDate(DateTimeUtils.parseDefaultDate(date));
-            report.setUser(user.orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = " + chatId)));
+            report.setUser(user.orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = %s".formatted(chatId))));
         }
 
         report.setTimeRecords(convertToTimeRecordEntities(timeRecordJson, report));
@@ -260,7 +250,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
             Optional<Category> categoryOptional = categoryService.getByName(trTO.getCategoryName());
             TimeRecord timeRecord = new TimeRecord(trTO);
             timeRecord.setId(trTO.getId());
-            timeRecord.setCategory(categoryOptional.orElseThrow(() -> new MismatchCategoryException("Can't find category by name = " + trTO.getCategoryName())));
+            timeRecord.setCategory(categoryOptional.orElseThrow(() -> new MismatchCategoryException("Can't find category by name = %s".formatted(trTO.getCategoryName()))));
             timeRecord.setReport(report);
             entities.add(timeRecord);
         }

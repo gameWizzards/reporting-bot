@@ -1,6 +1,7 @@
 package com.telegram.reporting.utils;
 
 import com.telegram.reporting.dialogs.ButtonValue;
+import com.telegram.reporting.repository.dto.TimeRecordTO;
 import org.apache.commons.lang3.Validate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -90,10 +91,19 @@ public class KeyboardUtils {
         return sendMessage;
     }
 
-    public static List<String> getAvailableButtons(String timeRecordsJson) {
+    public static List<String> getAvailableCategoryButtons(String timeRecordsJson) {
         return ButtonValue.categoryButtons().stream()
                 .map(ButtonValue::text)
                 .filter(Predicate.not(Optional.ofNullable(timeRecordsJson).orElse("")::contains))
                 .toList();
+    }
+
+    public static String[] getButtonsByTimeRecordOrdinalNumber(List<TimeRecordTO> timeRecordTOS) {
+        Validate.notEmpty(timeRecordTOS, "Can't create buttons for TimeRecordsTOs. List of TimeRecordTOs is empty or NULL");
+        timeRecordTOS.forEach(tr -> Validate.notNull(tr.getOrdinalNumber(), "TimeRecords must contain ordinal number to creating buttons for them. TimeRecord = %s".formatted(tr)));
+
+        List<String> buttons = new ArrayList<>(timeRecordTOS.size());
+        timeRecordTOS.forEach(tr -> buttons.add(String.valueOf(tr.getOrdinalNumber())));
+        return buttons.toArray(new String[timeRecordTOS.size()]);
     }
 }

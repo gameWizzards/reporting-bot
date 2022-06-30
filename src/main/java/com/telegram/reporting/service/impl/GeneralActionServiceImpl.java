@@ -16,7 +16,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -51,43 +50,31 @@ public class GeneralActionServiceImpl implements GeneralActionService {
             String message = """
                     Нет отчетов за - %s.
                     Выбери другую дату или вернись в главное меню.
-                    """;
-            SendMessage sendMessage = new SendMessage(chatId, String.format(message, date));
+                    """.formatted(date);
+            SendMessage sendMessage = new SendMessage(chatId, message);
             KeyboardRow rowButtons = KeyboardUtils.createRowButtons(ButtonValue.INPUT_NEW_DATE.text());
             sendBotMessageService.sendMessageWithKeys(sendMessage,
                     KeyboardUtils.createKeyboardMarkup(true, rowButtons));
             return;
         }
 
-        Long ordinalNumber = 1L;
-        List<String> buttons = new ArrayList<>();
-        StringBuilder timeRecordMessage = new StringBuilder();
+        String timeRecordMessage = TimeRecordUtils.convertListTimeRecordsToMessage(trTOs);
+        String[] buttons = KeyboardUtils.getButtonsByTimeRecordOrdinalNumber(trTOs);
 
         String message = """
                 Вот доступные отчеты за - %s.
                                 
                  Отчеты: \n
-                  %s
+                 %s
                                 
                 Выберите отчет из списка.
-                """;
-
-        for (TimeRecordTO timeRecordTO : trTOs) {
-            timeRecordTO.setOrdinalNumber(ordinalNumber);
-            String trMessage = TimeRecordUtils.convertTimeRecordToMessage(timeRecordTO);
-            timeRecordMessage.append(ordinalNumber)
-                    .append(". ")
-                    .append(trMessage)
-                    .append("\n");
-            buttons.add(String.valueOf(ordinalNumber));
-            ordinalNumber++;
-        }
+                """.formatted(date, timeRecordMessage);
 
         String timeRecordsJson = JsonUtils.serializeItem(trTOs);
         variables.put(ContextVariable.TIME_RECORDS_JSON, timeRecordsJson);
 
-        SendMessage sendMessage = new SendMessage(chatId, String.format(message, date, timeRecordMessage));
-        KeyboardRow rowButtons = KeyboardUtils.createRowButtons(buttons.toArray(new String[0]));
+        SendMessage sendMessage = new SendMessage(chatId, message);
+        KeyboardRow rowButtons = KeyboardUtils.createRowButtons(buttons);
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, rowButtons));
     }
@@ -123,7 +110,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
         };
 
         String formattedReportDate = DateTimeUtils.toDefaultFormat(reportDate);
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Дата принята = " + formattedReportDate);
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Дата принята = %s".formatted(formattedReportDate));
         context.getExtendedState().getVariables().put(ContextVariable.DATE, formattedReportDate);
     }
 
@@ -131,7 +118,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
     public <S, E> void handleUserTimeInput(StateContext<S, E> context) {
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_TIME);
 
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), String.format("Время принято = %s ч.", userInput));
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Время принято = %s ч.".formatted(userInput));
     }
 
     @Override
@@ -155,7 +142,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
             userMessage = "Отчет создан без примечания";
             variables.put(ContextVariable.REPORT_NOTE, note);
         } else {
-            userMessage = String.format("Примечание принято = \"%s\"", userInput);
+            userMessage = "Примечание принято = \"%s\"".formatted(userInput);
         }
 
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), userMessage);
