@@ -30,7 +30,7 @@ public class TelegramUtils {
     }
 
     public static String createLogPrefix(String dialogName, Long chatId) {
-        return String.format("%s-[%s]", chatId.toString(), dialogName);
+        return "%s-[%s]".formatted(chatId.toString(), dialogName);
     }
 
     public static <S, E> String getLogPrefix(StateMachine<S, E> stateMachine) {
@@ -38,10 +38,10 @@ public class TelegramUtils {
     }
 
     private static <S, E> String getDefaultPrefix(StateMachine<S,E> stateMachine) {
-        return "Undefined prefix Dialog=" + stateMachine.getInitialState()
-                                                            .getId()
-                                                            .getClass()
-                                                            .getSimpleName()
-                                                            .replaceAll("State", "");
+        return "Undefined prefix Dialog= %s".formatted(stateMachine.getInitialState()
+                                                                            .getId()
+                                                                            .getClass()
+                                                                            .getSimpleName()
+                                                                            .replaceAll("State", ""));
     }
 }

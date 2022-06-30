@@ -32,7 +32,7 @@ class DateTimeUtilsTest {
     void parseDefaultDate_inputNull_throwNullPointerException() {
         expectedErrorMessage = "Date string is required! Non null!";
         var exception = assertThrows(NullPointerException.class, () -> DateTimeUtils.parseDefaultDate(null));
-        assertTrue(exception.getMessage().contains(expectedErrorMessage), "Can't find text in error message! Text: " + expectedErrorMessage);
+        assertTrue(exception.getMessage().contains(expectedErrorMessage), "Can't find text in error message! Text: %s".formatted(expectedErrorMessage));
     }
 
     @ParameterizedTest
@@ -40,8 +40,8 @@ class DateTimeUtilsTest {
     void parseDefaultDate_badDateFormat_throwDateTimeException(String date) {
         var exception = assertThrows(DateTimeException.class, () -> DateTimeUtils.parseDefaultDate(date));
         var errorMessage = exception.getMessage();
-        assertTrue(errorMessage.contains(date), "Can't find current input in error message. Input: " + date);
-        assertTrue(errorMessage.contains(DateTimeUtils.DEFAULT_DATE_FORMAT), "Can't find format suggestion in error message. Format: " + DateTimeUtils.DEFAULT_DATE_FORMAT);
+        assertTrue(errorMessage.contains(date), "Can't find current input in error message. Input: %s".formatted(date));
+        assertTrue(errorMessage.contains(DateTimeUtils.DEFAULT_DATE_FORMAT), "Can't find format suggestion in error message. Format: %s".formatted(DateTimeUtils.DEFAULT_DATE_FORMAT));
     }
 
     @Test
@@ -55,7 +55,7 @@ class DateTimeUtilsTest {
     void parseDefaultDateTime_inputNull_throwNullPointerException() {
         expectedErrorMessage = "DateTime string is required! Non null!";
         var exception = assertThrows(NullPointerException.class, () -> DateTimeUtils.parseDefaultDateTime(null));
-        assertTrue(exception.getMessage().contains(expectedErrorMessage), "Can't find text in error message. Text: " + expectedErrorMessage);
+        assertTrue(exception.getMessage().contains(expectedErrorMessage), "Can't find text in error message. Text: %s".formatted(expectedErrorMessage));
     }
 
     @ParameterizedTest
@@ -63,8 +63,8 @@ class DateTimeUtilsTest {
     void parseDefaultDateTime_badDateFormat_throwDateTimeException(String date) {
         var exception = assertThrows(DateTimeException.class, () -> DateTimeUtils.parseDefaultDateTime(date));
         var errorMessage = exception.getMessage();
-        assertTrue(errorMessage.contains(date), "Can't find current input in error message. Input: " + date);
-        assertTrue(errorMessage.contains(DateTimeUtils.DEFAULT_DATE_TIME_FORMAT), "Can't find format suggestion in error message. Format: " + DateTimeUtils.DEFAULT_DATE_TIME_FORMAT);
+        assertTrue(errorMessage.contains(date), "Can't find current input in error message. Input: %s".formatted(date));
+        assertTrue(errorMessage.contains(DateTimeUtils.DEFAULT_DATE_TIME_FORMAT), "Can't find format suggestion in error message. Format: %s".formatted(DateTimeUtils.DEFAULT_DATE_TIME_FORMAT));
     }
 
     @Test
@@ -76,7 +76,7 @@ class DateTimeUtilsTest {
         var pattern = Pattern.compile(regexDatePattern);
         var matcher = pattern.matcher(date);
 
-        assertTrue(matcher.matches(), "Wrong Date format! Expected: 'dd.MM.yyyy'. Current: " + date);
+        assertTrue(matcher.matches(), "Wrong Date format! Expected: 'dd.MM.yyyy'. Current: %s".formatted(date));
     }
 
     @Test
@@ -97,7 +97,7 @@ class DateTimeUtilsTest {
         var pattern = Pattern.compile(regexDateTimePattern);
         var matcher = pattern.matcher(date);
 
-        assertTrue(matcher.matches(), "Wrong DateTime format! Expected: 'dd.MM.yyyy HH:mm:ss'. Current: " + date);
+        assertTrue(matcher.matches(), "Wrong DateTime format! Expected: 'dd.MM.yyyy HH:mm:ss'. Current: %s".formatted(date));
     }
 
     @Test

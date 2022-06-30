@@ -63,7 +63,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CATEGORY.text());
         KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.SPEND_TIME.text(), ButtonValue.NOTE.text());
 
-        boolean existAvailableCategories = !CollectionUtils.isEmpty(KeyboardUtils.getAvailableButtons(timeRecordsJson));
+        boolean existAvailableCategories = !CollectionUtils.isEmpty(KeyboardUtils.getAvailableCategoryButtons(timeRecordsJson));
         if (existAvailableCategories) {
             sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow, secondRow));
         } else {
@@ -87,7 +87,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
         String message;
 
-        ButtonValue button = ButtonValue.getByText(buttonValue).orElseThrow(() -> new MismatchButtonValueException("Can't find appropriate enum of ButtonValue with value = " + buttonValue));
+        ButtonValue button = ButtonValue.getByText(buttonValue).orElseThrow(() -> new MismatchButtonValueException("Can't find appropriate enum of ButtonValue with value = %s".formatted(buttonValue)));
 
         switch (button) {
             case SPEND_TIME -> {
@@ -177,7 +177,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
 
         String chatId = TelegramUtils.currentChatId(context);
 
-        List<String> buttons = KeyboardUtils.getAvailableButtons(timeRecordsJson);
+        List<String> buttons = KeyboardUtils.getAvailableCategoryButtons(timeRecordsJson);
 
         SendMessage sendMessage = new SendMessage(chatId, Message.CHOICE_REPORT_CATEGORY.text());
         KeyboardRow[] buttonsWithRows = KeyboardUtils.createButtonsWithRows(buttons, 2);

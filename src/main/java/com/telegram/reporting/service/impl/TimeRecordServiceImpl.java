@@ -65,7 +65,7 @@ public class TimeRecordServiceImpl implements TimeRecordService {
     @Transactional
     public void deleteByTimeRecordTO(TimeRecordTO timeRecordTO) {
         Validate.notNull(timeRecordTO, "Required not null TimeRecordTO object to remove time record");
-        String errorMessage = String.format("Required to have timeRecordId when make remove. %s", timeRecordTO);
+        String errorMessage = "Required to have timeRecordId when make remove. %s".formatted(timeRecordTO);
         Validate.notNull(timeRecordTO.getId(), errorMessage);
 
         long timeRecordCount = timeRecordRepository.countTimeRecordsInReport(timeRecordTO.getReportId());

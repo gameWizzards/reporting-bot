@@ -48,7 +48,7 @@ public class JsonUtils {
             throw new NullPointerException("Can't deserialize json without value");
         }
         if (clazz == null) {
-            throw new NullPointerException("Can't deserialize json without class type. Json: " + json);
+            throw new NullPointerException("Can't deserialize json without class type. Json: %s".formatted(json));
         }
     }
 }

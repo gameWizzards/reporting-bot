@@ -44,7 +44,7 @@ public class DateTimeUtils {
 
         if (!matcher.matches()) {
             String format = getFormat(handleType);
-            throw new DateTimeException(String.format("Incorrect %s format. Use default format: %s. Current value = %s", handleType, format, input));
+            throw new DateTimeException("Incorrect %s format. Use default format: %s. Current value = %s".formatted(handleType, format, input));
         }
     }
 
@@ -52,7 +52,7 @@ public class DateTimeUtils {
         return switch (type) {
             case "Date" -> DEFAULT_DATE_FORMAT;
             case "DateTime" -> DEFAULT_DATE_TIME_FORMAT;
-            default -> "Unrecognized type! Input: " + type;
+            default -> "Unrecognized type! Input: %s".formatted(type);
         };
     }
 }

@@ -41,18 +41,17 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
         String date = (String) variables.get(ContextVariable.DATE);
         String timeRecordJson = (String) variables.get(ContextVariable.TARGET_TIME_RECORD_JSON);
 
+        TimeRecordTO trTO = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
+        String timeRecordMessage = TimeRecordUtils.convertTimeRecordToMessage(trTO);
         String message = """
                 Хочешь удалить отчет за - %s.
                                 
                   %s
                       
                   %s
-                """;
+                """.formatted(date, timeRecordMessage, Message.REQUEST_DELETE_CONFIRMATION_REPORT.text());
 
-        TimeRecordTO trTO = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
-        String timeRecordMessage = TimeRecordUtils.convertTimeRecordToMessage(trTO);
-
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), String.format(message, date, timeRecordMessage, Message.REQUEST_DELETE_CONFIRMATION_REPORT.text()));
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), message);
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CONFIRM_DELETE_TIME_RECORD.text(), ButtonValue.CANCEL.text());
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
     }
@@ -65,7 +64,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
 
         if (StringUtils.isBlank(timeRecordJson)) {
             sendBotMessageService.sendMessage(chatId, "Что-то пошло не так. Отчет не удален(");
-            throw new NoSuchElementException("Can't find timeRecord to delete on Date = " + variables.get(ContextVariable.DATE));
+            throw new NoSuchElementException("Can't find timeRecord to delete on Date = %s".formatted(variables.get(ContextVariable.DATE)));
         }
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
         timeRecordService.deleteByTimeRecordTO(timeRecordTO);

@@ -19,7 +19,7 @@ class KeyboardUtilsTest {
     @Test
     public void createButton_validButtonName_success() {
         var button = KeyboardUtils.createButton(buttonName1);
-        assertTrue(button.contains(buttonName1), "Can't find button with assigning name: " + buttonName1);
+        assertTrue(button.contains(buttonName1), "Can't find button with assigning name: %s".formatted(buttonName1));
     }
 
     @Test
@@ -39,8 +39,8 @@ class KeyboardUtilsTest {
         String[] buttonNames = {buttonName1, buttonName2};
         var rowButtons = KeyboardUtils.createRowButtons(buttonNames);
         assertEquals(buttonNames.length, rowButtons.size(), "Expected quantity of buttons don't create.");
-        assertTrue(rowButtons.contains(buttonName1), "Can't find button with assigning name: " + buttonName1);
-        assertTrue(rowButtons.contains(buttonName2), "Can't find button with assigning name: " + buttonName2);
+        assertTrue(rowButtons.contains(buttonName1), "Can't find button with assigning name: %s".formatted(buttonName1));
+        assertTrue(rowButtons.contains(buttonName2), "Can't find button with assigning name: %s".formatted(buttonName2));
     }
 
     @Test

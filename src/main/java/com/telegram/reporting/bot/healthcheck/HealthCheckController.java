@@ -10,7 +10,7 @@ public class HealthCheckController {
 
     @GetMapping("/ping")
     public String ping() {
-        return "Server time is: " + LocalDateTime.now();
+        return "Server time is: %s".formatted(LocalDateTime.now());
     }
 
 }

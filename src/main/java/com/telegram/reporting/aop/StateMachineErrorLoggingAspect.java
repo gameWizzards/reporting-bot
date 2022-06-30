@@ -38,7 +38,7 @@ public class StateMachineErrorLoggingAspect {
         String logPrefix = TelegramUtils.getContextVariableValue(context, ContextVariable.LOG_PREFIX);
 
         String contextVarValues = context.getExtendedState().getVariables().keySet().stream()
-                .map(key -> key + "=" + context.getExtendedState().getVariables().get(key))
+                .map(key -> key + "=%s".formatted(context.getExtendedState().getVariables().get(key)))
                 .collect(Collectors.joining(", ", "{", "}"));
 
         StackTraceElement[] stackTrace = Arrays.stream(e.getStackTrace()).parallel()
