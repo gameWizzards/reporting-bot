@@ -28,15 +28,18 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     private final StateMachineHandler createReportHandler;
     private final StateMachineHandler deleteReportHandler;
     private final StateMachineHandler editReportHandler;
+    private final StateMachineHandler statisticHandler;
     private final SendBotMessageService sendBotMessageService;
 
     public DialogRouterServiceImpl(@Qualifier("CreateReportStateMachineHandler") StateMachineHandler createReportHandler,
                                    @Qualifier("DeleteReportStateMachineHandler") StateMachineHandler deleteReportHandler,
                                    @Qualifier("EditReportStateMachineHandler") StateMachineHandler editReportHandler,
+                                   @Qualifier("StatisticStateMachineHandler") StateMachineHandler statisticHandler,
                                    SendBotMessageService sendBotMessageService) {
         this.createReportHandler = createReportHandler;
         this.deleteReportHandler = deleteReportHandler;
         this.editReportHandler = editReportHandler;
+        this.statisticHandler = statisticHandler;
         this.sendBotMessageService = sendBotMessageService;
         stateMachineHandlers = new HashMap<>();
     }
@@ -99,6 +102,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
             case CREATE_REPORT_START_DIALOG -> createReportHandler.initStateMachine(chatId);
             case DELETE_REPORT_START_DIALOG -> deleteReportHandler.initStateMachine(chatId);
             case EDIT_REPORT_START_DIALOG -> editReportHandler.initStateMachine(chatId);
+            case STATISTIC_START_DIALOG -> statisticHandler.initStateMachine(chatId);
             default -> null;
         };
     }

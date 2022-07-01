@@ -16,6 +16,8 @@ public class DateTimeUtils {
     private static final String DATE_TYPE = "Date";
     private static final String DATE_TIME_TYPE = "DateTime";
 
+    private DateTimeUtils() {}
+
     public static LocalDate parseDefaultDate(String date) {
         checkStringInputFormat(date, DEFAULT_DATE_PATTERN, DATE_TYPE);
         return LocalDate.parse(date, DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT));

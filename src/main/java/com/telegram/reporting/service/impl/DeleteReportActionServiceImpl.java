@@ -12,7 +12,7 @@ import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.JsonUtils;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
-import com.telegram.reporting.utils.TimeRecordUtils;
+import com.telegram.reporting.utils.MessageConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.statemachine.StateContext;
@@ -42,7 +42,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
         String timeRecordJson = (String) variables.get(ContextVariable.TARGET_TIME_RECORD_JSON);
 
         TimeRecordTO trTO = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
-        String timeRecordMessage = TimeRecordUtils.convertTimeRecordToMessage(trTO);
+        String timeRecordMessage = MessageConvertorUtils.convertToMessage(trTO);
         String message = """
                 Хочешь удалить отчет за - %s.
                                 

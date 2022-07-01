@@ -11,6 +11,8 @@ import java.util.List;
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
+    private JsonUtils() {}
+
     public static String serializeItem(Object item) {
         try {
             if (item == null) {

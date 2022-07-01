@@ -51,11 +51,6 @@ class JsonUtilsTest {
     }
 
     @Test
-    public void serializeItem_unserializableObject_throwJsonUtilsException() {
-        assertThrows(JsonUtilsException.class, () -> JsonUtils.serializeItem(new JsonUtils()));
-    }
-
-    @Test
     public void deserializeItem_inputValidData_success() {
         var timeRecord = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
 

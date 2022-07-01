@@ -1,7 +1,7 @@
 package com.telegram.reporting.service;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.dialogs.edit_dialog.EditReportState;
+import com.telegram.reporting.dialogs.edit_report.EditReportState;
 import org.springframework.statemachine.StateContext;
 
 public interface EditReportActionService {

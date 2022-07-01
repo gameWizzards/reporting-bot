@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 public class KeyboardUtils {
 
+    private KeyboardUtils() {}
+
     public static KeyboardRow createButton(String name) {
         Validate.notBlank(name, "Can't create button without name");
         return createRowButtons(name);
@@ -86,7 +88,8 @@ public class KeyboardUtils {
         SendMessage sendMessage = new SendMessage(chatId, startFlowMessage);
         KeyboardRow firstRow = KeyboardUtils.createButton(ButtonValue.CREATE_REPORT_START_DIALOG.text());
         KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.EDIT_REPORT_START_DIALOG.text(), ButtonValue.DELETE_REPORT_START_DIALOG.text());
-        sendMessage.setReplyMarkup(KeyboardUtils.createKeyboardMarkup(false, firstRow, secondRow));
+        KeyboardRow thirdRow = KeyboardUtils.createRowButtons(ButtonValue.STATISTIC_START_DIALOG.text());
+        sendMessage.setReplyMarkup(createKeyboardMarkup(false, firstRow, secondRow, thirdRow));
 
         return sendMessage;
     }

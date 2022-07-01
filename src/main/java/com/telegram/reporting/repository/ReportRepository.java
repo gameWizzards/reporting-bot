@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
@@ -17,4 +18,9 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     @Query(value = "SELECT r FROM Report r JOIN FETCH r.timeRecords WHERE r.date=?1")
     Report getByDate(LocalDate date);
+
+    @Query(value = "SELECT DISTINCT(r) FROM Report r JOIN FETCH r.timeRecords " +
+            "WHERE extract(month from r.date) = ?1 AND extract(year from r.date) = ?2 " +
+            "ORDER BY r.date")
+    List<Report> getReportsBelongMonth(int month, int year);
 }

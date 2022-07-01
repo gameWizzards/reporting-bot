@@ -58,7 +58,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
             return;
         }
 
-        String timeRecordMessage = TimeRecordUtils.convertListTimeRecordsToMessage(trTOs);
+        String timeRecordMessage = MessageConvertorUtils.convertToMessage(trTOs);
         String[] buttons = KeyboardUtils.getButtonsByTimeRecordOrdinalNumber(trTOs);
 
         String message = """

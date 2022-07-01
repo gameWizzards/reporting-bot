@@ -4,10 +4,6 @@ import com.telegram.reporting.dialogs.ButtonValue;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -116,25 +112,5 @@ class KeyboardUtilsTest {
     @Test
     public void createKeyboardMarkup_kulls_provideCustomErrorMessage() {
 
-//        List<String> first = new ArrayList<>(List.of("first", "second", "third", "fourth", "fifth"));
-        List<String> first = new ArrayList<>(List.of("first"));
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        int buttonsInRow = 2;
-        int cycle = first.size() / 2;
-        int lastRowButtons = first.size() % buttonsInRow;
-
-        for (int i = 0; i < cycle; i++) {
-            List<String> sub = new ArrayList<>(first.subList(0, buttonsInRow));
-            KeyboardRow button = KeyboardUtils.createRowButtons(sub.toArray(new String[0]));
-            sub.forEach(first::remove);
-
-            keyboardRows.add(button);
-        }
-        if (lastRowButtons != 0) {
-            keyboardRows.add(KeyboardUtils.createRowButtons(first.toArray(new String[0])));
-        }
-
-        KeyboardUtils.createKeyboardMarkup(true, keyboardRows.toArray(new KeyboardRow[0]));
     }
 }

@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.edit_dialog;
+package com.telegram.reporting.dialogs.edit_report;
 
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.service.EditReportActionService;

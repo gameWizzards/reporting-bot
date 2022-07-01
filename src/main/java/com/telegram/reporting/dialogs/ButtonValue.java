@@ -23,6 +23,10 @@ public enum ButtonValue {
     DECLINE_EDIT_ADDITIONAL_DATA("И так сойдет"),
     APPLY_DATA_CHANGES("Применить изменения"),
 
+    // statistic dialog
+    STATISTIC_START_DIALOG("Статистика"),
+    PREVIOUS_MONTH_STATISTIC("Показать за прошлый месяц"),
+
     // add new user dialog
     ADD_NEW_USER_START_DIALOG("Добавить пользователя"),
 
@@ -52,7 +56,7 @@ public enum ButtonValue {
     }
 
     public static List<ButtonValue> startDialogButtons() {
-        return Arrays.asList(CREATE_REPORT_START_DIALOG, DELETE_REPORT_START_DIALOG, EDIT_REPORT_START_DIALOG);
+        return Arrays.asList(CREATE_REPORT_START_DIALOG, DELETE_REPORT_START_DIALOG, EDIT_REPORT_START_DIALOG, STATISTIC_START_DIALOG);
     }
 
     public static List<ButtonValue> categoryButtons() {

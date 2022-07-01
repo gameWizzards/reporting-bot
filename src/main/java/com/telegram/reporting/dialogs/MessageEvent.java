@@ -17,7 +17,7 @@ public enum MessageEvent {
     CONFIRM_DELETE_TIME_RECORD,
     DECLINE_DELETE_TIME_RECORD,
 
-    // edit report dialog,
+    // edit report dialog
     RUN_EDIT_REPORT_DIALOG,
     CHOOSE_EDIT_NOTE,
     CHOOSE_EDIT_CATEGORY,
@@ -31,6 +31,11 @@ public enum MessageEvent {
     DECLINE_EDIT_ADDITIONAL_DATA,
     CONFIRM_EDIT_ADDITIONAL_TIME_RECORD,
     DECLINE_EDIT_ADDITIONAL_TIME_RECORD,
+
+    // statistic dialog
+    RUN_STATISTIC_DIALOG,
+    SHOW_PREVIOUS_MONTH_STATISTIC,
+    END_STATISTIC_DIALOG,
 
     // add new user dialog
     RUN_ADD_NEW_USER_DIALOG,

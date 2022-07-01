@@ -10,5 +10,6 @@ public enum ContextVariable {
     TIME_RECORDS_JSON,
     TARGET_TIME_RECORD_JSON,
     TIME_RECORD_CHOICE,
+    MONTH,
     LOG_PREFIX
 }

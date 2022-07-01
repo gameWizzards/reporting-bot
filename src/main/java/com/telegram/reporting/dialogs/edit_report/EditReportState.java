@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.edit_dialog;
+package com.telegram.reporting.dialogs.edit_report;
 
 public enum EditReportState {
     START_EDIT_REPORT_DIALOG,

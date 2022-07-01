@@ -9,6 +9,8 @@ public class TelegramUtils {
 
     public static String COMMAND_PREFIX = "/";
 
+    private TelegramUtils(){}
+
     public static Long currentChatId(Update update) {
         return update.getMessage().getChatId();
     }

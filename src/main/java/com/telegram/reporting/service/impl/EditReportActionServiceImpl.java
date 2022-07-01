@@ -4,7 +4,7 @@ import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.dialogs.edit_dialog.EditReportState;
+import com.telegram.reporting.dialogs.edit_report.EditReportState;
 import com.telegram.reporting.exception.MismatchButtonValueException;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
@@ -16,7 +16,7 @@ import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.JsonUtils;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
-import com.telegram.reporting.utils.TimeRecordUtils;
+import com.telegram.reporting.utils.MessageConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
         String timeRecordsJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TIME_RECORDS_JSON);
 
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
-        String timeRecordMessage = TimeRecordUtils.convertTimeRecordToMessage(trTO);
+        String timeRecordMessage = MessageConvertorUtils.convertToMessage(trTO);
 
         String message = """
                 Выбери данные из этого отчета которые ты хочешь изменить.
@@ -157,7 +157,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
     public void requestEditAdditionalData(StateContext<EditReportState, MessageEvent> context) {
         String editTimeRecordJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
-        String timeRecordToMessage = TimeRecordUtils.convertTimeRecordToMessage(timeRecordTO);
+        String timeRecordToMessage = MessageConvertorUtils.convertToMessage(timeRecordTO);
         String message = """
                 Хочешь еще что нибудь изменить в этом отчете?
                                 
@@ -189,7 +189,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
     public void requestSaveTimeRecordChanges(StateContext<EditReportState, MessageEvent> context) {
         String editTimeRecordJson = (String) context.getExtendedState().getVariables().get(ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
-        String timeRecordToMessage = TimeRecordUtils.convertTimeRecordToMessage(timeRecordTO);
+        String timeRecordToMessage = MessageConvertorUtils.convertToMessage(timeRecordTO);
         String message = """
                 Хочешь сохранить изменения для этого отчета?
                                 

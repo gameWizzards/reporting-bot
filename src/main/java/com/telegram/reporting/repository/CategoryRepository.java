@@ -10,4 +10,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query(value = "SELECT c FROM Category c WHERE c.name=?1")
     Category getByName(String name);
+
+    @Query(value = "SELECT c FROM Category c WHERE c.id=?1")
+    Category getById(long id);
 }

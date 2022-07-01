@@ -6,7 +6,9 @@ import com.telegram.reporting.service.ReportService;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -32,5 +34,18 @@ public class ReportServiceImpl implements ReportService {
     public Report getReport(LocalDate date) {
         Validate.notNull(date, "Date object is required for get report");
         return reportRepository.getByDate(date);
+    }
+
+    @Override
+    public List<Report> getReportsBelongMonth(int month) {
+        return getReportsBelongMonth(month, LocalDate.now().getYear());
+    }
+
+    @Override
+    public List<Report> getReportsBelongMonth(int month, int year) {
+        if (month < 1 || year < 1) {
+            throw new DateTimeException("Not valid arguments. They must be bigger than ZERO. Month = %d. Year = %d.".formatted(month, year));
+        }
+        return reportRepository.getReportsBelongMonth(month, year);
     }
 }
