@@ -3,7 +3,7 @@ def remote = [name: env.BOT_NAME, host: env.BOT_HOST, allowAnyHosts: true]
 pipeline {
     agent any
     parameters{
-       booleanParam(defaultValue: false, description: 'Deploy reporting-bot', name: 'enable_step_DEPLOY')
+       booleanParam(defaultValue: true, description: 'Deploy reporting-bot', name: 'enable_step_DEPLOY')
     }
      options {
         skipDefaultCheckout true
