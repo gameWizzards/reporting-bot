@@ -28,6 +28,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'RepoBotHostDOCreds', passwordVariable: 'USER_SECRET', usernameVariable: 'USER_LOGIN')]) {
                         remote.user = USER_LOGIN
                         remote.password = USER_SECRET
+                        sshCommand remote: remote, command: 'docker exec reporting-bot ps -ef | grep java | grep -v grep | awk \'{print \$2}\' | docker exec -i reporting-bot xargs -r kill'
                         sshCommand remote: remote, command: 'docker exec reporting-bot mkdir -p ' + "$TESTDIR"
                         sshCommand remote: remote, command: 'docker exec reporting-bot rm -rf ' + "$TESTDIR/$APPDIR/"
                         sshCommand remote: remote, command: 'docker exec reporting-bot mkdir ' + "$TESTDIR/$APPDIR/"
@@ -59,7 +60,6 @@ pipeline {
             steps{
                 sshCommand remote: remote, command: 'docker exec reporting-bot mkdir -p ' + "$WORKDIR"
                 sshCommand remote: remote, command: 'docker exec reporting-bot cp ' + "$TESTDIR/$APPDIR/target/$APPNAME $WORKDIR/"
-                sshCommand remote: remote, command: 'docker exec reporting-bot ps -ef | grep java | grep -v grep | awk \'{print \$2}\' | docker exec -i reporting-bot xargs -r kill'
                 sshCommand remote: remote, command: 'docker exec reporting-bot java -Dspring.profiles.active=' + "$SPRING_PROFILE -jar $WORKDIR/$APPNAME >/dev/null 2>&1 &"
             }
         }
