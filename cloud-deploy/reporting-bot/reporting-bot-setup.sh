@@ -1,3 +1,4 @@
+#!/bin/bash
 repoBotPasswd="123456"
 
 exist=1

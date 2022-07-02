@@ -1,3 +1,4 @@
+#!/bin/bash
 jenkinsPasswd="jenkins"
 
 exist=1
