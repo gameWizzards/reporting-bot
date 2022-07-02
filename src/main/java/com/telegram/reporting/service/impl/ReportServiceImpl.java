@@ -31,21 +31,24 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Report getReport(LocalDate date) {
-        Validate.notNull(date, "Date object is required for get report");
-        return reportRepository.getByDate(date);
+    public Report getReport(LocalDate date, Long chatId) {
+        if (date == null || chatId == null) {
+            throw new NullPointerException("Date and chatId objects are required for get report!");
+        }
+        return reportRepository.getByDate(date, chatId);
     }
 
     @Override
-    public List<Report> getReportsBelongMonth(int month) {
-        return getReportsBelongMonth(month, LocalDate.now().getYear());
+    public List<Report> getReportsBelongMonth(int month, Long chatId) {
+        return getReportsBelongMonth(month, LocalDate.now().getYear(), chatId);
     }
 
     @Override
-    public List<Report> getReportsBelongMonth(int month, int year) {
-        if (month < 1 || year < 1) {
+    public List<Report> getReportsBelongMonth(int month, int year, Long chatId) {
+        Validate.notNull(chatId, "ChatId is required for get report!");
+        if (month < 1 || year < 2021) {
             throw new DateTimeException("Not valid arguments. They must be bigger than ZERO. Month = %d. Year = %d.".formatted(month, year));
         }
-        return reportRepository.getReportsBelongMonth(month, year);
+        return reportRepository.getReportsBelongMonth(month, year, chatId);
     }
 }

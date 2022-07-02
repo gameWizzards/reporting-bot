@@ -11,10 +11,10 @@ public interface ReportService {
 
     void delete(Long reportId);
 
-    Report getReport(LocalDate date);
+    Report getReport(LocalDate date, Long chatId);
 
-    List<Report> getReportsBelongMonth(int month);
+    List<Report> getReportsBelongMonth(int month, Long chatId);
 
-    List<Report> getReportsBelongMonth(int month, int year);
+    List<Report> getReportsBelongMonth(int month, int year, Long chatId);
 
 }

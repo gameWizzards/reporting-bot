@@ -220,7 +220,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
         String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
         Long chatId = (Long) variables.get(ContextVariable.CHAT_ID);
 
-        Report report = reportService.getReport(DateTimeUtils.parseDefaultDate(date));
+        Report report = reportService.getReport(DateTimeUtils.parseDefaultDate(date), chatId);
 
         if (report == null) {
             report = new Report();

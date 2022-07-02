@@ -45,7 +45,7 @@ public class StatisticActionServiceImpl implements StatisticActionService {
         AtomicInteger ordinalNumb = new AtomicInteger(1);
 
         int month = getStatisticMonth(context.getExtendedState().getVariables());
-        List<Report> reports = reportService.getReportsBelongMonth(month);
+        List<Report> reports = reportService.getReportsBelongMonth(month, Long.parseLong(TelegramUtils.currentChatId(context)));
 
         long sumHours = reports.parallelStream()
                 .flatMap(repo -> repo.getTimeRecords().stream())
