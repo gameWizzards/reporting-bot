@@ -21,9 +21,21 @@ bot:
   token: ${BOT_TOKEN}
   admins: miha_phoenix,Markovskyi_Serhii
 
+# Tomcat config:
+server:
+  connection-timeout: 20s
+  tomcat:
+    threads:
+      max: 100
+
 ---
+
 # Dev profile without sslMode
 spring:
   profiles: dev
   datasource:
     url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/${BOT_DB_NAME}
+
+server:
+  address: 18.135.45.130
+  port: 8008
