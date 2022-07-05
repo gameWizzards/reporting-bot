@@ -1,7 +1,7 @@
 # DB configurations:
 spring:
   datasource:
-    url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/reporting?sslmode=require
+    url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/reporting
     driver-class-name: org.postgresql.Driver
     username: ${BOT_DB_USERNAME}
     password: ${BOT_DB_PASSWORD}
@@ -23,6 +23,7 @@ bot:
 
 # Tomcat config:
 server:
+  port: 8008
   connection-timeout: 20s
   tomcat:
     threads:
@@ -35,7 +36,3 @@ spring:
   profiles: dev
   datasource:
     url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/${BOT_DB_NAME}
-
-server:
-  address: 18.135.45.130
-  port: 8008
