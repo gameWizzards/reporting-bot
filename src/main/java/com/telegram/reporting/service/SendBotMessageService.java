@@ -1,8 +1,7 @@
 package com.telegram.reporting.service;
 
-import lombok.SneakyThrows;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public interface SendBotMessageService {
 
     void sendMessageWithKeys(SendMessage message);
 
-    void sendMessageWithKeys(SendMessage message, ReplyKeyboardMarkup keyboardMarkup);
+    void sendMessageWithKeys(SendMessage message, ReplyKeyboard keyboardMarkup);
 
     /**
      * Send message via telegram bot.

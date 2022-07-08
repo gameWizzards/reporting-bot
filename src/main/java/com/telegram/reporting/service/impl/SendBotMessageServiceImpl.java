@@ -5,7 +5,7 @@ import com.telegram.reporting.service.SendBotMessageService;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     }
 
     @Override
-    public void sendMessageWithKeys(SendMessage message, ReplyKeyboardMarkup keyboardMarkup) {
+    public void sendMessageWithKeys(SendMessage message, ReplyKeyboard keyboardMarkup) {
         Objects.requireNonNull(keyboardMarkup, "Keyboard markup is require!");
         message.setReplyMarkup(keyboardMarkup);
         sendMessageWithKeys(message);
