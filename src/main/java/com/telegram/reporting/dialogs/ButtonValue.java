@@ -41,6 +41,9 @@ public enum ButtonValue {
 
     REPORT_CATEGORY_ON_STORAGE("На складе"), REPORT_CATEGORY_ON_ORDER("На заказе"),
     REPORT_CATEGORY_ON_OFFICE("На офисе"), REPORT_CATEGORY_ON_COORDINATION("На координации"),
+
+    MANAGER_MENU("Меню менеджера"),
+    ADMIN_MENU("Меню администратора")
     ;
 
     private final String text;
@@ -53,10 +56,6 @@ public enum ButtonValue {
         return Arrays.stream(values())
                 .filter(message -> message.text().equals(text))
                 .findFirst();
-    }
-
-    public static List<ButtonValue> startDialogButtons() {
-        return Arrays.asList(CREATE_REPORT_START_DIALOG, DELETE_REPORT_START_DIALOG, EDIT_REPORT_START_DIALOG, STATISTIC_START_DIALOG);
     }
 
     public static List<ButtonValue> categoryButtons() {

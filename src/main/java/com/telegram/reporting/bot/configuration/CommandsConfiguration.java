@@ -2,6 +2,7 @@ package com.telegram.reporting.bot.configuration;
 
 import com.telegram.reporting.command.impl.AddUserCommand;
 import com.telegram.reporting.command.impl.StartCommand;
+import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,9 @@ public class CommandsConfiguration {
     }
 
     @Bean
-    public StartCommand startCommand(@Lazy SendBotMessageService sendBotMessageService, @Lazy TelegramUserService telegramUserService) {
-        return new StartCommand(sendBotMessageService, telegramUserService);
+    public StartCommand startCommand(@Lazy SendBotMessageService sendBotMessageService, @Lazy TelegramUserService telegramUserService,
+                                     @Lazy DialogRouterService dialogRouterService) {
+        return new StartCommand(sendBotMessageService, telegramUserService, dialogRouterService);
     }
 
 }

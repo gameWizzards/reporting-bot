@@ -2,108 +2,140 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.Message;
-import com.telegram.reporting.dialogs.StateMachineHandler;
 import com.telegram.reporting.service.DialogRouterService;
+import com.telegram.reporting.service.DialogHandler;
 import com.telegram.reporting.service.SendBotMessageService;
+import com.telegram.reporting.service.SubDialogHandler;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 @Slf4j
 @Service
 public class DialogRouterServiceImpl implements DialogRouterService {
-    public final static String START_FLOW_MESSAGE = """
-            Окей.
-            Выбери диалог.
-            """;
-    private final Map<Long, StateMachineHandler> stateMachineHandlers;
 
-    private final StateMachineHandler createReportHandler;
-    private final StateMachineHandler deleteReportHandler;
-    private final StateMachineHandler editReportHandler;
-    private final StateMachineHandler statisticHandler;
+    private final Map<String, DialogHandler> dialogHandlers;
+    private final List<DialogHandler> existingDialogHandlers;
+
+    private final DialogHandler generalDialogHandler;
+    private final DialogHandler managerDialogHandler;
+    private final DialogHandler adminDialogHandler;
+
     private final SendBotMessageService sendBotMessageService;
 
-    public DialogRouterServiceImpl(@Qualifier("CreateReportStateMachineHandler") StateMachineHandler createReportHandler,
-                                   @Qualifier("DeleteReportStateMachineHandler") StateMachineHandler deleteReportHandler,
-                                   @Qualifier("EditReportStateMachineHandler") StateMachineHandler editReportHandler,
-                                   @Qualifier("StatisticStateMachineHandler") StateMachineHandler statisticHandler,
+    public DialogRouterServiceImpl(@Qualifier("GeneralDialogHandler") DialogHandler generalDialogHandler,
+                                   @Qualifier("ManagerDialogHandler") DialogHandler managerDialogHandler,
+                                   @Qualifier("AdminDialogHandler") DialogHandler adminDialogHandler,
                                    SendBotMessageService sendBotMessageService) {
-        this.createReportHandler = createReportHandler;
-        this.deleteReportHandler = deleteReportHandler;
-        this.editReportHandler = editReportHandler;
-        this.statisticHandler = statisticHandler;
+
         this.sendBotMessageService = sendBotMessageService;
-        stateMachineHandlers = new HashMap<>();
+
+        this.generalDialogHandler = generalDialogHandler;
+        this.managerDialogHandler = managerDialogHandler;
+        this.adminDialogHandler = adminDialogHandler;
+
+        existingDialogHandlers = List.of(generalDialogHandler, managerDialogHandler, adminDialogHandler);
+        dialogHandlers = new ConcurrentHashMap<>();
     }
 
     @Override
     public void handleTelegramUpdateEvent(Update update) {
         String input = TelegramUtils.getMessage(update);
-        Long chatId = TelegramUtils.currentChatId(update);
+        String chatId = TelegramUtils.currentChatId(update).toString();
 
-        Optional<ButtonValue> messageOptional = ButtonValue.getByText(input);
-        if (messageOptional.isPresent()) {
-            ButtonValue buttonValue = messageOptional.get();
+        Optional<ButtonValue> optionalButtonValue = ButtonValue.getByText(input);
+
+        if (optionalButtonValue.isPresent()) {
+            ButtonValue buttonValue = optionalButtonValue.get();
 
             // return to root menu when click 'main menu' button
             if (ButtonValue.MAIN_MENU.equals(buttonValue)) {
-                startFlow(chatId.toString());
+                removeUnusedHandlers(chatId);
+                startFlow(chatId);
                 return;
             }
 
-            // create new handler when buttonValue contains name of particular dialog
-            if (ButtonValue.startDialogButtons().contains(buttonValue)) {
-                createStateMachineHandler(chatId, buttonValue);
-            }
+            // bind handlers when buttonValue contains name of particular dialog
+            //TODO consider the possibility to add checking - if handler bound already
+            bindDialogHandler(chatId, buttonValue);
+            bindSubDialogHandler(chatId, buttonValue);
 
-
-            // when dialog in telegram remain on some step with buttons but app was reloaded
+            // when dialog in telegram remained on some step with buttons but app was reloaded
             // that means that there is no handler for the dialog - start from root menu
-            if (!stateMachineHandlers.containsKey(chatId)) {
+            if (!dialogHandlers.containsKey(chatId)) {
                 sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
-                startFlow(chatId.toString());
+                startFlow(chatId);
                 return;
             }
-
-            stateMachineHandlers.get(chatId).handleMessage(chatId, buttonValue);
-        } else {
-
-            // when dialog in telegram remain on some step with user input but app was reloaded
-            // that means that is no handler for the dialog - start from root menu
-            if (!stateMachineHandlers.containsKey(chatId)) {
-                sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
-                startFlow(chatId.toString());
-                return;
-            }
-            stateMachineHandlers.get(chatId).handleUserInput(chatId, input);
         }
+
+        // when dialog in telegram remain on some step with user input but app was reloaded
+        // that means that is no handler for the dialog - start from root menu
+        if (!dialogHandlers.containsKey(chatId)) {
+            sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
+            startFlow(chatId);
+            return;
+        }
+        dialogHandlers.get(chatId).handleTelegramInput(chatId, input);
     }
 
     @Override
     public void startFlow(String chatId) {
-        sendBotMessageService.sendMessageWithKeys(KeyboardUtils.createRootMenuMessage(chatId));
+        removeUnusedHandlers(chatId);
+        final String startFlowMessage = """
+                Окей.
+                Выбери диалог.
+                """;
+        KeyboardRow[] keyboardRows = existingDialogHandlers.stream()
+                .map(handler -> handler.getRootMenuButtons(chatId))
+                .flatMap(Collection::stream)
+                .filter(Predicate.not(CollectionUtils::isEmpty))
+                .toArray(KeyboardRow[]::new);
+        SendMessage sendMessage = new SendMessage(chatId, startFlowMessage);
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(false, keyboardRows));
     }
 
-    private StateMachineHandler createStateMachineHandler(Long chatId, ButtonValue buttonValue) {
-        stateMachineHandlers.put(chatId, getStateMachineHandler(chatId, buttonValue));
-        return stateMachineHandlers.get(chatId);
+    private void removeUnusedHandlers(String chatId) {
+        Optional<DialogHandler> optionalHandler = Optional.ofNullable(dialogHandlers.get(chatId));
+        optionalHandler.ifPresent(handler -> handler.removeStateMachineHandler(chatId));
+        dialogHandlers.remove(chatId);
     }
 
-    private StateMachineHandler getStateMachineHandler(Long chatId, ButtonValue buttonValue) {
-        return switch (buttonValue) {
-            case CREATE_REPORT_START_DIALOG -> createReportHandler.initStateMachine(chatId);
-            case DELETE_REPORT_START_DIALOG -> deleteReportHandler.initStateMachine(chatId);
-            case EDIT_REPORT_START_DIALOG -> editReportHandler.initStateMachine(chatId);
-            case STATISTIC_START_DIALOG -> statisticHandler.initStateMachine(chatId);
-            default -> null;
-        };
+    private void bindDialogHandler(String chatId, ButtonValue buttonValue) {
+        if (generalDialogHandler.belongToDialogStarter(buttonValue)) {
+            generalDialogHandler.createStateMachineHandler(chatId, buttonValue);
+            dialogHandlers.put(chatId, generalDialogHandler);
+            return;
+        }
+        if (managerDialogHandler.belongToDialogStarter(buttonValue)) {
+            dialogHandlers.put(chatId, managerDialogHandler);
+            return;
+        }
+        if (adminDialogHandler.belongToDialogStarter(buttonValue)) {
+            dialogHandlers.put(chatId, adminDialogHandler);
+        }
+    }
+
+    private void bindSubDialogHandler(String chatId, ButtonValue buttonValue) {
+        if (((SubDialogHandler) managerDialogHandler).belongToSubDialogStarter(buttonValue)) {
+            dialogHandlers.get(chatId).createStateMachineHandler(chatId, buttonValue);
+            return;
+        }
+        if (((SubDialogHandler) adminDialogHandler).belongToSubDialogStarter(buttonValue)) {
+            dialogHandlers.get(chatId).createStateMachineHandler(chatId, buttonValue);
+        }
     }
 }

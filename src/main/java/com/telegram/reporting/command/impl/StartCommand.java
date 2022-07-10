@@ -2,6 +2,7 @@ package com.telegram.reporting.command.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.KeyboardUtils;
@@ -24,10 +25,13 @@ public non-sealed class StartCommand implements Command {
 
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
+    private final DialogRouterService dialogRouterService;
 
-    public StartCommand(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
+    public StartCommand(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService,
+                        DialogRouterService dialogRouterService) {
         this.sendBotMessageService = sendBotMessageService;
         this.telegramUserService = telegramUserService;
+        this.dialogRouterService = dialogRouterService;
     }
 
     @Override
@@ -49,7 +53,7 @@ public non-sealed class StartCommand implements Command {
             shareContact.get(0).setRequestContact(true);
             sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(false, shareContact));
         } else {
-            sendBotMessageService.sendMessageWithKeys(KeyboardUtils.createRootMenuMessage(chatId.toString()));
+            dialogRouterService.startFlow(chatId.toString());
         }
     }
 }

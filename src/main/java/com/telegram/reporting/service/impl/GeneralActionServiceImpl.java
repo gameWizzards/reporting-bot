@@ -4,6 +4,7 @@ import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
+import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.GeneralActionService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TimeRecordService;
@@ -25,11 +26,13 @@ import java.util.Map;
 public class GeneralActionServiceImpl implements GeneralActionService {
     private final SendBotMessageService sendBotMessageService;
     private final TimeRecordService timeRecordsService;
+    private final DialogRouterService dialogRouterService;
 
-    public GeneralActionServiceImpl(SendBotMessageService sendBotMessageService,
-                                    TimeRecordService timeRecordsService) {
+    public GeneralActionServiceImpl(SendBotMessageService sendBotMessageService, TimeRecordService timeRecordsService,
+                                    DialogRouterService dialogRouterService) {
         this.sendBotMessageService = sendBotMessageService;
         this.timeRecordsService = timeRecordsService;
+        this.dialogRouterService = dialogRouterService;
     }
 
     @Override
@@ -151,7 +154,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
     @Override
     public <S, E> void sendRootMenuButtons(StateContext<S, E> context) {
         String chatId = TelegramUtils.currentChatId(context);
-        sendBotMessageService.sendMessageWithKeys(KeyboardUtils.createRootMenuMessage(chatId));
+        dialogRouterService.startFlow(chatId);
     }
 
     private Integer[] parseUserInput(String userInput) {
