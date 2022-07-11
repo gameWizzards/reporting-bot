@@ -3,6 +3,7 @@ package com.telegram.reporting.repository.entity;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +21,8 @@ import java.util.Optional;
 @Data
 @Entity
 @Table(name = "time_record", schema = "public")
-@EqualsAndHashCode()
+@EqualsAndHashCode(exclude = "report")
+@ToString(exclude = "report")
 public class TimeRecord {
 
     @Id

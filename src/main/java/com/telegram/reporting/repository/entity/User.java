@@ -4,21 +4,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
 @Table(name = "user", schema = "public")
-@EqualsAndHashCode()
+@EqualsAndHashCode(exclude = {"reports", "deleted"})
+@ToString(exclude = {"reports"})
 public class User {
 
     @Id
@@ -41,7 +35,12 @@ public class User {
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
-    @ToString.Exclude
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @Column(name = "role", nullable = false)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    private Set<Role> roles;
+
     @OneToMany(mappedBy = "user",
             fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

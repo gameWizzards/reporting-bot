@@ -183,5 +183,32 @@
                 disabled="false"
         />
     </changeSet>
+    <changeSet id="user_role_table" author="cyberdyne_systems">
+        <createTable schemaName="public" tableName="user_role">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="text" defaultValue="EMPLOYEE_ROLE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey
+                schemaName="public"
+                tableName="user_role"
+                columnNames="user_id, role"
+                constraintName="user_role_pk"
+        />
+        <addForeignKeyConstraint baseTableName="user_role" baseColumnNames="user_id"
+                                 constraintName="user_role_user_id_fk"
+                                 referencedTableName="user" referencedColumnNames="id"
+                                 onDelete="CASCADE" onUpdate="CASCADE"
+        />
+    </changeSet>
+    <changeSet id="update_user_role_table" author="cyberdyne_systems">
+        <sql dbms="postgresql">
+            INSERT INTO "public"."user_role" ("user_id")
+            SELECT "id" FROM "user";
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

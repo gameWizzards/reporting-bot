@@ -11,7 +11,8 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "report", schema = "public")
-@EqualsAndHashCode()
+@EqualsAndHashCode(exclude = {"user", "timeRecords"})
+@ToString(exclude = {"user", "timeRecords"})
 public class Report {
 
     @Id
@@ -26,7 +27,6 @@ public class Report {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ToString.Exclude
     @OneToMany(mappedBy = "report",
             fetch = FetchType.LAZY,
             cascade = {CascadeType.ALL},
