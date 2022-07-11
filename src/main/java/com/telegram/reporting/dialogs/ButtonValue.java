@@ -6,16 +6,16 @@ import java.util.Optional;
 
 public enum ButtonValue {
     //create report dialog
-    CREATE_REPORT_START_DIALOG("Создать отчет"),
+    CREATE_REPORT_START_DIALOG("\u2705 Создать отчет"),
     SKIP_NOTE("Пропустить примечание"),
     CONFIRM_CREATION_FINAL_REPORT("Отправить отчет"),
 
     //delete report dialog
-    DELETE_REPORT_START_DIALOG("Удалить отчет"),
+    DELETE_REPORT_START_DIALOG("\uE333 Удалить отчет"),
     CONFIRM_DELETE_TIME_RECORD("Удалить запись"),
 
     // edit report dialog
-    EDIT_REPORT_START_DIALOG("Изменить отчет"),
+    EDIT_REPORT_START_DIALOG("\u270F Изменить отчет"),
     SPEND_TIME("Затраченное время"),
     CATEGORY("Категория рабочего времени"),
     NOTE("Примичание"),
@@ -24,7 +24,7 @@ public enum ButtonValue {
     APPLY_DATA_CHANGES("Применить изменения"),
 
     // statistic dialog
-    STATISTIC_START_DIALOG("Статистика"),
+    STATISTIC_START_DIALOG("\uD83D\uDCC3 Статистика"),
     PREVIOUS_MONTH_STATISTIC("Показать за прошлый месяц"),
 
     // add new user dialog
@@ -42,8 +42,8 @@ public enum ButtonValue {
     REPORT_CATEGORY_ON_STORAGE("На складе"), REPORT_CATEGORY_ON_ORDER("На заказе"),
     REPORT_CATEGORY_ON_OFFICE("На офисе"), REPORT_CATEGORY_ON_COORDINATION("На координации"),
 
-    MANAGER_MENU("Меню менеджера"),
-    ADMIN_MENU("Меню администратора")
+    MANAGER_MENU("\uD83D\uDC68\u200D\uD83D\uDCBC Меню менеджера"),
+    ADMIN_MENU("\uD83D\uDC68\u200D\uD83D\uDCBB Меню администратора")
     ;
 
     private final String text;
