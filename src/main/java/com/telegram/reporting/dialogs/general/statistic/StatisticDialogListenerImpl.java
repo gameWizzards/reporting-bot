@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.delete_report;
+package com.telegram.reporting.dialogs.general.statistic;
 
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.utils.TelegramUtils;
@@ -11,22 +11,22 @@ import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.transition.Transition;
 
 @Slf4j
-public class DeleteReportDialogListenerImpl implements StateMachineListener<DeleteReportState, MessageEvent> {
-    private StateMachine<DeleteReportState, MessageEvent> stateMachine;
+public class StatisticDialogListenerImpl implements StateMachineListener<StatisticState, MessageEvent> {
+    private StateMachine<StatisticState, MessageEvent> stateMachine;
     @Override
-    public void stateChanged(State<DeleteReportState, MessageEvent> from, State<DeleteReportState, MessageEvent> to) {
+    public void stateChanged(State<StatisticState, MessageEvent> from, State<StatisticState, MessageEvent> to) {
         if (from != null) {
             log.info("{} dialog go from {} to step {}", TelegramUtils.getLogPrefix(stateMachine), from.getId(), to.getId());
         }
     }
 
     @Override
-    public void stateEntered(State<DeleteReportState, MessageEvent> state) {
+    public void stateEntered(State<StatisticState, MessageEvent> state) {
 
     }
 
     @Override
-    public void stateExited(State<DeleteReportState, MessageEvent> state) {
+    public void stateExited(State<StatisticState, MessageEvent> state) {
 
     }
 
@@ -39,32 +39,32 @@ public class DeleteReportDialogListenerImpl implements StateMachineListener<Dele
     }
 
     @Override
-    public void transition(Transition<DeleteReportState, MessageEvent> transition) {
+    public void transition(Transition<StatisticState, MessageEvent> transition) {
 
     }
 
     @Override
-    public void transitionStarted(Transition<DeleteReportState, MessageEvent> transition) {
+    public void transitionStarted(Transition<StatisticState, MessageEvent> transition) {
 
     }
 
     @Override
-    public void transitionEnded(Transition<DeleteReportState, MessageEvent> transition) {
+    public void transitionEnded(Transition<StatisticState, MessageEvent> transition) {
 
     }
 
     @Override
-    public void stateMachineStarted(StateMachine<DeleteReportState, MessageEvent> stateMachine) {
+    public void stateMachineStarted(StateMachine<StatisticState, MessageEvent> stateMachine) {
         this.stateMachine = stateMachine;
     }
 
     @Override
-    public void stateMachineStopped(StateMachine<DeleteReportState, MessageEvent> stateMachine) {
+    public void stateMachineStopped(StateMachine<StatisticState, MessageEvent> stateMachine) {
 
     }
 
     @Override
-    public void stateMachineError(StateMachine<DeleteReportState, MessageEvent> stateMachine, Exception e) {
+    public void stateMachineError(StateMachine<StatisticState, MessageEvent> stateMachine, Exception e) {
         log.error("{}. Current step = {}. Exception = {}",
                 TelegramUtils.getLogPrefix(stateMachine),
                 stateMachine.getState().getId(),
@@ -83,7 +83,7 @@ public class DeleteReportDialogListenerImpl implements StateMachineListener<Dele
     }
 
     @Override
-    public void stateContext(StateContext<DeleteReportState, MessageEvent> stateContext) {
+    public void stateContext(StateContext<StatisticState, MessageEvent> stateContext) {
 
     }
 }

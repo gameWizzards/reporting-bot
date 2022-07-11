@@ -78,22 +78,6 @@ public class KeyboardUtils {
         return replyKeyboardMarkup;
     }
 
-    public static SendMessage createRootMenuMessage(String chatId) {
-        Objects.requireNonNull(chatId, "Can't create root menu buttons! ChatId is required");
-        final String startFlowMessage = """
-                Окей.
-                Выбери диалог.
-                """;
-
-        SendMessage sendMessage = new SendMessage(chatId, startFlowMessage);
-        KeyboardRow firstRow = KeyboardUtils.createButton(ButtonValue.CREATE_REPORT_START_DIALOG.text());
-        KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.EDIT_REPORT_START_DIALOG.text(), ButtonValue.DELETE_REPORT_START_DIALOG.text());
-        KeyboardRow thirdRow = KeyboardUtils.createRowButtons(ButtonValue.STATISTIC_START_DIALOG.text());
-        sendMessage.setReplyMarkup(createKeyboardMarkup(false, firstRow, secondRow, thirdRow));
-
-        return sendMessage;
-    }
-
     public static List<String> getAvailableCategoryButtons(String timeRecordsJson) {
         return ButtonValue.categoryButtons().stream()
                 .map(ButtonValue::text)

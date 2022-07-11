@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.statistic;
+package com.telegram.reporting.dialogs.general.statistic;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
@@ -53,7 +53,6 @@ public class StatisticStateMachineHandler implements StateMachineHandler {
                 variables.put(ContextVariable.DATE, userInput);
                 yield MessageEvent.VALIDATE_USER_DATE_INPUT;
             }
-
             default -> null;
         };
 

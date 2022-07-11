@@ -10,7 +10,7 @@ public interface TimeRecordService {
 
     TimeRecord save(TimeRecord timeRecord);
 
-    List<TimeRecordTO> getTimeRecordTOs(String date, String chatId);
+    List<TimeRecordTO> getTimeRecordTOs(String date, Long chatId);
 
     void deleteByTimeRecordTO(TimeRecordTO timeRecordTO);
 }

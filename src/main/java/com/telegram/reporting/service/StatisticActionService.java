@@ -1,7 +1,7 @@
 package com.telegram.reporting.service;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.dialogs.statistic.StatisticState;
+import com.telegram.reporting.dialogs.general.statistic.StatisticState;
 import org.springframework.statemachine.StateContext;
 
 public interface StatisticActionService {

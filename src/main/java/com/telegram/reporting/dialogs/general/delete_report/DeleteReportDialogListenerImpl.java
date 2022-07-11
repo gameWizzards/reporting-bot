@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.create_report;
+package com.telegram.reporting.dialogs.general.delete_report;
 
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.utils.TelegramUtils;
@@ -11,61 +11,60 @@ import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.transition.Transition;
 
 @Slf4j
-public class CreateReportDialogListenerImpl implements StateMachineListener<CreateReportState, MessageEvent> {
-    private StateMachine<CreateReportState, MessageEvent> stateMachine;
-
+public class DeleteReportDialogListenerImpl implements StateMachineListener<DeleteReportState, MessageEvent> {
+    private StateMachine<DeleteReportState, MessageEvent> stateMachine;
     @Override
-    public void stateChanged(State<CreateReportState, MessageEvent> from, State<CreateReportState, MessageEvent> to) {
+    public void stateChanged(State<DeleteReportState, MessageEvent> from, State<DeleteReportState, MessageEvent> to) {
         if (from != null) {
             log.info("{} dialog go from {} to step {}", TelegramUtils.getLogPrefix(stateMachine), from.getId(), to.getId());
         }
     }
 
     @Override
-    public void stateEntered(State<CreateReportState, MessageEvent> state) {
+    public void stateEntered(State<DeleteReportState, MessageEvent> state) {
 
     }
 
     @Override
-    public void stateExited(State<CreateReportState, MessageEvent> state) {
+    public void stateExited(State<DeleteReportState, MessageEvent> state) {
 
     }
 
     @Override
     public void eventNotAccepted(Message<MessageEvent> message) {
-        log.error("{} Invalid transition! Current step = {}. Invalid event {}.",
+        log.error("{} Invalid transition! Current step = {}. Invalid event = {}.",
                 TelegramUtils.getLogPrefix(stateMachine),
                 stateMachine.getState().getId(),
                 message.getPayload());
     }
 
     @Override
-    public void transition(Transition<CreateReportState, MessageEvent> transition) {
+    public void transition(Transition<DeleteReportState, MessageEvent> transition) {
 
     }
 
     @Override
-    public void transitionStarted(Transition<CreateReportState, MessageEvent> transition) {
+    public void transitionStarted(Transition<DeleteReportState, MessageEvent> transition) {
 
     }
 
     @Override
-    public void transitionEnded(Transition<CreateReportState, MessageEvent> transition) {
+    public void transitionEnded(Transition<DeleteReportState, MessageEvent> transition) {
 
     }
 
     @Override
-    public void stateMachineStarted(StateMachine<CreateReportState, MessageEvent> stateMachine) {
+    public void stateMachineStarted(StateMachine<DeleteReportState, MessageEvent> stateMachine) {
         this.stateMachine = stateMachine;
     }
 
     @Override
-    public void stateMachineStopped(StateMachine<CreateReportState, MessageEvent> stateMachine) {
+    public void stateMachineStopped(StateMachine<DeleteReportState, MessageEvent> stateMachine) {
 
     }
 
     @Override
-    public void stateMachineError(StateMachine<CreateReportState, MessageEvent> stateMachine, Exception e) {
+    public void stateMachineError(StateMachine<DeleteReportState, MessageEvent> stateMachine, Exception e) {
         log.error("{}. Current step = {}. Exception = {}",
                 TelegramUtils.getLogPrefix(stateMachine),
                 stateMachine.getState().getId(),
@@ -84,7 +83,7 @@ public class CreateReportDialogListenerImpl implements StateMachineListener<Crea
     }
 
     @Override
-    public void stateContext(StateContext<CreateReportState, MessageEvent> stateContext) {
+    public void stateContext(StateContext<DeleteReportState, MessageEvent> stateContext) {
 
     }
 }

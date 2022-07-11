@@ -3,7 +3,7 @@ package com.telegram.reporting.service.impl;
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.dialogs.statistic.StatisticState;
+import com.telegram.reporting.dialogs.general.statistic.StatisticState;
 import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.service.ReportService;
@@ -45,7 +45,7 @@ public class StatisticActionServiceImpl implements StatisticActionService {
         AtomicInteger ordinalNumb = new AtomicInteger(1);
 
         int month = getStatisticMonth(context.getExtendedState().getVariables());
-        List<Report> reports = reportService.getReportsBelongMonth(month, Long.parseLong(TelegramUtils.currentChatId(context)));
+        List<Report> reports = reportService.getReportsBelongMonth(month, TelegramUtils.currentChatId(context));
 
         long sumHours = reports.parallelStream()
                 .flatMap(repo -> repo.getTimeRecords().stream())
@@ -63,13 +63,13 @@ public class StatisticActionServiceImpl implements StatisticActionService {
                 %s
                 """.formatted(Month.getNameByOrdinal(month), sumHours, statistic);
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), statisticMessage);
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), statisticMessage);
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
     }
 
     @Override
     public void sendPreviousMonthStatisticButton(StateContext<StatisticState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), "Также доступна статистика за прошлый месяц.");
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), "Также доступна статистика за прошлый месяц.");
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.PREVIOUS_MONTH_STATISTIC.text());
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
     }

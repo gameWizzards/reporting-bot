@@ -25,7 +25,7 @@ public class GuardServiceImpl implements GuardService {
         String regexDayMonth = "^([1-9]|0[1-9]|1\\d|2\\d|3[01]).(0[1-9]|1[0-2])$";
         String regexFullDate = "^([1-9]|0[1-9]|1\\d|2\\d|3[01]).(0[1-9]|1[0-2]).(19|20)\\d{2}$";
 
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.DATE);
 
         if (userInput.matches(regexDay) || userInput.matches(regexDayMonth) || userInput.matches(regexFullDate)) {
@@ -43,7 +43,7 @@ public class GuardServiceImpl implements GuardService {
 
     @Override
     public <S, E> boolean validateTime(StateContext<S, E> context) {
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_TIME);
 
         if (userInput.matches("\\d+") && isWithinDay(userInput)) {
@@ -61,7 +61,7 @@ public class GuardServiceImpl implements GuardService {
     @Override
     public <S, E> boolean validateNote(StateContext<S, E> context) {
         int minNoteLength = 5;
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_NOTE);
         String lastButtonText = (String) context.getExtendedState().getVariables().get(ContextVariable.BUTTON_VALUE);
         boolean isSkipNote = ButtonValue.SKIP_NOTE.text().equals(lastButtonText.trim());

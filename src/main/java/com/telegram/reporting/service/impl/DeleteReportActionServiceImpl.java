@@ -2,7 +2,7 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
-import com.telegram.reporting.dialogs.delete_report.DeleteReportState;
+import com.telegram.reporting.dialogs.general.delete_report.DeleteReportState;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
@@ -51,7 +51,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
                   %s
                 """.formatted(date, timeRecordMessage, Message.REQUEST_DELETE_CONFIRMATION_REPORT.text());
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), message);
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), message);
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CONFIRM_DELETE_TIME_RECORD.text(), ButtonValue.CANCEL.text());
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
     }
@@ -59,7 +59,7 @@ public class DeleteReportActionServiceImpl implements DeleteReportActionService 
     @Override
     public void removeTimeRecord(StateContext<DeleteReportState, MessageEvent> context) {
         Map<Object, Object> variables = context.getExtendedState().getVariables();
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         String timeRecordJson = (String) variables.get(ContextVariable.TARGET_TIME_RECORD_JSON);
 
         if (StringUtils.isBlank(timeRecordJson)) {

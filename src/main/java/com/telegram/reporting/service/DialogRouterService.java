@@ -5,5 +5,5 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public interface DialogRouterService {
     void handleTelegramUpdateEvent(Update update);
 
-    void startFlow(String chatId);
+    void startFlow(Long chatId);
 }

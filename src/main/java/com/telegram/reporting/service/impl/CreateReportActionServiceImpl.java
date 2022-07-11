@@ -4,7 +4,7 @@ import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.dialogs.create_report.CreateReportState;
+import com.telegram.reporting.dialogs.general.create_report.CreateReportState;
 import com.telegram.reporting.exception.MismatchCategoryException;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
@@ -50,14 +50,14 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
     @Override
     public void requestInputDate(StateContext<CreateReportState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.USER_DATE_INPUT_CREATE_REPORT.text());
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), Message.USER_DATE_INPUT_CREATE_REPORT.text());
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
     }
 
     @Override
     public void sendExistedTimeRecords(StateContext<CreateReportState, MessageEvent> context) {
         Map<Object, Object> variables = context.getExtendedState().getVariables();
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         String date = (String) variables.get(ContextVariable.DATE);
 
         List<TimeRecordTO> trTOs = timeRecordService.getTimeRecordTOs(date, chatId);
@@ -90,7 +90,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
         SendMessage sendMessage;
         String message;
 
-        String chatId = TelegramUtils.currentChatId(context);
+        String chatId = TelegramUtils.currentChatIdString(context);
         String timeRecordsJson = (String) context.getExtendedState().getVariables().get(ContextVariable.TIME_RECORDS_JSON);
         List<String> buttons = KeyboardUtils.getAvailableCategoryButtons(timeRecordsJson);
         boolean isAllCategoriesOccupied = StringUtils.isNotBlank(timeRecordsJson) && buttons.isEmpty();
@@ -134,14 +134,14 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
                         """.formatted(reportCategoryType,
                 Message.USER_TIME_INPUT.text());
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), userMessageCategoryAccepted);
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), userMessageCategoryAccepted);
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
     }
 
     @Override
     public void requestInputNote(StateContext<CreateReportState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.REQUEST_ADD_NOTE_REPORT.text());
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), Message.REQUEST_ADD_NOTE_REPORT.text());
         KeyboardRow row = KeyboardUtils.createRowButtons(ButtonValue.SKIP_NOTE.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, row));
@@ -177,7 +177,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
 
     @Override
     public void requestAdditionalReport(StateContext<CreateReportState, MessageEvent> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.REQUEST_ADDITIONAL_REPORT.text());
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), Message.REQUEST_ADDITIONAL_REPORT.text());
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.YES.text(), ButtonValue.NO.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
@@ -205,7 +205,7 @@ public class CreateReportActionServiceImpl implements CreateReportActionService 
                   %s
                 """.formatted(date, timeRecordMessage, Message.REQUEST_CONFIRMATION_REPORT.text());
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), message);
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), message);
 
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CONFIRM_CREATION_FINAL_REPORT.text(), ButtonValue.CANCEL.text());
 

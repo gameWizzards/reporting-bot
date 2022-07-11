@@ -50,7 +50,7 @@ public class StateMachineErrorLoggingAspect {
         log.error(logPrefix + e.getMessage(), e);
         log.error("{} Context variables = {}", logPrefix, contextVarValues);
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), "Упс) Что-то пошло не так, попробуй начать сначала");
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), "Упс) Что-то пошло не так, попробуй начать сначала");
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
     }
 }

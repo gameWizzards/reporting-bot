@@ -1,7 +1,8 @@
-package com.telegram.reporting.service.impl;
+package com.telegram.reporting.dialogs.manager;
 
 import com.telegram.reporting.dialogs.ButtonValue;
-import com.telegram.reporting.service.DialogHandler;
+import com.telegram.reporting.dialogs.DialogHandler;
+import com.telegram.reporting.repository.entity.Role;
 import com.telegram.reporting.service.SubDialogHandler;
 import com.telegram.reporting.utils.KeyboardUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,27 +16,32 @@ import java.util.List;
 public class ManagerDialogHandlerImpl implements DialogHandler, SubDialogHandler {
 
     @Override
-    public void createStateMachineHandler(String chatId, ButtonValue buttonValue) {
+    public void createStateMachineHandler(Long chatId, ButtonValue buttonValue) {
     }
 
     @Override
-    public void removeStateMachineHandler(String chatId) {
-
-    }
-
-    @Override
-    public void handleTelegramInput(String chatId, String input) {
+    public void removeStateMachineHandler(Long chatId) {
 
     }
 
     @Override
-    public List<KeyboardRow> getRootMenuButtons(String chatId) {
+    public void handleTelegramInput(Long chatId, String input) {
+
+    }
+
+    @Override
+    public List<KeyboardRow> getRootMenuButtons() {
         return List.of(KeyboardUtils.createButton(ButtonValue.MANAGER_MENU.text()));
     }
 
     @Override
     public boolean belongToDialogStarter(ButtonValue buttonValue) {
         return ButtonValue.MANAGER_MENU.equals(buttonValue);
+    }
+
+    @Override
+    public List<Role> roleAccessibility() {
+        return List.of(Role.MANAGER_ROLE, Role.ADMIN_ROLE);
     }
 
     @Override

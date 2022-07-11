@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.delete_report;
+package com.telegram.reporting.dialogs.general.delete_report;
 
 public enum DeleteReportState {
     START_DELETE_REPORT_DIALOG,

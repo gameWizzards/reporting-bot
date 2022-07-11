@@ -42,7 +42,7 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
                 sendBotMessageService.sendMessage(TelegramUtils.currentChatId(update), "Кажеться твой номер не добавили в список разрешенных. Свяжись с тем кто может добавить твой номер в White list!");
                 throw new TelegramUserException("This user is not registered yet! Phone = +%s. ChatId = %s.".formatted(update.getMessage().getContact().getPhoneNumber(), TelegramUtils.currentChatId(update)));
             }
-            dialogRouterService.startFlow(user.getChatId().toString());
+            dialogRouterService.startFlow(user.getChatId());
             return;
         }
         if (update.hasMessage() && update.getMessage().hasText()) {

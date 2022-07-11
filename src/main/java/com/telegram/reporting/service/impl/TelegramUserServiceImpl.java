@@ -1,6 +1,7 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.repository.UserRepository;
+import com.telegram.reporting.repository.entity.Role;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.TelegramUserService;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Implementation of {@link TelegramUserService}.
@@ -64,6 +66,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
             // need for better identification in report or list of employee
             user.setSurname(contact.getPhoneNumber());
         }
+        user.setRoles(Set.of(Role.EMPLOYEE_ROLE));
         return save(user);
     }
 }

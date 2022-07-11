@@ -1,8 +1,6 @@
-package com.telegram.reporting.dialogs.statistic;
+package com.telegram.reporting.dialogs.general.statistic;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.service.GeneralActionService;
-import com.telegram.reporting.service.GuardService;
 import com.telegram.reporting.service.StatisticActionService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -17,15 +15,9 @@ import java.util.EnumSet;
 @Configuration
 @EnableStateMachineFactory(name = "StatisticDialogStateMachineFactory")
 public class StatisticDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<StatisticState, MessageEvent> {
-    private final GuardService guardService;
-    private final GeneralActionService generalActionService;
     private final StatisticActionService statisticActionService;
 
-    public StatisticDialogStateMachineFactory(@Lazy GuardService guardService,
-                                              @Lazy GeneralActionService generalActionService,
-                                              @Lazy StatisticActionService statisticActionService) {
-        this.guardService = guardService;
-        this.generalActionService = generalActionService;
+    public StatisticDialogStateMachineFactory(@Lazy StatisticActionService statisticActionService) {
         this.statisticActionService = statisticActionService;
     }
 
@@ -43,7 +35,6 @@ public class StatisticDialogStateMachineFactory extends EnumStateMachineConfigur
                 .initial(StatisticState.START_STATISTIC_DIALOG)
                 .end(StatisticState.END_STATISTIC_DIALOG)
                 .states(EnumSet.allOf(StatisticState.class));
-
     }
 
     @Override

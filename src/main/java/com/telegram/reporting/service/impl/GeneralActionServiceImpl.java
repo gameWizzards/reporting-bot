@@ -37,14 +37,14 @@ public class GeneralActionServiceImpl implements GeneralActionService {
 
     @Override
     public <S, E> void generalRequestInputDate(StateContext<S, E> context) {
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), Message.USER_DATE_INPUT_GENERAL.text());
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), Message.USER_DATE_INPUT_GENERAL.text());
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
     }
 
     @Override
     public <S, E> void sendListTimeRecords(StateContext<S, E> context) {
         Map<Object, Object> variables = context.getExtendedState().getVariables();
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         String date = (String) variables.get(ContextVariable.DATE);
 
         List<TimeRecordTO> trTOs = timeRecordsService.getTimeRecordTOs(date, chatId);
@@ -54,7 +54,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
                     Нет отчетов за - %s.
                     Выбери другую дату или вернись в главное меню.
                     """.formatted(date);
-            SendMessage sendMessage = new SendMessage(chatId, message);
+            SendMessage sendMessage = new SendMessage(chatId.toString(), message);
             KeyboardRow rowButtons = KeyboardUtils.createRowButtons(ButtonValue.INPUT_NEW_DATE.text());
             sendBotMessageService.sendMessageWithKeys(sendMessage,
                     KeyboardUtils.createKeyboardMarkup(true, rowButtons));
@@ -76,7 +76,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
         String timeRecordsJson = JsonUtils.serializeItem(trTOs);
         variables.put(ContextVariable.TIME_RECORDS_JSON, timeRecordsJson);
 
-        SendMessage sendMessage = new SendMessage(chatId, message);
+        SendMessage sendMessage = new SendMessage(chatId.toString(), message);
         KeyboardRow rowButtons = KeyboardUtils.createRowButtons(buttons);
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, rowButtons));
@@ -153,7 +153,7 @@ public class GeneralActionServiceImpl implements GeneralActionService {
 
     @Override
     public <S, E> void sendRootMenuButtons(StateContext<S, E> context) {
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         dialogRouterService.startFlow(chatId);
     }
 

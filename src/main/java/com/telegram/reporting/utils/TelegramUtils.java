@@ -15,7 +15,11 @@ public class TelegramUtils {
         return update.getMessage().getChatId();
     }
 
-    public static <S, E> String currentChatId(StateContext<S, E> context) {
+    public static <S, E> Long currentChatId(StateContext<S, E> context) {
+        return (Long) context.getExtendedState().getVariables().get(ContextVariable.CHAT_ID);
+    }
+
+    public static <S, E> String currentChatIdString(StateContext<S, E> context) {
         return String.valueOf(context.getExtendedState().getVariables().get(ContextVariable.CHAT_ID));
     }
 
@@ -32,7 +36,7 @@ public class TelegramUtils {
     }
 
     public static String createLogPrefix(String dialogName, Long chatId) {
-        return "%s-[%s]".formatted(chatId.toString(), dialogName);
+        return "%s-[%s]".formatted(chatId, dialogName);
     }
 
     public static <S, E> String getLogPrefix(StateMachine<S, E> stateMachine) {

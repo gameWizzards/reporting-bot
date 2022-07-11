@@ -53,7 +53,7 @@ public non-sealed class StartCommand implements Command {
             shareContact.get(0).setRequestContact(true);
             sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(false, shareContact));
         } else {
-            dialogRouterService.startFlow(chatId.toString());
+            dialogRouterService.startFlow(chatId);
         }
     }
 }

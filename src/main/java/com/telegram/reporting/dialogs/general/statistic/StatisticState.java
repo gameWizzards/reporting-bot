@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.statistic;
+package com.telegram.reporting.dialogs.general.statistic;
 
 public enum StatisticState {
     START_STATISTIC_DIALOG,

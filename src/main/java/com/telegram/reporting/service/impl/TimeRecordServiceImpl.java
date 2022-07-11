@@ -45,12 +45,12 @@ public class TimeRecordServiceImpl implements TimeRecordService {
     }
 
     @Override
-    public List<TimeRecordTO> getTimeRecordTOs(String date, String chatId) {
-        if (StringUtils.isBlank(date) || StringUtils.isBlank(chatId)) {
+    public List<TimeRecordTO> getTimeRecordTOs(String date, Long chatId) {
+        if (StringUtils.isBlank(date) || chatId == null) {
             return null;
         }
         LocalDate localDate = DateTimeUtils.parseDefaultDate(date);
-        List<TimeRecord> trs = timeRecordRepository.getTimeRecordsByReportDateAndUserChatId(localDate, Long.parseLong(chatId));
+        List<TimeRecord> trs = timeRecordRepository.getTimeRecordsByReportDateAndUserChatId(localDate, chatId);
 
         if (CollectionUtils.isEmpty(trs)) {
             return null;

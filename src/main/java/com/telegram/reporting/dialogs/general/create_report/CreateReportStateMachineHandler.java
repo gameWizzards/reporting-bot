@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.create_report;
+package com.telegram.reporting.dialogs.general.create_report;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;

@@ -4,7 +4,7 @@ import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.dialogs.edit_report.EditReportState;
+import com.telegram.reporting.dialogs.general.edit_report.EditReportState;
 import com.telegram.reporting.exception.MismatchButtonValueException;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
@@ -44,7 +44,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
 
     @Override
     public void requestChooseEditData(StateContext<EditReportState, MessageEvent> context) {
-        String chatId = TelegramUtils.currentChatId(context);
+        Long chatId = TelegramUtils.currentChatId(context);
         String editTimeRecordJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TARGET_TIME_RECORD_JSON);
         String timeRecordsJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TIME_RECORDS_JSON);
 
@@ -58,7 +58,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
                   
                 """.formatted(timeRecordMessage);
 
-        SendMessage sendMessage = new SendMessage(chatId, message);
+        SendMessage sendMessage = new SendMessage(chatId.toString(), message);
 
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CATEGORY.text());
         KeyboardRow secondRow = KeyboardUtils.createRowButtons(ButtonValue.SPEND_TIME.text(), ButtonValue.NOTE.text());
@@ -165,7 +165,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
                                 
                 """.formatted(timeRecordToMessage);
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), message);
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), message);
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.CONFIRM_EDIT_ADDITIONAL_DATA.text(), ButtonValue.DECLINE_EDIT_ADDITIONAL_DATA.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
@@ -175,11 +175,9 @@ public class EditReportActionServiceImpl implements EditReportActionService {
     public void sendCategoryButtons(StateContext<EditReportState, MessageEvent> context) {
         String timeRecordsJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TIME_RECORDS_JSON);
 
-        String chatId = TelegramUtils.currentChatId(context);
-
         List<String> buttons = KeyboardUtils.getAvailableCategoryButtons(timeRecordsJson);
 
-        SendMessage sendMessage = new SendMessage(chatId, Message.CHOICE_REPORT_CATEGORY.text());
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), Message.CHOICE_REPORT_CATEGORY.text());
         KeyboardRow[] buttonsWithRows = KeyboardUtils.createButtonsWithRows(buttons, 2);
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, buttonsWithRows));
@@ -197,7 +195,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
                                 
                 """.formatted(timeRecordToMessage);
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), message);
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), message);
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.APPLY_DATA_CHANGES.text(), ButtonValue.CANCEL.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));
@@ -228,7 +226,7 @@ public class EditReportActionServiceImpl implements EditReportActionService {
                                 
                 """.formatted(date);
 
-        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatId(context), message);
+        SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), message);
         KeyboardRow firstRow = KeyboardUtils.createRowButtons(ButtonValue.YES.text(), ButtonValue.NO.text());
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, firstRow));

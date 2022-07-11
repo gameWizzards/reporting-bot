@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs.create_report;
+package com.telegram.reporting.dialogs.general.create_report;
 
 public enum CreateReportState {
     START_CREATE_REPORT_DIALOG,

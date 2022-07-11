@@ -1,33 +1,32 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
+import com.telegram.reporting.dialogs.DialogHandler;
 import com.telegram.reporting.dialogs.Message;
+import com.telegram.reporting.exception.TelegramUserException;
+import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.service.DialogHandler;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.SubDialogHandler;
+import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 
 @Slf4j
 @Service
 public class DialogRouterServiceImpl implements DialogRouterService {
 
-    private final Map<String, DialogHandler> dialogHandlers;
+    private final Map<Long, DialogHandler> dialogHandlers;
+    private final Map<Long, User> principalUsers;
     private final List<DialogHandler> existingDialogHandlers;
 
     private final DialogHandler generalDialogHandler;
@@ -35,26 +34,29 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     private final DialogHandler adminDialogHandler;
 
     private final SendBotMessageService sendBotMessageService;
+    private final TelegramUserService telegramUserService;
 
     public DialogRouterServiceImpl(@Qualifier("GeneralDialogHandler") DialogHandler generalDialogHandler,
                                    @Qualifier("ManagerDialogHandler") DialogHandler managerDialogHandler,
                                    @Qualifier("AdminDialogHandler") DialogHandler adminDialogHandler,
-                                   SendBotMessageService sendBotMessageService) {
-
-        this.sendBotMessageService = sendBotMessageService;
+                                   SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
 
         this.generalDialogHandler = generalDialogHandler;
         this.managerDialogHandler = managerDialogHandler;
         this.adminDialogHandler = adminDialogHandler;
 
+        this.sendBotMessageService = sendBotMessageService;
+        this.telegramUserService = telegramUserService;
+
         existingDialogHandlers = List.of(generalDialogHandler, managerDialogHandler, adminDialogHandler);
         dialogHandlers = new ConcurrentHashMap<>();
+        principalUsers = new ConcurrentHashMap<>();
     }
 
     @Override
     public void handleTelegramUpdateEvent(Update update) {
         String input = TelegramUtils.getMessage(update);
-        String chatId = TelegramUtils.currentChatId(update).toString();
+        Long chatId = TelegramUtils.currentChatId(update);
 
         Optional<ButtonValue> optionalButtonValue = ButtonValue.getByText(input);
 
@@ -63,17 +65,18 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
             // return to root menu when click 'main menu' button
             if (ButtonValue.MAIN_MENU.equals(buttonValue)) {
-                removeUnusedHandlers(chatId);
                 startFlow(chatId);
                 return;
             }
 
             // bind handlers when buttonValue contains name of particular dialog
-            //TODO consider the possibility to add checking - if handler bound already
-            bindDialogHandler(chatId, buttonValue);
-            bindSubDialogHandler(chatId, buttonValue);
+            // if user doesn't exist go to startFlow on next condition
+            if (!dialogHandlers.containsKey(chatId) && principalUsers.get(chatId) != null && !principalUsers.get(chatId).isDeleted()) {
+                bindDialogHandler(chatId, buttonValue);
+                bindSubDialogHandler(chatId, buttonValue);
+            }
 
-            // when dialog in telegram remained on some step with buttons but app was reloaded
+            // when dialog in telegram remained on some step (different from starter) with buttons but app was reloaded
             // that means that there is no handler for the dialog - start from root menu
             if (!dialogHandlers.containsKey(chatId)) {
                 sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
@@ -93,28 +96,47 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     }
 
     @Override
-    public void startFlow(String chatId) {
+    public void startFlow(Long chatId) {
         removeUnusedHandlers(chatId);
+        User user = getDialogPrincipalUser(chatId);
+
         final String startFlowMessage = """
-                Окей.
+                Окей %s.
                 Выбери диалог.
-                """;
+                """.formatted(user.getName());
+
         KeyboardRow[] keyboardRows = existingDialogHandlers.stream()
-                .map(handler -> handler.getRootMenuButtons(chatId))
+                .filter(handler -> checkDialogAccessibility(handler, user))
+                .map(DialogHandler::getRootMenuButtons)
                 .flatMap(Collection::stream)
-                .filter(Predicate.not(CollectionUtils::isEmpty))
                 .toArray(KeyboardRow[]::new);
-        SendMessage sendMessage = new SendMessage(chatId, startFlowMessage);
+        SendMessage sendMessage = new SendMessage(chatId.toString(), startFlowMessage);
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(false, keyboardRows));
     }
 
-    private void removeUnusedHandlers(String chatId) {
+    private boolean checkDialogAccessibility(DialogHandler handler, User user) {
+        return !Collections.disjoint(handler.roleAccessibility(), user.getRoles());
+    }
+
+    private User getDialogPrincipalUser(Long chatId) {
+        Optional<User> user = telegramUserService.findByChatId(chatId);
+        if (user.isEmpty() || user.get().isDeleted()) {
+            String reason = user.isEmpty() ? "Твоя учетная запись не найдена" : "Твоя учетная запись удалена";
+            sendBotMessageService.sendMessage(chatId, "Похоже у тебя нет доступа к боту. Причина: %s. Свяжись с тем кто может обновить твою учетную запись!".formatted(reason));
+            principalUsers.remove(chatId);
+            throw new TelegramUserException("User is not available to set his as principal. ChatId: %s. User: %s".formatted(chatId, user));
+        }
+        principalUsers.put(chatId, user.get());
+        return user.get();
+    }
+
+    private void removeUnusedHandlers(Long chatId) {
         Optional<DialogHandler> optionalHandler = Optional.ofNullable(dialogHandlers.get(chatId));
         optionalHandler.ifPresent(handler -> handler.removeStateMachineHandler(chatId));
         dialogHandlers.remove(chatId);
     }
 
-    private void bindDialogHandler(String chatId, ButtonValue buttonValue) {
+    private void bindDialogHandler(Long chatId, ButtonValue buttonValue) {
         if (generalDialogHandler.belongToDialogStarter(buttonValue)) {
             generalDialogHandler.createStateMachineHandler(chatId, buttonValue);
             dialogHandlers.put(chatId, generalDialogHandler);
@@ -129,7 +151,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         }
     }
 
-    private void bindSubDialogHandler(String chatId, ButtonValue buttonValue) {
+    private void bindSubDialogHandler(Long chatId, ButtonValue buttonValue) {
         if (((SubDialogHandler) managerDialogHandler).belongToSubDialogStarter(buttonValue)) {
             dialogHandlers.get(chatId).createStateMachineHandler(chatId, buttonValue);
             return;

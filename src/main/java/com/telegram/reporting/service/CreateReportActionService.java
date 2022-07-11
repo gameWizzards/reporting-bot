@@ -1,7 +1,7 @@
 package com.telegram.reporting.service;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.dialogs.create_report.CreateReportState;
+import com.telegram.reporting.dialogs.general.create_report.CreateReportState;
 import org.springframework.statemachine.StateContext;
 
 public interface CreateReportActionService {
