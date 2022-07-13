@@ -1,4 +1,4 @@
-package com.telegram.reporting.service.impl;
+package com.telegram.reporting.dialogs.actions.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
@@ -10,7 +10,7 @@ import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.service.CategoryService;
-import com.telegram.reporting.service.EditReportActionService;
+import com.telegram.reporting.dialogs.actions.EditReportActions;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.JsonUtils;
@@ -30,13 +30,13 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class EditReportActionServiceImpl implements EditReportActionService {
+public class EditReportActionsImpl implements EditReportActions {
     private final SendBotMessageService sendBotMessageService;
     private final CategoryService categoryService;
     private final TimeRecordService timeRecordService;
 
-    public EditReportActionServiceImpl(SendBotMessageService sendBotMessageService, CategoryService categoryService,
-                                       TimeRecordService timeRecordService) {
+    public EditReportActionsImpl(SendBotMessageService sendBotMessageService, CategoryService categoryService,
+                                 TimeRecordService timeRecordService) {
         this.sendBotMessageService = sendBotMessageService;
         this.categoryService = categoryService;
         this.timeRecordService = timeRecordService;

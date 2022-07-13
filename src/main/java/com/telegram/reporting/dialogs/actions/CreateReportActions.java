@@ -1,10 +1,10 @@
-package com.telegram.reporting.service;
+package com.telegram.reporting.dialogs.actions;
 
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.general.create_report.CreateReportState;
 import org.springframework.statemachine.StateContext;
 
-public interface CreateReportActionService {
+public interface CreateReportActions {
     void requestInputDate(StateContext<CreateReportState, MessageEvent> context);
 
     void sendExistedTimeRecords(StateContext<CreateReportState, MessageEvent> context);

@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.general.delete_report;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.service.DeleteReportActionService;
-import com.telegram.reporting.service.GeneralActionService;
-import com.telegram.reporting.service.GuardService;
+import com.telegram.reporting.dialogs.actions.DeleteReportActions;
+import com.telegram.reporting.dialogs.actions.GeneralActions;
+import com.telegram.reporting.dialogs.guards.GuardValidator;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -17,16 +17,16 @@ import java.util.EnumSet;
 @Configuration
 @EnableStateMachineFactory(name = "DeleteReportDialogStateMachineFactory")
 public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<DeleteReportState, MessageEvent> {
-    private final GuardService guardService;
-    private final GeneralActionService generalActionService;
-    private final DeleteReportActionService deleteReportActionService;
+    private final GuardValidator guardValidator;
+    private final GeneralActions generalActions;
+    private final DeleteReportActions deleteReportActions;
 
-    public DeleteReportDialogStateMachineFactory(@Lazy GuardService guardService,
-                                                 @Lazy GeneralActionService generalActionService,
-                                                 @Lazy DeleteReportActionService deleteReportActionService) {
-        this.guardService = guardService;
-        this.generalActionService = generalActionService;
-        this.deleteReportActionService = deleteReportActionService;
+    public DeleteReportDialogStateMachineFactory(@Lazy GuardValidator guardValidator,
+                                                 @Lazy GeneralActions generalActions,
+                                                 @Lazy DeleteReportActions deleteReportActions) {
+        this.guardValidator = guardValidator;
+        this.generalActions = generalActions;
+        this.deleteReportActions = deleteReportActions;
     }
 
     @Override
@@ -52,41 +52,41 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .source(DeleteReportState.START_DELETE_REPORT_DIALOG)
                 .event(MessageEvent.RUN_DELETE_REPORT_DIALOG)
                 .target(DeleteReportState.USER_DATE_INPUTTING)
-                .action(generalActionService::generalRequestInputDate)
+                .action(generalActions::generalRequestInputDate)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_DATE_INPUTTING)
                 .event(MessageEvent.VALIDATE_USER_DATE_INPUT)
                 .target(DeleteReportState.USER_TIME_RECORD_CHOICE)
-                .guard(guardService::validateDate)
-                .action(generalActionService::handleUserDateInput)
-                .action(generalActionService::sendListTimeRecords)
+                .guard(guardValidator::validateDate)
+                .action(generalActions::handleUserDateInput)
+                .action(generalActions::sendListTimeRecords)
 
                 // if report doesn't exist
                 .and().withExternal()
                 .source(DeleteReportState.USER_TIME_RECORD_CHOICE)
                 .event(MessageEvent.RETURN_TO_USER_DATE_INPUTTING)
                 .target(DeleteReportState.USER_DATE_INPUTTING)
-                .action(generalActionService::generalRequestInputDate)
+                .action(generalActions::generalRequestInputDate)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_TIME_RECORD_CHOICE)
                 .event(MessageEvent.CHOOSE_TIME_RECORD)
                 .target(DeleteReportState.USER_DELETE_CONFIRMATION)
-                .action(generalActionService::handleChoiceTimeRecord)
-                .action(deleteReportActionService::requestDeleteConfirmation)
+                .action(generalActions::handleChoiceTimeRecord)
+                .action(deleteReportActions::requestDeleteConfirmation)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_DELETE_CONFIRMATION)
                 .event(MessageEvent.CONFIRM_DELETE_TIME_RECORD)
                 .target(DeleteReportState.USER_TIME_RECORD_CHOICE)
-                .action(deleteReportActionService::removeTimeRecord)
-                .action(generalActionService::sendListTimeRecords)
+                .action(deleteReportActions::removeTimeRecord)
+                .action(generalActions::sendListTimeRecords)
 
                 .and().withExternal()
                 .source(DeleteReportState.USER_DELETE_CONFIRMATION)
                 .event(MessageEvent.DECLINE_DELETE_TIME_RECORD)
                 .target(DeleteReportState.USER_TIME_RECORD_CHOICE)
-                .action(generalActionService::sendListTimeRecords);
+                .action(generalActions::sendListTimeRecords);
     }
 }

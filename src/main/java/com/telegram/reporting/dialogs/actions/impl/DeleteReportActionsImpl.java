@@ -1,4 +1,4 @@
-package com.telegram.reporting.service.impl;
+package com.telegram.reporting.dialogs.actions.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
@@ -6,7 +6,7 @@ import com.telegram.reporting.dialogs.general.delete_report.DeleteReportState;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.service.DeleteReportActionService;
+import com.telegram.reporting.dialogs.actions.DeleteReportActions;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.JsonUtils;
@@ -25,12 +25,12 @@ import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
-public class DeleteReportActionServiceImpl implements DeleteReportActionService {
+public class DeleteReportActionsImpl implements DeleteReportActions {
     private final SendBotMessageService sendBotMessageService;
     private final TimeRecordService timeRecordService;
 
-    public DeleteReportActionServiceImpl(SendBotMessageService sendBotMessageService,
-                                         TimeRecordService timeRecordService) {
+    public DeleteReportActionsImpl(SendBotMessageService sendBotMessageService,
+                                   TimeRecordService timeRecordService) {
         this.sendBotMessageService = sendBotMessageService;
         this.timeRecordService = timeRecordService;
     }

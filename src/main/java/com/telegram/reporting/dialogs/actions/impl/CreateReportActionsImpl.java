@@ -1,9 +1,10 @@
-package com.telegram.reporting.service.impl;
+package com.telegram.reporting.dialogs.actions.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.MessageEvent;
+import com.telegram.reporting.dialogs.actions.CreateReportActions;
 import com.telegram.reporting.dialogs.general.create_report.CreateReportState;
 import com.telegram.reporting.exception.MismatchCategoryException;
 import com.telegram.reporting.exception.TelegramUserException;
@@ -31,16 +32,16 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class CreateReportActionServiceImpl implements CreateReportActionService {
+public class CreateReportActionsImpl implements CreateReportActions {
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
     private final CategoryService categoryService;
     private final ReportService reportService;
     private final TimeRecordService timeRecordService;
 
-    public CreateReportActionServiceImpl(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService,
-                                         CategoryService categoryService, ReportService reportService,
-                                         TimeRecordService timeRecordService) {
+    public CreateReportActionsImpl(SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService,
+                                   CategoryService categoryService, ReportService reportService,
+                                   TimeRecordService timeRecordService) {
         this.sendBotMessageService = sendBotMessageService;
         this.telegramUserService = telegramUserService;
         this.categoryService = categoryService;

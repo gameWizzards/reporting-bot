@@ -1,11 +1,11 @@
-package com.telegram.reporting.service.impl;
+package com.telegram.reporting.dialogs.actions.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.service.GeneralActionService;
+import com.telegram.reporting.dialogs.actions.GeneralActions;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.*;
@@ -23,13 +23,13 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class GeneralActionServiceImpl implements GeneralActionService {
+public class GeneralActionsImpl implements GeneralActions {
     private final SendBotMessageService sendBotMessageService;
     private final TimeRecordService timeRecordsService;
     private final DialogRouterService dialogRouterService;
 
-    public GeneralActionServiceImpl(SendBotMessageService sendBotMessageService, TimeRecordService timeRecordsService,
-                                    DialogRouterService dialogRouterService) {
+    public GeneralActionsImpl(SendBotMessageService sendBotMessageService, TimeRecordService timeRecordsService,
+                              DialogRouterService dialogRouterService) {
         this.sendBotMessageService = sendBotMessageService;
         this.timeRecordsService = timeRecordsService;
         this.dialogRouterService = dialogRouterService;

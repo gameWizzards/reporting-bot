@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.general.create_report;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.service.CreateReportActionService;
-import com.telegram.reporting.service.GeneralActionService;
-import com.telegram.reporting.service.GuardService;
+import com.telegram.reporting.dialogs.actions.CreateReportActions;
+import com.telegram.reporting.dialogs.actions.GeneralActions;
+import com.telegram.reporting.dialogs.guards.GuardValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -19,18 +19,18 @@ import java.util.EnumSet;
 @EnableStateMachineFactory(name = "CreateReportDialogStateMachineFactory")
 public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<CreateReportState, MessageEvent> {
 
-    private final GeneralActionService generalActionService;
-    private final CreateReportActionService createReportActionService;
-    private final GuardService guardService;
+    private final GeneralActions generalActions;
+    private final CreateReportActions createReportActions;
+    private final GuardValidator guardValidator;
 
     @Autowired
-    public CreateReportDialogStateMachineFactory(@Lazy CreateReportActionService createReportActionService,
-                                                 @Lazy GeneralActionService generalActionService,
-                                                 @Lazy GuardService guardService) {
+    public CreateReportDialogStateMachineFactory(@Lazy CreateReportActions createReportActions,
+                                                 @Lazy GeneralActions generalActions,
+                                                 @Lazy GuardValidator guardValidator) {
 
-        this.createReportActionService = createReportActionService;
-        this.generalActionService = generalActionService;
-        this.guardService = guardService;
+        this.createReportActions = createReportActions;
+        this.generalActions = generalActions;
+        this.guardValidator = guardValidator;
     }
 
     @Override
@@ -56,80 +56,80 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
                 .source(CreateReportState.START_CREATE_REPORT_DIALOG)
                 .event(MessageEvent.RUN_CREATE_REPORT_DIALOG)
                 .target(CreateReportState.USER_DATE_INPUTTING)
-                .action(createReportActionService::requestInputDate)
+                .action(createReportActions::requestInputDate)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_DATE_INPUTTING)
                 .event(MessageEvent.VALIDATE_USER_DATE_INPUT)
                 .target(CreateReportState.USER_CATEGORY_CHOICE)
-                .guard(guardService::validateDate)
-                .action(generalActionService::handleUserDateInput)
-                .action(createReportActionService::sendExistedTimeRecords)
-                .action(createReportActionService::sendCategoryButtons)
+                .guard(guardValidator::validateDate)
+                .action(generalActions::handleUserDateInput)
+                .action(createReportActions::sendExistedTimeRecords)
+                .action(createReportActions::sendCategoryButtons)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_CATEGORY_CHOICE)
                 .event(MessageEvent.CHOOSE_REPORT_CATEGORY)
                 .target(CreateReportState.USER_TIME_INPUTTING)
-                .action(generalActionService::handleCategory)
-                .action(createReportActionService::requestInputTime)
+                .action(generalActions::handleCategory)
+                .action(createReportActions::requestInputTime)
 
                 // if all categories are occupied on USER_DATE_INPUTTING step
                 .and().withExternal()
                 .source(CreateReportState.USER_CATEGORY_CHOICE)
                 .event(MessageEvent.RETURN_TO_USER_DATE_INPUTTING)
                 .target(CreateReportState.USER_DATE_INPUTTING)
-                .action(generalActionService::generalRequestInputDate)
+                .action(generalActions::generalRequestInputDate)
 
                 // if all categories are occupied on USER_CREATE_ADDITIONAL_REPORT step
                 .and().withExternal()
                 .source(CreateReportState.USER_CATEGORY_CHOICE)
                 .event(MessageEvent.GO_TO_USER_FINAL_REPORT_CONFIRMATION)
                 .target(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
-                .action(createReportActionService::requestConfirmationReport)
+                .action(createReportActions::requestConfirmationReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_TIME_INPUTTING)
                 .event(MessageEvent.VALIDATE_USER_TIME_INPUT)
                 .target(CreateReportState.USER_NOTE_INPUTTING)
-                .guard(guardService::validateTime)
-                .action(generalActionService::handleUserTimeInput)
-                .action(createReportActionService::requestInputNote)
+                .guard(guardValidator::validateTime)
+                .action(generalActions::handleUserTimeInput)
+                .action(createReportActions::requestInputNote)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_NOTE_INPUTTING)
                 .event(MessageEvent.VALIDATE_USER_NOTE_INPUT)
                 .target(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
-                .guard(guardService::validateNote)
-                .action(generalActionService::handleUserNoteInput)
-                .action(createReportActionService::prepareTimeRecord)
-                .action(createReportActionService::requestAdditionalReport)
+                .guard(guardValidator::validateNote)
+                .action(generalActions::handleUserNoteInput)
+                .action(createReportActions::prepareTimeRecord)
+                .action(createReportActions::requestAdditionalReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.CONFIRM_ADDITIONAL_REPORT)
                 .target(CreateReportState.USER_CATEGORY_CHOICE)
-                .action(createReportActionService::sendCategoryButtons)
+                .action(createReportActions::sendCategoryButtons)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_CREATE_ADDITIONAL_REPORT)
                 .event(MessageEvent.DECLINE_ADDITIONAL_REPORT)
                 .target(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
-                .action(createReportActionService::requestConfirmationReport)
+                .action(createReportActions::requestConfirmationReport)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.CONFIRM_CREATION_FINAL_REPORT)
                 .target(CreateReportState.END_CREATE_REPORT_DIALOG)
-                .action(createReportActionService::persistReport)
-                .action(generalActionService::sendRootMenuButtons)
+                .action(createReportActions::persistReport)
+                .action(generalActions::sendRootMenuButtons)
 
                 .and().withExternal()
                 .source(CreateReportState.USER_FINAL_REPORT_CONFIRMATION)
                 .event(MessageEvent.DECLINE_CREATION_FINAL_REPORT)
                 .target(CreateReportState.END_CREATE_REPORT_DIALOG)
-                .action(createReportActionService::declinePersistReport)
-                .action(generalActionService::sendRootMenuButtons);
+                .action(createReportActions::declinePersistReport)
+                .action(generalActions::sendRootMenuButtons);
 
     }
 }

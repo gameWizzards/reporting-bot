@@ -1,8 +1,8 @@
-package com.telegram.reporting.service;
+package com.telegram.reporting.dialogs.actions;
 
 import org.springframework.statemachine.StateContext;
 
-public interface GeneralActionService {
+public interface GeneralActions {
     <S, E> void generalRequestInputDate(StateContext<S, E> context);
 
     <S, E> void sendListTimeRecords(StateContext<S, E> context);

@@ -1,6 +1,4 @@
-package com.telegram.reporting.service;
-
-import com.telegram.reporting.dialogs.ButtonValue;
+package com.telegram.reporting.dialogs;
 
 public interface SubDialogHandler {
     boolean belongToSubDialogStarter(ButtonValue buttonValue);

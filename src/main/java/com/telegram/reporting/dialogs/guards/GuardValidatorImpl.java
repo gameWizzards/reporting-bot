@@ -1,8 +1,7 @@
-package com.telegram.reporting.service.impl;
+package com.telegram.reporting.dialogs.guards;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
-import com.telegram.reporting.service.GuardService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -11,11 +10,11 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class GuardServiceImpl implements GuardService {
+public class GuardValidatorImpl implements GuardValidator {
 
     private final SendBotMessageService sendBotMessageService;
 
-    public GuardServiceImpl(SendBotMessageService sendBotMessageService) {
+    public GuardValidatorImpl(SendBotMessageService sendBotMessageService) {
         this.sendBotMessageService = sendBotMessageService;
     }
 

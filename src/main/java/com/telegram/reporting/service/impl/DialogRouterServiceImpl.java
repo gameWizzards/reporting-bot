@@ -7,7 +7,7 @@ import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.SubDialogHandler;
+import com.telegram.reporting.dialogs.SubDialogHandler;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
@@ -71,7 +71,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
             // bind handlers when buttonValue contains name of particular dialog
             // if user doesn't exist go to startFlow on next condition
-            if (!dialogHandlers.containsKey(chatId) && principalUsers.get(chatId) != null && !principalUsers.get(chatId).isDeleted()) {
+            if (principalUsers.get(chatId) != null && !principalUsers.get(chatId).isDeleted()) {
                 bindDialogHandler(chatId, buttonValue);
                 bindSubDialogHandler(chatId, buttonValue);
             }

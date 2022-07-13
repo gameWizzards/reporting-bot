@@ -1,14 +1,13 @@
-package com.telegram.reporting.service.impl;
+package com.telegram.reporting.dialogs.actions.impl;
 
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.general.statistic.StatisticState;
 import com.telegram.reporting.repository.entity.Report;
-import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.service.ReportService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.StatisticActionService;
+import com.telegram.reporting.dialogs.actions.StatisticActions;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.MessageConvertorUtils;
 import com.telegram.reporting.utils.Month;
@@ -16,41 +15,44 @@ import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class StatisticActionServiceImpl implements StatisticActionService {
+public class StatisticActionsImpl implements StatisticActions {
     private final SendBotMessageService sendBotMessageService;
     private final ReportService reportService;
 
-    public StatisticActionServiceImpl(SendBotMessageService sendBotMessageService,
-                                      ReportService reportService) {
+    public StatisticActionsImpl(SendBotMessageService sendBotMessageService,
+                                ReportService reportService) {
         this.sendBotMessageService = sendBotMessageService;
         this.reportService = reportService;
     }
 
     @Override
-    @Transactional
     public void sendMonthStatistic(StateContext<StatisticState, MessageEvent> context) {
         AtomicInteger ordinalNumb = new AtomicInteger(1);
+        Map<String, Integer> categoryHours = new HashMap<>();
 
         int month = getStatisticMonth(context.getExtendedState().getVariables());
         List<Report> reports = reportService.getReportsBelongMonth(month, TelegramUtils.currentChatId(context));
 
-        long sumHours = reports.parallelStream()
-                .flatMap(repo -> repo.getTimeRecords().stream())
-                .mapToLong(TimeRecord::getHours)
+        reports.parallelStream()
+                .map(Report::getTimeRecords)
+                .flatMap(Collection::stream)
+                .forEach(tr -> categoryHours.put(tr.getCategory().getName(), categoryHours.getOrDefault(tr.getCategory().getName(), 0) + tr.getHours()));
+
+        int sumHours = categoryHours.values().stream()
+                .mapToInt(Integer::intValue)
                 .sum();
+
+        String categoryHoursMessage = prepareHoursByCategoryMessage(categoryHours);
 
         String statistic = reports.stream()
                 .map(MessageConvertorUtils::convertToStatisticMessage)
@@ -59,9 +61,10 @@ public class StatisticActionServiceImpl implements StatisticActionService {
 
         String statisticMessage = """
                 Общее время за %s - %d ч.
-                                
+                По категорям:
                 %s
-                """.formatted(Month.getNameByOrdinal(month), sumHours, statistic);
+                %s
+                """.formatted(Month.getNameByOrdinal(month), sumHours, categoryHoursMessage, statistic);
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), statisticMessage);
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
@@ -85,5 +88,17 @@ public class StatisticActionServiceImpl implements StatisticActionService {
         Optional<Integer> monthOpt = Optional.ofNullable((Integer) variables.remove(ContextVariable.MONTH));
         return monthOpt
                 .orElse(LocalDate.now().getMonthValue());
+    }
+
+    private String prepareHoursByCategoryMessage(Map<String, Integer> categoryHours) {
+        String empty = "У тебя пока нет отчетов за этот период";
+        StringBuilder message = new StringBuilder();
+
+        for (Map.Entry<String, Integer> entry : categoryHours.entrySet()) {
+            message
+                    .append("\"%s\" = %d ч.".formatted(entry.getKey(), entry.getValue()))
+                    .append("\n");
+        }
+        return message.isEmpty() ? empty : message.toString();
     }
 }

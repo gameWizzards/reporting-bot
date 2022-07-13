@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.general.edit_report;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.service.EditReportActionService;
-import com.telegram.reporting.service.GeneralActionService;
-import com.telegram.reporting.service.GuardService;
+import com.telegram.reporting.dialogs.actions.EditReportActions;
+import com.telegram.reporting.dialogs.actions.GeneralActions;
+import com.telegram.reporting.dialogs.guards.GuardValidator;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -17,16 +17,16 @@ import java.util.EnumSet;
 @Configuration
 @EnableStateMachineFactory(name = "EditReportDialogStateMachineFactory")
 public class EditReportDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<EditReportState, MessageEvent> {
-    private final GuardService guardService;
-    private final GeneralActionService generalActionService;
-    private final EditReportActionService editReportActionService;
+    private final GuardValidator guardValidator;
+    private final GeneralActions generalActions;
+    private final EditReportActions editReportActions;
 
-    public EditReportDialogStateMachineFactory(@Lazy GuardService guardService,
-                                               @Lazy GeneralActionService generalActionService,
-                                               @Lazy EditReportActionService editReportActionService) {
-        this.guardService = guardService;
-        this.generalActionService = generalActionService;
-        this.editReportActionService = editReportActionService;
+    public EditReportDialogStateMachineFactory(@Lazy GuardValidator guardValidator,
+                                               @Lazy GeneralActions generalActions,
+                                               @Lazy EditReportActions editReportActions) {
+        this.guardValidator = guardValidator;
+        this.generalActions = generalActions;
+        this.editReportActions = editReportActions;
     }
 
     @Override
@@ -52,29 +52,29 @@ public class EditReportDialogStateMachineFactory extends EnumStateMachineConfigu
                 .source(EditReportState.START_EDIT_REPORT_DIALOG)
                 .event(MessageEvent.RUN_EDIT_REPORT_DIALOG)
                 .target(EditReportState.USER_DATE_INPUTTING)
-                .action(generalActionService::generalRequestInputDate)
+                .action(generalActions::generalRequestInputDate)
 
                 .and().withExternal()
                 .source(EditReportState.USER_DATE_INPUTTING)
                 .event(MessageEvent.VALIDATE_USER_DATE_INPUT)
                 .target(EditReportState.USER_TIME_RECORD_CHOICE)
-                .guard(guardService::validateDate)
-                .action(generalActionService::handleUserDateInput)
-                .action(generalActionService::sendListTimeRecords)
+                .guard(guardValidator::validateDate)
+                .action(generalActions::handleUserDateInput)
+                .action(generalActions::sendListTimeRecords)
 
                 // if report doesn't exist
                 .and().withExternal()
                 .source(EditReportState.USER_TIME_RECORD_CHOICE)
                 .event(MessageEvent.RETURN_TO_USER_DATE_INPUTTING)
                 .target(EditReportState.USER_DATE_INPUTTING)
-                .action(generalActionService::generalRequestInputDate)
+                .action(generalActions::generalRequestInputDate)
 
                 .and().withExternal()
                 .source(EditReportState.USER_TIME_RECORD_CHOICE)
                 .event(MessageEvent.CHOOSE_TIME_RECORD)
                 .target(EditReportState.USER_EDIT_DATA_CHOICE)
-                .action(generalActionService::handleChoiceTimeRecord)
-                .action(editReportActionService::requestChooseEditData)
+                .action(generalActions::handleChoiceTimeRecord)
+                .action(editReportActions::requestChooseEditData)
 
                 //---------------- Handle Time record data -------------------
                 // SPEND_TIME handling
@@ -82,47 +82,47 @@ public class EditReportDialogStateMachineFactory extends EnumStateMachineConfigu
                 .source(EditReportState.USER_EDIT_DATA_CHOICE)
                 .event(MessageEvent.CHOOSE_EDIT_SPEND_TIME)
                 .target(EditReportState.USER_CHANGE_SPEND_TIME)
-                .action(editReportActionService::sendDataToEdit)
+                .action(editReportActions::sendDataToEdit)
 
                 .and().withExternal()
                 .source(EditReportState.USER_CHANGE_SPEND_TIME)
                 .event(MessageEvent.HANDLE_USER_CHANGE_SPEND_TIME)
                 .target(EditReportState.USER_EDIT_ADDITIONAL_DATA)
-                .guard(guardService::validateTime)
-                .action(generalActionService::handleUserTimeInput)
-                .action(editReportActionService::editTimeRecord)
-                .action(editReportActionService::requestEditAdditionalData)
+                .guard(guardValidator::validateTime)
+                .action(generalActions::handleUserTimeInput)
+                .action(editReportActions::editTimeRecord)
+                .action(editReportActions::requestEditAdditionalData)
 
                 // CATEGORY handling
                 .and().withExternal()
                 .source(EditReportState.USER_EDIT_DATA_CHOICE)
                 .event(MessageEvent.CHOOSE_EDIT_CATEGORY)
                 .target(EditReportState.USER_CHANGE_CATEGORY)
-                .action(editReportActionService::sendCategoryButtons)
+                .action(editReportActions::sendCategoryButtons)
 
                 .and().withExternal()
                 .source(EditReportState.USER_CHANGE_CATEGORY)
                 .event(MessageEvent.HANDLE_USER_CHANGE_CATEGORY)
                 .target(EditReportState.USER_EDIT_ADDITIONAL_DATA)
-                .action(generalActionService::handleCategory)
-                .action(editReportActionService::editTimeRecord)
-                .action(editReportActionService::requestEditAdditionalData)
+                .action(generalActions::handleCategory)
+                .action(editReportActions::editTimeRecord)
+                .action(editReportActions::requestEditAdditionalData)
 
                 // NOTE handling
                 .and().withExternal()
                 .source(EditReportState.USER_EDIT_DATA_CHOICE)
                 .event(MessageEvent.CHOOSE_EDIT_NOTE)
                 .target(EditReportState.USER_CHANGE_NOTE)
-                .action(editReportActionService::sendDataToEdit)
+                .action(editReportActions::sendDataToEdit)
 
                 .and().withExternal()
                 .source(EditReportState.USER_CHANGE_NOTE)
                 .event(MessageEvent.HANDLE_USER_CHANGE_NOTE)
                 .target(EditReportState.USER_EDIT_ADDITIONAL_DATA)
-                .guard(guardService::validateNote)
-                .action(generalActionService::handleUserNoteInput)
-                .action(editReportActionService::editTimeRecord)
-                .action(editReportActionService::requestEditAdditionalData)
+                .guard(guardValidator::validateNote)
+                .action(generalActions::handleUserNoteInput)
+                .action(editReportActions::editTimeRecord)
+                .action(editReportActions::requestEditAdditionalData)
 
                 //---------------------------------------------------------
 
@@ -132,29 +132,29 @@ public class EditReportDialogStateMachineFactory extends EnumStateMachineConfigu
                 .source(EditReportState.USER_EDIT_ADDITIONAL_DATA)
                 .event(MessageEvent.CONFIRM_EDIT_ADDITIONAL_DATA)
                 .target(EditReportState.USER_EDIT_DATA_CHOICE)
-                .action(editReportActionService::requestChooseEditData)
+                .action(editReportActions::requestChooseEditData)
 
                 // no
                 .and().withExternal()
                 .source(EditReportState.USER_EDIT_ADDITIONAL_DATA)
                 .event(MessageEvent.DECLINE_EDIT_ADDITIONAL_DATA)
                 .target(EditReportState.USER_EDIT_DATA_CONFIRMATION)
-                .action(editReportActionService::requestSaveTimeRecordChanges)
+                .action(editReportActions::requestSaveTimeRecordChanges)
 
                 // YES
                 .and().withExternal()
                 .source(EditReportState.USER_EDIT_DATA_CONFIRMATION)
                 .event(MessageEvent.CONFIRM_EDIT_DATA)
                 .target(EditReportState.USER_EDIT_ADDITIONAL_TIME_RECORD)
-                .action(editReportActionService::saveTimeRecordChanges)
-                .action(editReportActionService::requestEditAdditionalTimeRecord)
+                .action(editReportActions::saveTimeRecordChanges)
+                .action(editReportActions::requestEditAdditionalTimeRecord)
 
                 // NO
                 .and().withExternal()
                 .source(EditReportState.USER_EDIT_DATA_CONFIRMATION)
                 .event(MessageEvent.DECLINE_EDIT_DATA)
                 .target(EditReportState.USER_EDIT_ADDITIONAL_TIME_RECORD)
-                .action(editReportActionService::requestEditAdditionalTimeRecord)
+                .action(editReportActions::requestEditAdditionalTimeRecord)
 
                 // return to list TimeRecords of current date
                 //YES
@@ -162,7 +162,7 @@ public class EditReportDialogStateMachineFactory extends EnumStateMachineConfigu
                 .source(EditReportState.USER_EDIT_ADDITIONAL_TIME_RECORD)
                 .event(MessageEvent.CONFIRM_EDIT_ADDITIONAL_TIME_RECORD)
                 .target(EditReportState.USER_TIME_RECORD_CHOICE)
-                .action(generalActionService::sendListTimeRecords)
+                .action(generalActions::sendListTimeRecords)
 
 
                 // NO
@@ -170,6 +170,6 @@ public class EditReportDialogStateMachineFactory extends EnumStateMachineConfigu
                 .source(EditReportState.USER_EDIT_ADDITIONAL_TIME_RECORD)
                 .event(MessageEvent.DECLINE_EDIT_ADDITIONAL_TIME_RECORD)
                 .target(EditReportState.END_EDIT_REPORT_DIALOG)
-                .action(generalActionService::sendRootMenuButtons);
+                .action(generalActions::sendRootMenuButtons);
     }
 }

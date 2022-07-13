@@ -1,10 +1,10 @@
-package com.telegram.reporting.service;
+package com.telegram.reporting.dialogs.actions;
 
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.general.edit_report.EditReportState;
 import org.springframework.statemachine.StateContext;
 
-public interface EditReportActionService {
+public interface EditReportActions {
 
     void requestChooseEditData(StateContext<EditReportState, MessageEvent> context);
 

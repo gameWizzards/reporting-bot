@@ -1,7 +1,7 @@
 package com.telegram.reporting.dialogs.general.statistic;
 
 import com.telegram.reporting.dialogs.MessageEvent;
-import com.telegram.reporting.service.StatisticActionService;
+import com.telegram.reporting.dialogs.actions.StatisticActions;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -15,10 +15,10 @@ import java.util.EnumSet;
 @Configuration
 @EnableStateMachineFactory(name = "StatisticDialogStateMachineFactory")
 public class StatisticDialogStateMachineFactory extends EnumStateMachineConfigurerAdapter<StatisticState, MessageEvent> {
-    private final StatisticActionService statisticActionService;
+    private final StatisticActions statisticActions;
 
-    public StatisticDialogStateMachineFactory(@Lazy StatisticActionService statisticActionService) {
-        this.statisticActionService = statisticActionService;
+    public StatisticDialogStateMachineFactory(@Lazy StatisticActions statisticActions) {
+        this.statisticActions = statisticActions;
     }
 
     @Override
@@ -43,15 +43,15 @@ public class StatisticDialogStateMachineFactory extends EnumStateMachineConfigur
                 .source(StatisticState.START_STATISTIC_DIALOG)
                 .event(MessageEvent.RUN_STATISTIC_DIALOG)
                 .target(StatisticState.USER_STATISTIC_WATCH)
-                .action(statisticActionService::sendMonthStatistic)
-                .action(statisticActionService::sendPreviousMonthStatisticButton)
+                .action(statisticActions::sendMonthStatistic)
+                .action(statisticActions::sendPreviousMonthStatisticButton)
 
                 .and().withExternal()
                 .source(StatisticState.USER_STATISTIC_WATCH)
                 .event(MessageEvent.SHOW_PREVIOUS_MONTH_STATISTIC)
                 .target(StatisticState.USER_PREVIOUS_MONTH_STATISTIC_WATCH)
-                .action(statisticActionService::preparePreviousMonthDate)
-                .action(statisticActionService::sendMonthStatistic)
+                .action(statisticActions::preparePreviousMonthDate)
+                .action(statisticActions::sendMonthStatistic)
 
                 .and().withExternal()
                 .source(StatisticState.USER_PREVIOUS_MONTH_STATISTIC_WATCH)
