@@ -31,17 +31,27 @@ public class ManagerDialogHandlerImpl implements DialogHandler, SubDialogHandler
 
     @Override
     public List<KeyboardRow> getRootMenuButtons() {
-        return List.of(KeyboardUtils.createButton(ButtonValue.MANAGER_MENU.text()));
+        return List.of(KeyboardUtils.createButton(ButtonValue.MANAGER_MENU_START_DIALOG.text()));
     }
 
     @Override
     public boolean belongToDialogStarter(ButtonValue buttonValue) {
-        return ButtonValue.MANAGER_MENU.equals(buttonValue);
+        return ButtonValue.MANAGER_MENU_START_DIALOG.equals(buttonValue);
     }
 
     @Override
     public List<Role> roleAccessibility() {
         return List.of(Role.MANAGER_ROLE, Role.ADMIN_ROLE);
+    }
+
+    @Override
+    public void startSubDialogFlow(Long chatId) {
+
+    }
+
+    @Override
+    public List<KeyboardRow> getSubMenuButtons() {
+        return null;
     }
 
     @Override

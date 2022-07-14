@@ -27,6 +27,12 @@ public enum ButtonValue {
     STATISTIC_START_DIALOG("\uD83D\uDCC3 Статистика"),
     PREVIOUS_MONTH_STATISTIC("Показать за прошлый месяц"),
 
+    // list users dialog
+    LIST_USERS_START_DIALOG("Список пользователей"),
+    USER_STATUS_ACTIVE("Активные"),
+    USER_STATUS_NOT_VERIFIED("На верифифкации"),
+    USER_STATUS_DELETED("Удаленные"),
+
     // add new user dialog
     ADD_NEW_USER_START_DIALOG("Добавить пользователя"),
 
@@ -34,7 +40,9 @@ public enum ButtonValue {
     YES("Да"),
     NO("Нет"),
     CANCEL("Отмена"),
-    MAIN_MENU("Главное меню"),
+    RETURN_MAIN_MENU("Главное меню"),
+    RETURN_MANAGER_MENU("Меню менеджера"),
+    RETURN_ADMIN_MENU("Меню администратора"),
     INPUT_NEW_DATE("Ввести новую дату"),
     LIST_TIME_RECORDS("Список очтетов"),
     SHARE_PHONE("Поделится номером телефона"),
@@ -42,8 +50,8 @@ public enum ButtonValue {
     REPORT_CATEGORY_ON_STORAGE("На складе"), REPORT_CATEGORY_ON_ORDER("На заказе"),
     REPORT_CATEGORY_ON_OFFICE("На офисе"), REPORT_CATEGORY_ON_COORDINATION("На координации"),
 
-    MANAGER_MENU("\uD83D\uDC68\u200D\uD83D\uDCBC Меню менеджера"),
-    ADMIN_MENU("\uD83D\uDC68\u200D\uD83D\uDCBB Меню администратора")
+    MANAGER_MENU_START_DIALOG("\uD83D\uDC68\u200D\uD83D\uDCBC Меню менеджера"),
+    ADMIN_MENU_START_DIALOG("\uD83D\uDC68\u200D\uD83D\uDCBB Меню администратора")
     ;
 
     private final String text;

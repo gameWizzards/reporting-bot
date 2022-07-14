@@ -3,11 +3,11 @@ package com.telegram.reporting.service.impl;
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.DialogHandler;
 import com.telegram.reporting.dialogs.Message;
+import com.telegram.reporting.dialogs.SubDialogHandler;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.dialogs.SubDialogHandler;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
@@ -64,16 +64,15 @@ public class DialogRouterServiceImpl implements DialogRouterService {
             ButtonValue buttonValue = optionalButtonValue.get();
 
             // return to root menu when click 'main menu' button
-            if (ButtonValue.MAIN_MENU.equals(buttonValue)) {
+            if (ButtonValue.RETURN_MAIN_MENU.equals(buttonValue)) {
                 startFlow(chatId);
                 return;
             }
 
             // bind handlers when buttonValue contains name of particular dialog
             // if user doesn't exist go to startFlow on next condition
-            if (principalUsers.get(chatId) != null && !principalUsers.get(chatId).isDeleted()) {
+            if (!dialogHandlers.containsKey(chatId) && principalUsers.get(chatId) != null && !principalUsers.get(chatId).isDeleted()) {
                 bindDialogHandler(chatId, buttonValue);
-                bindSubDialogHandler(chatId, buttonValue);
             }
 
             // when dialog in telegram remained on some step (different from starter) with buttons but app was reloaded
@@ -144,20 +143,12 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         }
         if (managerDialogHandler.belongToDialogStarter(buttonValue)) {
             dialogHandlers.put(chatId, managerDialogHandler);
+            ((SubDialogHandler) managerDialogHandler).startSubDialogFlow(chatId);
             return;
         }
         if (adminDialogHandler.belongToDialogStarter(buttonValue)) {
             dialogHandlers.put(chatId, adminDialogHandler);
-        }
-    }
-
-    private void bindSubDialogHandler(Long chatId, ButtonValue buttonValue) {
-        if (((SubDialogHandler) managerDialogHandler).belongToSubDialogStarter(buttonValue)) {
-            dialogHandlers.get(chatId).createStateMachineHandler(chatId, buttonValue);
-            return;
-        }
-        if (((SubDialogHandler) adminDialogHandler).belongToSubDialogStarter(buttonValue)) {
-            dialogHandlers.get(chatId).createStateMachineHandler(chatId, buttonValue);
+            ((SubDialogHandler) adminDialogHandler).startSubDialogFlow(chatId);
         }
     }
 }

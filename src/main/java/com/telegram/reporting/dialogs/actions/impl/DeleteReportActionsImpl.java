@@ -42,7 +42,7 @@ public class DeleteReportActionsImpl implements DeleteReportActions {
         String timeRecordJson = (String) variables.get(ContextVariable.TARGET_TIME_RECORD_JSON);
 
         TimeRecordTO trTO = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
-        String timeRecordMessage = MessageConvertorUtils.convertToMessage(trTO);
+        String timeRecordMessage = MessageConvertorUtils.convertToTimeRecordMessage(trTO);
         String message = """
                 Хочешь удалить отчет за - %s.
                                 

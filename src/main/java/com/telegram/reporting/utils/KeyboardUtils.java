@@ -3,7 +3,6 @@ package com.telegram.reporting.utils;
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import org.apache.commons.lang3.Validate;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -13,7 +12,8 @@ import java.util.stream.Stream;
 
 public class KeyboardUtils {
 
-    private KeyboardUtils() {}
+    private KeyboardUtils() {
+    }
 
     public static KeyboardRow createButton(String name) {
         Validate.notBlank(name, "Can't create button without name");
@@ -62,20 +62,31 @@ public class KeyboardUtils {
         return createKeyboardMarkup(true, new KeyboardRow());
     }
 
+    public static ReplyKeyboardMarkup createMenuButtonMarkup(List<ButtonValue> menuButtons) {
+        return createKeyboardMarkup(menuButtons, new KeyboardRow());
+    }
+
     public static ReplyKeyboardMarkup createKeyboardMarkup(boolean addMainMenuButton, KeyboardRow... rows) {
         Objects.requireNonNull(rows, "Can't create keyboard markup without keyboard rows");
         List<KeyboardRow> keyboardRows = new ArrayList<>(List.of(rows));
         if (addMainMenuButton) {
-            KeyboardRow mainMenuButton = createButton(ButtonValue.MAIN_MENU.text());
+            KeyboardRow mainMenuButton = createButton(ButtonValue.RETURN_MAIN_MENU.text());
             keyboardRows.add(mainMenuButton);
         }
+        return createReplyKeyboardMarkup(keyboardRows);
+    }
 
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(false);
-        replyKeyboardMarkup.setKeyboard(keyboardRows);
-        return replyKeyboardMarkup;
+    public static ReplyKeyboardMarkup createKeyboardMarkup(List<ButtonValue> menuButtons, KeyboardRow... rows) {
+        Validate.notEmpty(menuButtons, "Can't create menu buttons. List menuButtons empty or NULL");
+        Objects.requireNonNull(rows, "Can't create keyboard markup without keyboard rows");
+        List<KeyboardRow> keyboardRows = new ArrayList<>(List.of(rows));
+        if (!menuButtons.isEmpty()) {
+            List<String> buttonNames = menuButtons.stream()
+                    .map(ButtonValue::text)
+                    .toList();
+            keyboardRows.addAll(Arrays.asList(createButtonsWithRows(buttonNames, 2)));
+        }
+        return createReplyKeyboardMarkup(keyboardRows);
     }
 
     public static List<String> getAvailableCategoryButtons(String timeRecordsJson) {
@@ -92,5 +103,14 @@ public class KeyboardUtils {
         List<String> buttons = new ArrayList<>(timeRecordTOS.size());
         timeRecordTOS.forEach(tr -> buttons.add(String.valueOf(tr.getOrdinalNumber())));
         return buttons.toArray(new String[timeRecordTOS.size()]);
+    }
+
+    private static ReplyKeyboardMarkup createReplyKeyboardMarkup(List<KeyboardRow> keyboardRows) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+        return replyKeyboardMarkup;
     }
 }

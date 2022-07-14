@@ -68,7 +68,7 @@ public class CreateReportActionsImpl implements CreateReportActions {
             return;
         }
 
-        String timeRecordMessage = MessageConvertorUtils.convertToMessage(trTOs);
+        String timeRecordMessage = MessageConvertorUtils.convertToListTimeRecordsMessage(trTOs);
 
         String message = """
                 Ранее созданные отчеты за - %s.
@@ -194,7 +194,7 @@ public class CreateReportActionsImpl implements CreateReportActions {
         List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);
 
         String timeRecordMessage = trTOS.stream()
-                .map(MessageConvertorUtils::convertToMessage)
+                .map(MessageConvertorUtils::convertToTimeRecordMessage)
                 .collect(Collectors.joining("\n"));
 
         String message = """

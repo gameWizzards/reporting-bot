@@ -61,7 +61,7 @@ public class GeneralActionsImpl implements GeneralActions {
             return;
         }
 
-        String timeRecordMessage = MessageConvertorUtils.convertToMessage(trTOs);
+        String timeRecordMessage = MessageConvertorUtils.convertToListTimeRecordsMessage(trTOs);
         String[] buttons = KeyboardUtils.getButtonsByTimeRecordOrdinalNumber(trTOs);
 
         String message = """

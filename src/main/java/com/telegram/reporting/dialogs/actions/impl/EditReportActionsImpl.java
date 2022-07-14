@@ -49,7 +49,7 @@ public class EditReportActionsImpl implements EditReportActions {
         String timeRecordsJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TIME_RECORDS_JSON);
 
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
-        String timeRecordMessage = MessageConvertorUtils.convertToMessage(trTO);
+        String timeRecordMessage = MessageConvertorUtils.convertToTimeRecordMessage(trTO);
 
         String message = """
                 Выбери данные из этого отчета которые ты хочешь изменить.
@@ -157,7 +157,7 @@ public class EditReportActionsImpl implements EditReportActions {
     public void requestEditAdditionalData(StateContext<EditReportState, MessageEvent> context) {
         String editTimeRecordJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
-        String timeRecordToMessage = MessageConvertorUtils.convertToMessage(timeRecordTO);
+        String timeRecordToMessage = MessageConvertorUtils.convertToTimeRecordMessage(timeRecordTO);
         String message = """
                 Хочешь еще что нибудь изменить в этом отчете?
                                 
@@ -187,7 +187,7 @@ public class EditReportActionsImpl implements EditReportActions {
     public void requestSaveTimeRecordChanges(StateContext<EditReportState, MessageEvent> context) {
         String editTimeRecordJson = (String) context.getExtendedState().getVariables().get(ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
-        String timeRecordToMessage = MessageConvertorUtils.convertToMessage(timeRecordTO);
+        String timeRecordToMessage = MessageConvertorUtils.convertToTimeRecordMessage(timeRecordTO);
         String message = """
                 Хочешь сохранить изменения для этого отчета?
                                 

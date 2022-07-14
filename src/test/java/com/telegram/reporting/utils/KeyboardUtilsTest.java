@@ -55,7 +55,7 @@ class KeyboardUtilsTest {
 
     @Test
     public void createMainMenuButtonMarkup_success() {
-        var mainMenuButtonName = ButtonValue.MAIN_MENU.text();
+        var mainMenuButtonName = ButtonValue.RETURN_MAIN_MENU.text();
         var mainMenuButtonMarkup = KeyboardUtils.createMainMenuButtonMarkup();
 
         var hasMainMenuButton = mainMenuButtonMarkup.getKeyboard()
@@ -87,7 +87,7 @@ class KeyboardUtilsTest {
 
     @Test
     public void createKeyboardMarkup_withMainMenuButton_success() {
-        var mainMenuButtonName = ButtonValue.MAIN_MENU.text();
+        var mainMenuButtonName = ButtonValue.RETURN_MAIN_MENU.text();
         String[] buttonNames = {buttonName1, buttonName2, mainMenuButtonName};
 
         var rowButtons = KeyboardUtils.createRowButtons(buttonNames);

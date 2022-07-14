@@ -35,7 +35,12 @@ public enum MessageEvent {
     // statistic dialog
     RUN_STATISTIC_DIALOG,
     SHOW_PREVIOUS_MONTH_STATISTIC,
-    END_STATISTIC_DIALOG,
+
+    // list users dialog
+    RUN_LIST_USERS_DIALOG,
+    SHOW_NOT_VERIFIED_USERS,
+    SHOW_ACTIVE_USERS,
+    SHOW_DELETED_USERS,
 
     // add new user dialog
     RUN_ADD_NEW_USER_DIALOG,
