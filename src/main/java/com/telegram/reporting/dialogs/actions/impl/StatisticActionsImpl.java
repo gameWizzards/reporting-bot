@@ -8,11 +8,9 @@ import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.service.ReportService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.dialogs.actions.StatisticActions;
-import com.telegram.reporting.utils.KeyboardUtils;
-import com.telegram.reporting.utils.MessageConvertorUtils;
-import com.telegram.reporting.utils.Month;
-import com.telegram.reporting.utils.TelegramUtils;
+import com.telegram.reporting.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -40,8 +38,8 @@ public class StatisticActionsImpl implements StatisticActions {
         AtomicInteger ordinalNumb = new AtomicInteger(1);
         Map<String, Integer> categoryHours = new HashMap<>();
 
-        int month = getStatisticMonth(context.getExtendedState().getVariables());
-        List<Report> reports = reportService.getReportsBelongMonth(month, TelegramUtils.currentChatId(context));
+        LocalDate statisticDate = getStatisticMonth(TelegramUtils.getContextVariableValueAsString(context, ContextVariable.DATE));
+        List<Report> reports = reportService.getReportsBelongMonth(statisticDate, TelegramUtils.currentChatId(context));
 
         reports.parallelStream()
                 .map(Report::getTimeRecords)
@@ -52,7 +50,7 @@ public class StatisticActionsImpl implements StatisticActions {
                 .mapToInt(Integer::intValue)
                 .sum();
 
-        String categoryHoursMessage = prepareHoursByCategoryMessage(categoryHours);
+        String categoryHoursMessage = MessageConvertorUtils.prepareHoursByCategoryMessage(categoryHours);
 
         String statistic = reports.stream()
                 .map(MessageConvertorUtils::convertToStatisticMessage)
@@ -61,10 +59,9 @@ public class StatisticActionsImpl implements StatisticActions {
 
         String statisticMessage = """
                 Общее время за %s - %d ч.
-                По категорям:
                 %s
                 %s
-                """.formatted(Month.getNameByOrdinal(month), sumHours, categoryHoursMessage, statistic);
+                """.formatted(Month.getNameByOrdinal(statisticDate.getMonthValue()), sumHours, categoryHoursMessage, statistic);
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), statisticMessage);
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createMainMenuButtonMarkup());
@@ -80,25 +77,14 @@ public class StatisticActionsImpl implements StatisticActions {
     @Override
     public void preparePreviousMonthDate(StateContext<StatisticState, MessageEvent> context) {
         long minusMonths = 1;
-        int month = LocalDate.now().minusMonths(minusMonths).getMonthValue();
-        context.getExtendedState().getVariables().put(ContextVariable.MONTH, month);
+        LocalDate previousMonth = LocalDate.now().minusMonths(minusMonths);
+        context.getExtendedState().getVariables().put(ContextVariable.DATE, DateTimeUtils.toDefaultFormat(previousMonth));
     }
 
-    private int getStatisticMonth(Map<Object, Object> variables) {
-        Optional<Integer> monthOpt = Optional.ofNullable((Integer) variables.remove(ContextVariable.MONTH));
-        return monthOpt
-                .orElse(LocalDate.now().getMonthValue());
-    }
-
-    private String prepareHoursByCategoryMessage(Map<String, Integer> categoryHours) {
-        String empty = "У тебя пока нет отчетов за этот период";
-        StringBuilder message = new StringBuilder();
-
-        for (Map.Entry<String, Integer> entry : categoryHours.entrySet()) {
-            message
-                    .append("\"%s\" = %d ч.".formatted(entry.getKey(), entry.getValue()))
-                    .append("\n");
+    private LocalDate getStatisticMonth(String statisticDate) {
+        if (StringUtils.isBlank(statisticDate)) {
+            return LocalDate.now();
         }
-        return message.isEmpty() ? empty : message.toString();
+        return DateTimeUtils.parseDefaultDate(statisticDate);
     }
 }

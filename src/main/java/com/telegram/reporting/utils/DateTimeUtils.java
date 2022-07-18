@@ -4,6 +4,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +37,28 @@ public class DateTimeUtils {
     public static String toDefaultFormat(LocalDateTime dateTime) {
         Objects.requireNonNull(dateTime, "DateTime is required! Non null!");
         return dateTime.format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT));
+    }
+
+    public static LocalDate convertUserInputToDate(String userInput) {
+        final LocalDate localDate = LocalDate.now();
+        //handle user input to date
+        Integer[] parsedDate = parseUserInput(userInput);
+        return switch (parsedDate.length) {
+            case 1 -> LocalDate.of(localDate.getYear(), localDate.getMonth(), parsedDate[0]);
+            case 2 -> LocalDate.of(localDate.getYear(), parsedDate[1], parsedDate[0]);
+            case 3 -> LocalDate.of(parsedDate[2], parsedDate[1], parsedDate[0]);
+            default -> localDate;
+        };
+    }
+
+    private static Integer[] parseUserInput(String userInput) {
+        String[] date = userInput
+                .replaceAll("\\D+", "-")
+                .split("-");
+
+        return Arrays.stream(date)
+                .map(Integer::parseInt)
+                .toArray(Integer[]::new);
     }
 
     private static void checkStringInputFormat(String input, String regexPattern, String handleType) {

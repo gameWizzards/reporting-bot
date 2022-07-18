@@ -1,5 +1,6 @@
 package com.telegram.reporting.utils;
 
+import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.repository.entity.TimeRecord;
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MessageConvertorUtils {
@@ -25,8 +27,9 @@ public class MessageConvertorUtils {
     }
 
     public static String convertToListTimeRecordsMessage(List<TimeRecordTO> timeRecordTOS) {
-        Validate.notEmpty(timeRecordTOS, "Can't covert TimeRecordsTO to message. List of TimeRecordTOs is empty or NULL");
-
+        if (CollectionUtils.isEmpty(timeRecordTOS)) {
+            return "";
+        }
         Long ordinalNumber = 1L;
         StringBuilder timeRecordsMessage = new StringBuilder();
         for (TimeRecordTO timeRecordTO : timeRecordTOS) {
@@ -51,10 +54,12 @@ public class MessageConvertorUtils {
 
         for (TimeRecord tr : report.getTimeRecords()) {
             String category = tr.getCategory().getName();
+            String note = tr.getNote().contains("NA") ? "" : " \uD83D\uDCAC%s".formatted(tr.getNote());
             totalHours += tr.getHours();
 
             statisticMessage
                     .append("*   \"%s\" - %d ч.".formatted(category, tr.getHours()))
+                    .append(note)
                     .append("\n");
         }
         return """
@@ -82,5 +87,40 @@ public class MessageConvertorUtils {
                     .append("\n");
         }
         return message.toString();
+    }
+
+    public static String prepareHoursByCategoryMessage(Map<String, Integer> categoryHours) {
+        String empty = "У тебя пока нет отчетов за этот период";
+        StringBuilder message = new StringBuilder("<u>По категорям:</u> \n");
+
+        for (Map.Entry<String, Integer> entry : categoryHours.entrySet()) {
+            message
+                    .append("\"%s\" - %d ч.".formatted(entry.getKey(), entry.getValue()))
+                    .append("\n");
+        }
+        return message.isEmpty() ? empty : message.toString();
+    }
+
+    public static String convertToListEmployeeMessage(List<EmployeeTO> employeeTOS) {
+        if (CollectionUtils.isEmpty(employeeTOS)) {
+            return "";
+        }
+        Long ordinalNumber = 1L;
+        StringBuilder listEmployeeMessage = new StringBuilder();
+        for (EmployeeTO employeeTO : employeeTOS) {
+            String statusEmployee = employeeTO.isDeleted() ? "Уволен" : "Активный";
+            employeeTO.setOrdinalNumber(ordinalNumber);
+
+            listEmployeeMessage.append(ordinalNumber)
+                    .append(". ")
+                    .append("""
+                            %s
+                            Тел. - +%s
+                            Статус - %s
+                            """.formatted(employeeTO.getFullName(), employeeTO.getPhone(), statusEmployee))
+                    .append("\n");
+            ordinalNumber++;
+        }
+        return listEmployeeMessage.toString();
     }
 }

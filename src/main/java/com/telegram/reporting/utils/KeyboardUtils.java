@@ -1,7 +1,7 @@
 package com.telegram.reporting.utils;
 
 import com.telegram.reporting.dialogs.ButtonValue;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
+import com.telegram.reporting.repository.dto.Ordinal;
 import org.apache.commons.lang3.Validate;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -28,34 +28,37 @@ public class KeyboardUtils {
         return button;
     }
 
+    public static KeyboardRow[] createButtonsWithRows(String[] buttonNames, int buttonsInRow) {
+        return createButtonsWithRows(Arrays.asList(buttonNames), buttonsInRow);
+    }
+
     public static KeyboardRow[] createButtonsWithRows(List<String> buttonNames, int buttonsInRow) {
-        Validate.notEmpty(buttonNames, "Can't create buttons with rows. List of names empty or NULL");
-        Validate.noNullElements(buttonNames, "Can't create buttons with rows. List of names contains NULL element");
+        Validate.notEmpty(buttonNames, "Can't create buttons with rows. List of buttonNames empty or NULL");
+        Validate.noNullElements(buttonNames, "Can't create buttons with rows. List of buttonNames contains NULL element");
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         List<String> listBN = new ArrayList<>(buttonNames);
 
-        final int requiredMinQuantity = 2;
-        if (buttonsInRow < requiredMinQuantity) {
-            buttonsInRow = requiredMinQuantity;
+        if (listBN.size() < buttonsInRow || buttonsInRow < 1) {
+            buttonsInRow = listBN.size();
         }
 
-        int cycle = listBN.size() / 2;
+        int cycle = listBN.size() / buttonsInRow;
         int lastRowButtons = listBN.size() % buttonsInRow;
 
         for (int i = 0; i < cycle; i++) {
             List<String> subBNs = new ArrayList<>(listBN.subList(0, buttonsInRow));
-            KeyboardRow button = KeyboardUtils.createRowButtons(subBNs.toArray(new String[0]));
+            KeyboardRow button = KeyboardUtils.createRowButtons(subBNs.toArray(String[]::new));
             subBNs.forEach(listBN::remove);
 
             keyboardRows.add(button);
         }
 
         if (lastRowButtons != 0) {
-            keyboardRows.add(KeyboardUtils.createRowButtons(listBN.toArray(new String[0])));
+            keyboardRows.add(KeyboardUtils.createRowButtons(listBN.toArray(String[]::new)));
         }
 
-        return keyboardRows.toArray(new KeyboardRow[0]);
+        return keyboardRows.toArray(KeyboardRow[]::new);
     }
 
     public static ReplyKeyboardMarkup createMainMenuButtonMarkup() {
@@ -96,13 +99,13 @@ public class KeyboardUtils {
                 .toList();
     }
 
-    public static String[] getButtonsByTimeRecordOrdinalNumber(List<TimeRecordTO> timeRecordTOS) {
-        Validate.notEmpty(timeRecordTOS, "Can't create buttons for TimeRecordsTOs. List of TimeRecordTOs is empty or NULL");
-        timeRecordTOS.forEach(tr -> Validate.notNull(tr.getOrdinalNumber(), "TimeRecords must contain ordinal number to creating buttons for them. TimeRecord = %s".formatted(tr)));
+    public static String[] getButtonsByOrdinalNumber(List<? extends Ordinal> ordinals) {
+        Validate.notEmpty(ordinals, "Can't create buttons for ordinals. List of ordinals is empty or NULL");
+        Validate.noNullElements(ordinals, "Object must contain ordinal number to creating buttons for them.");
 
-        List<String> buttons = new ArrayList<>(timeRecordTOS.size());
-        timeRecordTOS.forEach(tr -> buttons.add(String.valueOf(tr.getOrdinalNumber())));
-        return buttons.toArray(new String[timeRecordTOS.size()]);
+        List<String> buttons = new ArrayList<>(ordinals.size());
+        ordinals.forEach(ord -> buttons.add(String.valueOf(ord.getOrdinal())));
+        return buttons.toArray(String[]::new);
     }
 
     private static ReplyKeyboardMarkup createReplyKeyboardMarkup(List<KeyboardRow> keyboardRows) {

@@ -24,11 +24,17 @@ public enum ButtonValue {
     APPLY_DATA_CHANGES("Применить изменения"),
 
     // statistic dialog
-    STATISTIC_START_DIALOG("\uD83D\uDCC3 Статистика"),
+    STATISTIC_START_DIALOG("\uD83D\uDCC8 Статистика"),
     PREVIOUS_MONTH_STATISTIC("Показать за прошлый месяц"),
 
+    // employee statistic dialog
+    EMPLOYEE_STATISTIC_START_DIALOG("\uD83D\uDCCA Стат. сотрудников"),
+    CHOICE_ANOTHER_EMPLOYEE("Выбрать другого сотрудника"),
+    LOCK_EDIT_REPORT_DATA("Заблокировать период"),
+    UNLOCK_EDIT_REPORT_DATA("Открыть доступ"),
+
     // list users dialog
-    LIST_USERS_START_DIALOG("Список пользователей"),
+    LIST_USERS_START_DIALOG("\uD83D\uDCCB Список пользователей"),
     USER_STATUS_ACTIVE("Активные"),
     USER_STATUS_NOT_VERIFIED("На верифифкации"),
     USER_STATUS_DELETED("Удаленные"),
@@ -51,8 +57,7 @@ public enum ButtonValue {
     REPORT_CATEGORY_ON_OFFICE("На офисе"), REPORT_CATEGORY_ON_COORDINATION("На координации"),
 
     MANAGER_MENU_START_DIALOG("\uD83D\uDC68\u200D\uD83D\uDCBC Меню менеджера"),
-    ADMIN_MENU_START_DIALOG("\uD83D\uDC68\u200D\uD83D\uDCBB Меню администратора")
-    ;
+    ADMIN_MENU_START_DIALOG("\uD83D\uDCBB Меню администратора");
 
     private final String text;
 

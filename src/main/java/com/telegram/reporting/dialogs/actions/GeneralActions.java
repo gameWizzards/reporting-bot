@@ -11,6 +11,8 @@ public interface GeneralActions {
 
     <S, E> void handleUserDateInput(StateContext<S, E> context);
 
+    <S, E> void handleUserMonthInput(StateContext<S, E> context);
+
     <S, E> void handleUserTimeInput(StateContext<S, E> context);
 
     <S, E> void handleCategory(StateContext<S, E> context);
@@ -18,5 +20,4 @@ public interface GeneralActions {
     <S, E> void handleUserNoteInput(StateContext<S, E> context);
 
     <S, E> void sendRootMenuButtons(StateContext<S, E> context);
-
 }

@@ -211,4 +211,28 @@
         </sql>
     </changeSet>
 
+    <changeSet id="add_lock_update_report_table" author="cyberdyne_systems">
+        <createTable tableName="lock_update_report">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="lock_update_report_id_pk"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lock_month" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                schemaName="public"
+                tableName="lock_update_report"
+                columnNames="user_id, lock_month"
+                constraintName="user_id_lock_month_unique_const"
+                initiallyDeferred="true"
+                deferrable="true"
+                disabled="false"
+        />
+    </changeSet>
+
 </databaseChangeLog>

@@ -13,8 +13,6 @@ public interface ReportService {
 
     Report getReport(LocalDate date, Long chatId);
 
-    List<Report> getReportsBelongMonth(int month, Long chatId);
-
-    List<Report> getReportsBelongMonth(int month, int year, Long chatId);
+    List<Report> getReportsBelongMonth(LocalDate statisticDate, Long chatId);
 
 }

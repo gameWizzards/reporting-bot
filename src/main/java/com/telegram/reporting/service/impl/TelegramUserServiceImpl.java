@@ -1,18 +1,19 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.repository.UserRepository;
+import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.entity.Role;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.TelegramUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -49,7 +50,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
             switch (status) {
                 case ACTIVE -> result.addAll(userRepository.findUsers(filter.name(), filter.surname(), false));
                 case DELETED -> result.addAll(userRepository.findUsers(filter.name(), filter.surname(), true));
-                case NOT_VERIFIED -> result.addAll(userRepository.findAllNotActive());
+                case NOT_VERIFIED -> result.addAll(userRepository.findAllNotVerified());
             }
         }
 
@@ -75,6 +76,17 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         }
 
         return updateUser(user, contact, message.getChatId());
+    }
+
+    @Override
+    public List<EmployeeTO> findEmployeesWithExistReportsByMonth(LocalDate statisticMonth) {
+        Validate.notNull(statisticMonth, "StatisticMonth arg is required");
+        List<User> users = userRepository.findUsersWithExistReportsByMonth(
+                statisticMonth.getMonthValue(),
+                statisticMonth.getYear());
+        return users.stream()
+                .map(EmployeeTO::new)
+                .toList();
     }
 
     private User updateUser(User user, Contact contact, Long chatId) {

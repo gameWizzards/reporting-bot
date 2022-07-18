@@ -7,12 +7,13 @@ import com.telegram.reporting.utils.DateTimeUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode()
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TimeRecordTO {
+public class TimeRecordTO implements Serializable, Ordinal{
 
     private Long id;
     private Long ordinalNumber;
@@ -34,5 +35,10 @@ public class TimeRecordTO {
         this.note = timeRecord.getNote();
         this.categoryName = timeRecord.getCategory().getName();
         this.created = timeRecord.getCreated();
+    }
+
+    @Override
+    public Long getOrdinal() {
+        return ordinalNumber;
     }
 }

@@ -3,9 +3,9 @@ package com.telegram.reporting.dialogs.actions.impl;
 import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.Message;
+import com.telegram.reporting.dialogs.actions.GeneralActions;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.dialogs.actions.GeneralActions;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.*;
@@ -62,7 +62,7 @@ public class GeneralActionsImpl implements GeneralActions {
         }
 
         String timeRecordMessage = MessageConvertorUtils.convertToListTimeRecordsMessage(trTOs);
-        String[] buttons = KeyboardUtils.getButtonsByTimeRecordOrdinalNumber(trTOs);
+        String[] buttons = KeyboardUtils.getButtonsByOrdinalNumber(trTOs);
 
         String message = """
                 Вот доступные отчеты за - %s.
@@ -77,7 +77,7 @@ public class GeneralActionsImpl implements GeneralActions {
         variables.put(ContextVariable.TIME_RECORDS_JSON, timeRecordsJson);
 
         SendMessage sendMessage = new SendMessage(chatId.toString(), message);
-        KeyboardRow rowButtons = KeyboardUtils.createRowButtons(buttons);
+        KeyboardRow[] rowButtons = KeyboardUtils.createButtonsWithRows(buttons, 10);
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(true, rowButtons));
     }
@@ -101,19 +101,30 @@ public class GeneralActionsImpl implements GeneralActions {
 
     @Override
     public <S, E> void handleUserDateInput(StateContext<S, E> context) {
-        final LocalDate localDate = LocalDate.now();
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.DATE);
-        //handle user input to date
+
+        LocalDate reportDate = DateTimeUtils.convertUserInputToDate(userInput);
+
+        String formattedReportDate = DateTimeUtils.toDefaultFormat(reportDate);
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Дата принята = %s".formatted(formattedReportDate));
+        context.getExtendedState().getVariables().put(ContextVariable.DATE, formattedReportDate);
+    }
+
+    @Override
+    public <S, E> void handleUserMonthInput(StateContext<S, E> context) {
+        final LocalDate localDate = LocalDate.now();
+        final int defaultDay = 1;
+        String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.DATE);
+        //handle user input to month
         Integer[] parsedDate = parseUserInput(userInput);
         LocalDate reportDate = switch (parsedDate.length) {
-            case 1 -> LocalDate.of(localDate.getYear(), localDate.getMonth(), parsedDate[0]);
-            case 2 -> LocalDate.of(localDate.getYear(), parsedDate[1], parsedDate[0]);
-            case 3 -> LocalDate.of(parsedDate[2], parsedDate[1], parsedDate[0]);
+            case 1 -> LocalDate.of(localDate.getYear(), parsedDate[0], defaultDay);
+            case 2 -> LocalDate.of(parsedDate[1], parsedDate[0], defaultDay);
             default -> localDate;
         };
 
         String formattedReportDate = DateTimeUtils.toDefaultFormat(reportDate);
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Дата принята = %s".formatted(formattedReportDate));
+        sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Дата принята = %s".formatted(formattedReportDate.substring(3)));
         context.getExtendedState().getVariables().put(ContextVariable.DATE, formattedReportDate);
     }
 

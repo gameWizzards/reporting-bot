@@ -45,8 +45,8 @@ public class EditReportActionsImpl implements EditReportActions {
     @Override
     public void requestChooseEditData(StateContext<EditReportState, MessageEvent> context) {
         Long chatId = TelegramUtils.currentChatId(context);
-        String editTimeRecordJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TARGET_TIME_RECORD_JSON);
-        String timeRecordsJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TIME_RECORDS_JSON);
+        String editTimeRecordJson = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.TARGET_TIME_RECORD_JSON);
+        String timeRecordsJson = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.TIME_RECORDS_JSON);
 
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
         String timeRecordMessage = MessageConvertorUtils.convertToTimeRecordMessage(trTO);
@@ -82,8 +82,8 @@ public class EditReportActionsImpl implements EditReportActions {
 
     @Override
     public void sendDataToEdit(StateContext<EditReportState, MessageEvent> context) {
-        String buttonValue = TelegramUtils.getContextVariableValue(context, ContextVariable.BUTTON_VALUE);
-        String editTimeRecordJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TARGET_TIME_RECORD_JSON);
+        String buttonValue = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.BUTTON_VALUE);
+        String editTimeRecordJson = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
         String message;
 
@@ -133,9 +133,9 @@ public class EditReportActionsImpl implements EditReportActions {
     public void editTimeRecord(StateContext<EditReportState, MessageEvent> context) {
         Map<Object, Object> variables = context.getExtendedState().getVariables();
 
-        Optional<String> time = Optional.ofNullable(TelegramUtils.getContextVariableValue(context, ContextVariable.REPORT_TIME));
-        Optional<String> note = Optional.ofNullable(TelegramUtils.getContextVariableValue(context, ContextVariable.REPORT_NOTE));
-        Optional<String> categoryName = Optional.ofNullable(TelegramUtils.getContextVariableValue(context, ContextVariable.REPORT_CATEGORY_TYPE));
+        Optional<String> time = Optional.ofNullable(TelegramUtils.getContextVariableValueAsString(context, ContextVariable.REPORT_TIME));
+        Optional<String> note = Optional.ofNullable(TelegramUtils.getContextVariableValueAsString(context, ContextVariable.REPORT_NOTE));
+        Optional<String> categoryName = Optional.ofNullable(TelegramUtils.getContextVariableValueAsString(context, ContextVariable.REPORT_CATEGORY_TYPE));
 
         String editTimeRecord = (String) variables.get(ContextVariable.TARGET_TIME_RECORD_JSON);
 
@@ -155,7 +155,7 @@ public class EditReportActionsImpl implements EditReportActions {
 
     @Override
     public void requestEditAdditionalData(StateContext<EditReportState, MessageEvent> context) {
-        String editTimeRecordJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TARGET_TIME_RECORD_JSON);
+        String editTimeRecordJson = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
         String timeRecordToMessage = MessageConvertorUtils.convertToTimeRecordMessage(timeRecordTO);
         String message = """
@@ -173,7 +173,7 @@ public class EditReportActionsImpl implements EditReportActions {
 
     @Override
     public void sendCategoryButtons(StateContext<EditReportState, MessageEvent> context) {
-        String timeRecordsJson = TelegramUtils.getContextVariableValue(context, ContextVariable.TIME_RECORDS_JSON);
+        String timeRecordsJson = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.TIME_RECORDS_JSON);
 
         List<String> buttons = KeyboardUtils.getAvailableCategoryButtons(timeRecordsJson);
 
@@ -203,7 +203,7 @@ public class EditReportActionsImpl implements EditReportActions {
 
     @Override
     public void saveTimeRecordChanges(StateContext<EditReportState, MessageEvent> context) {
-        String editTimeRecord = TelegramUtils.getContextVariableValue(context, ContextVariable.TARGET_TIME_RECORD_JSON);
+        String editTimeRecord = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecord, TimeRecordTO.class);
         TimeRecord timeRecord = timeRecordService.getById(trTO.getId());
 
@@ -220,7 +220,7 @@ public class EditReportActionsImpl implements EditReportActions {
 
     @Override
     public void requestEditAdditionalTimeRecord(StateContext<EditReportState, MessageEvent> context) {
-        String date = TelegramUtils.getContextVariableValue(context, ContextVariable.DATE);
+        String date = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.DATE);
         String message = """         
                 Хочешь изменить еще один отчет за - %s?
                                 

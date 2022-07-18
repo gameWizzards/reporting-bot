@@ -23,7 +23,7 @@ public class TelegramUtils {
         return String.valueOf(context.getExtendedState().getVariables().get(ContextVariable.CHAT_ID));
     }
 
-    public static <S, E> String getContextVariableValue(StateContext<S, E> context, ContextVariable variable) {
+    public static <S, E> String getContextVariableValueAsString(StateContext<S, E> context, ContextVariable variable) {
         return (String) context.getExtendedState().getVariables().get(variable);
     }
 

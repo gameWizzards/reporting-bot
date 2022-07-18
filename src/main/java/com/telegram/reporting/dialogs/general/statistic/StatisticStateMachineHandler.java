@@ -4,6 +4,7 @@ import com.telegram.reporting.dialogs.ButtonValue;
 import com.telegram.reporting.dialogs.ContextVariable;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateMachine;
@@ -20,10 +21,13 @@ public class StatisticStateMachineHandler implements StateMachineHandler {
 
     private final StateMachineFactory<StatisticState, MessageEvent> stateMachineFactory;
     private final Map<Long, StateMachine<StatisticState, MessageEvent>> stateMachines;
+    private final SendBotMessageService sendBotMessageService;
 
 
-    public StatisticStateMachineHandler(StateMachineFactory<StatisticState, MessageEvent> stateMachineFactory) {
+    public StatisticStateMachineHandler(StateMachineFactory<StatisticState, MessageEvent> stateMachineFactory,
+                                        SendBotMessageService sendBotMessageService) {
         this.stateMachineFactory = stateMachineFactory;
+        this.sendBotMessageService = sendBotMessageService;
         stateMachines = new HashMap<>();
     }
 
@@ -32,8 +36,8 @@ public class StatisticStateMachineHandler implements StateMachineHandler {
         StateMachine<StatisticState, MessageEvent> stateMachine = stateMachines.get(chatId);
         Map<Object, Object> variables = stateMachine.getExtendedState().getVariables();
         MessageEvent messageEvent = switch (buttonValue) {
-            case STATISTIC_START_DIALOG ->  MessageEvent.RUN_STATISTIC_DIALOG;
-            case PREVIOUS_MONTH_STATISTIC ->  MessageEvent.SHOW_PREVIOUS_MONTH_STATISTIC;
+            case STATISTIC_START_DIALOG -> MessageEvent.RUN_STATISTIC_DIALOG;
+            case PREVIOUS_MONTH_STATISTIC -> MessageEvent.SHOW_PREVIOUS_MONTH_STATISTIC;
 
             default -> null;
         };
@@ -44,21 +48,7 @@ public class StatisticStateMachineHandler implements StateMachineHandler {
 
     @Override
     public void handleUserInput(Long chatId, String userInput) {
-        StateMachine<StatisticState, MessageEvent> stateMachine = stateMachines.get(chatId);
-        StatisticState currentState = stateMachine.getState().getId();
-        Map<Object, Object> variables = stateMachine.getExtendedState().getVariables();
-
-        MessageEvent messageEvent = switch (currentState) {
-            case USER_DATE_INPUTTING -> {
-                variables.put(ContextVariable.DATE, userInput);
-                yield MessageEvent.VALIDATE_USER_DATE_INPUT;
-            }
-            default -> null;
-        };
-
-        Optional.ofNullable(messageEvent)
-                .ifPresent(stateMachine::sendEvent);
-
+        sendBotMessageService.sendMessage(chatId, "Используй кнопки. Не напрягайся печатать буквы...");
     }
 
     @Override

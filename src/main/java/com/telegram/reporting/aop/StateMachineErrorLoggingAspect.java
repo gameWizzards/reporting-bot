@@ -35,7 +35,7 @@ public class StateMachineErrorLoggingAspect {
             throwing = "e")
     public <S, E> void doExceptionLogging(Exception e, StateContext<S, E> context) {
         String exceptLogs = "reactor";
-        String logPrefix = TelegramUtils.getContextVariableValue(context, ContextVariable.LOG_PREFIX);
+        String logPrefix = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.LOG_PREFIX);
 
         String contextVarValues = context.getExtendedState().getVariables().keySet().stream()
                 .map(key -> key + "=%s".formatted(context.getExtendedState().getVariables().get(key)))

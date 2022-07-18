@@ -36,6 +36,7 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     public void sendMessageWithKeys(SendMessage message, ReplyKeyboard keyboardMarkup) {
         Objects.requireNonNull(keyboardMarkup, "Keyboard markup is require!");
         message.setReplyMarkup(keyboardMarkup);
+        message.enableHtml(true);
         sendMessageWithKeys(message);
     }
 
