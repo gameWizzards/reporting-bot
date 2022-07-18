@@ -1,6 +1,5 @@
-package com.telegram.reporting.dialogs.manager.employee_statistic;
+package com.telegram.reporting.dialogs;
 
-import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -11,28 +10,28 @@ import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.transition.Transition;
 
 @Slf4j
-public class EmployeeStatisticDialogListenerImpl implements StateMachineListener<EmployeeStatisticState, MessageEvent> {
-    private StateMachine<EmployeeStatisticState, MessageEvent> stateMachine;
+public class GeneralDialogListener<S, E> implements StateMachineListener<S, E> {
+    private StateMachine<S, E> stateMachine;
 
     @Override
-    public void stateChanged(State<EmployeeStatisticState, MessageEvent> from, State<EmployeeStatisticState, MessageEvent> to) {
+    public void stateChanged(State<S, E> from, State<S, E> to) {
         if (from != null) {
             log.info("{} dialog go from {} to step {}", TelegramUtils.getLogPrefix(stateMachine), from.getId(), to.getId());
         }
     }
 
     @Override
-    public void stateEntered(State<EmployeeStatisticState, MessageEvent> state) {
+    public void stateEntered(State<S, E> state) {
 
     }
 
     @Override
-    public void stateExited(State<EmployeeStatisticState, MessageEvent> state) {
+    public void stateExited(State<S, E> state) {
 
     }
 
     @Override
-    public void eventNotAccepted(Message<MessageEvent> message) {
+    public void eventNotAccepted(Message<E> message) {
         log.error("{} Invalid transition! Current step = {}. Invalid event = {}.",
                 TelegramUtils.getLogPrefix(stateMachine),
                 stateMachine.getState().getId(),
@@ -40,32 +39,32 @@ public class EmployeeStatisticDialogListenerImpl implements StateMachineListener
     }
 
     @Override
-    public void transition(Transition<EmployeeStatisticState, MessageEvent> transition) {
+    public void transition(Transition<S, E> transition) {
 
     }
 
     @Override
-    public void transitionStarted(Transition<EmployeeStatisticState, MessageEvent> transition) {
+    public void transitionStarted(Transition<S, E> transition) {
 
     }
 
     @Override
-    public void transitionEnded(Transition<EmployeeStatisticState, MessageEvent> transition) {
+    public void transitionEnded(Transition<S, E> transition) {
 
     }
 
     @Override
-    public void stateMachineStarted(StateMachine<EmployeeStatisticState, MessageEvent> stateMachine) {
+    public void stateMachineStarted(StateMachine<S, E> stateMachine) {
         this.stateMachine = stateMachine;
     }
 
     @Override
-    public void stateMachineStopped(StateMachine<EmployeeStatisticState, MessageEvent> stateMachine) {
+    public void stateMachineStopped(StateMachine<S, E> stateMachine) {
 
     }
 
     @Override
-    public void stateMachineError(StateMachine<EmployeeStatisticState, MessageEvent> stateMachine, Exception e) {
+    public void stateMachineError(StateMachine<S, E> stateMachine, Exception e) {
         log.error("{}. Current step = {}. Exception = {}",
                 TelegramUtils.getLogPrefix(stateMachine),
                 stateMachine.getState().getId(),
@@ -84,7 +83,7 @@ public class EmployeeStatisticDialogListenerImpl implements StateMachineListener
     }
 
     @Override
-    public void stateContext(StateContext<EmployeeStatisticState, MessageEvent> stateContext) {
+    public void stateContext(StateContext<S, E> stateContext) {
 
     }
 }

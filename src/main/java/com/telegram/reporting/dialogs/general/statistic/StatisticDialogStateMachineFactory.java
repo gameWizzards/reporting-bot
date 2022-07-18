@@ -1,5 +1,6 @@
 package com.telegram.reporting.dialogs.general.statistic;
 
+import com.telegram.reporting.dialogs.GeneralDialogListener;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.actions.StatisticActions;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,7 @@ public class StatisticDialogStateMachineFactory extends EnumStateMachineConfigur
     @Override
     public void configure(StateMachineConfigurationConfigurer<StatisticState, MessageEvent> config) throws Exception {
         config.withConfiguration()
-                .listener(new StatisticDialogListenerImpl())
+                .listener(new GeneralDialogListener())
                 // Start after creation
                 .autoStartup(true);
     }

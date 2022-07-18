@@ -1,5 +1,6 @@
 package com.telegram.reporting.dialogs.general.delete_report;
 
+import com.telegram.reporting.dialogs.GeneralDialogListener;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.actions.DeleteReportActions;
 import com.telegram.reporting.dialogs.actions.GeneralActions;
@@ -32,7 +33,7 @@ public class DeleteReportDialogStateMachineFactory extends EnumStateMachineConfi
     @Override
     public void configure(StateMachineConfigurationConfigurer<DeleteReportState, MessageEvent> config) throws Exception {
         config.withConfiguration()
-                .listener(new DeleteReportDialogListenerImpl())
+                .listener(new GeneralDialogListener())
                 // Start after creation
                 .autoStartup(true);
     }

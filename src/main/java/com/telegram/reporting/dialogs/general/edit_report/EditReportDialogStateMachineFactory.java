@@ -1,5 +1,6 @@
 package com.telegram.reporting.dialogs.general.edit_report;
 
+import com.telegram.reporting.dialogs.GeneralDialogListener;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.actions.EditReportActions;
 import com.telegram.reporting.dialogs.actions.GeneralActions;
@@ -32,7 +33,7 @@ public class EditReportDialogStateMachineFactory extends EnumStateMachineConfigu
     @Override
     public void configure(StateMachineConfigurationConfigurer<EditReportState, MessageEvent> config) throws Exception {
         config.withConfiguration()
-                .listener(new EditReportDialogListenerImpl())
+                .listener(new GeneralDialogListener())
                 // Start after creation
                 .autoStartup(true);
     }

@@ -1,5 +1,6 @@
 package com.telegram.reporting.dialogs.manager.employee_statistic;
 
+import com.telegram.reporting.dialogs.GeneralDialogListener;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.actions.EmployeeStatisticActions;
 import com.telegram.reporting.dialogs.actions.GeneralActions;
@@ -32,7 +33,7 @@ public class EmployeeStatisticDialogStateMachineFactory extends EnumStateMachine
     @Override
     public void configure(StateMachineConfigurationConfigurer<EmployeeStatisticState, MessageEvent> config) throws Exception {
         config.withConfiguration()
-                .listener(new EmployeeStatisticDialogListenerImpl())
+                .listener(new GeneralDialogListener())
                 // Start after creation
                 .autoStartup(true);
     }

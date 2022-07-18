@@ -1,5 +1,6 @@
 package com.telegram.reporting.dialogs.admin.list_users;
 
+import com.telegram.reporting.dialogs.GeneralDialogListener;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.actions.ListUsersActions;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,7 @@ public class ListUsersDialogStateMachineFactory extends EnumStateMachineConfigur
     @Override
     public void configure(StateMachineConfigurationConfigurer<ListUsersState, MessageEvent> config) throws Exception {
         config.withConfiguration()
-                .listener(new ListUsersDialogListenerImpl())
+                .listener(new GeneralDialogListener<>())
                 // Start after creation
                 .autoStartup(true);
     }

@@ -1,5 +1,6 @@
 package com.telegram.reporting.dialogs.general.create_report;
 
+import com.telegram.reporting.dialogs.GeneralDialogListener;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.actions.CreateReportActions;
 import com.telegram.reporting.dialogs.actions.GeneralActions;
@@ -36,7 +37,7 @@ public class CreateReportDialogStateMachineFactory extends EnumStateMachineConfi
     @Override
     public void configure(StateMachineConfigurationConfigurer<CreateReportState, MessageEvent> config) throws Exception {
         config.withConfiguration()
-                .listener(new CreateReportDialogListenerImpl())
+                .listener(new GeneralDialogListener())
                 // Start after creation
                 .autoStartup(true);
     }
