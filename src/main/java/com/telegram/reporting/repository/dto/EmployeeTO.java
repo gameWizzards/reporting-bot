@@ -17,7 +17,6 @@ public class EmployeeTO implements Serializable, Ordinal {
     private Long id;
     private Long chatId;
     private String fullName;
-    private String surname;
     private String phone;
     private boolean deleted;
     private Set<Role> roles;
