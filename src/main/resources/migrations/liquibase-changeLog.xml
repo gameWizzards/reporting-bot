@@ -235,4 +235,12 @@
         />
     </changeSet>
 
+    <changeSet id="add_column_telegram_user_name" author="cyberdyne_systems">
+        <addColumn schemaName="public" tableName="user">
+            <column name="telegram_nickname" type="varchar(250)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

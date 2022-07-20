@@ -20,6 +20,7 @@ public class EmployeeTO implements Serializable, Ordinal {
     private String phone;
     private boolean deleted;
     private Set<Role> roles;
+    private String telegramNickname;
 
     private Long ordinalNumber;
 
@@ -33,6 +34,7 @@ public class EmployeeTO implements Serializable, Ordinal {
         this.phone = user.getPhone();
         this.deleted = user.isDeleted();
         this.roles = user.getRoles();
+        this.telegramNickname = user.getTelegramNickname();
     }
 
     @Override

@@ -135,8 +135,9 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
                 sumHours,
                 categoryHoursMessage,
                 statistic);
-
-        sendBotMessageService.sendMessage(TelegramUtils.currentChatIdString(context), statisticMessage);
+        Long chatId = TelegramUtils.currentChatId(context);
+        sendBotMessageService.sendMessage(chatId, statisticMessage);
+        sendBotMessageService.sendLink2UserChat(chatId, employeeTO);
     }
 
     @Override

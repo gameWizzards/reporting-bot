@@ -69,13 +69,12 @@ public class TelegramUserServiceImpl implements TelegramUserService {
             return null;
         }
         Contact contact = message.getContact();
-
         User user = userRepository.findByPhone(contact.getPhoneNumber().replaceAll(" ", ""));
         if (user == null) {
             return null;
         }
 
-        return updateUser(user, contact, message.getChatId());
+        return updateUser(user, contact, message.getChatId(), message.getFrom().getUserName());
     }
 
     @Override
@@ -89,7 +88,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
                 .toList();
     }
 
-    private User updateUser(User user, Contact contact, Long chatId) {
+    private User updateUser(User user, Contact contact, Long chatId, String telegramNickName) {
         user.setChatId(chatId);
         if (StringUtils.isBlank(user.getName())) {
             user.setName(contact.getFirstName());
@@ -100,6 +99,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
             // need for better identification in report or list of employee
             user.setSurname(contact.getPhoneNumber());
         }
+        user.setTelegramNickname(telegramNickName);
         user.setRoles(Set.of(Role.EMPLOYEE_ROLE));
         return save(user);
     }

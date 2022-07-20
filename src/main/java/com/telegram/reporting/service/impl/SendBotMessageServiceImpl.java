@@ -1,24 +1,22 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.bot.ReportingTelegramBot;
+import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.service.SendBotMessageService;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.List;
-import java.util.Objects;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.springframework.util.CollectionUtils.isEmpty;
-
-/**
- * Implementation of {@link SendBotMessageService} interface.
- */
+@Slf4j
 @Service
 public class SendBotMessageServiceImpl implements SendBotMessageService {
+    private final String USER_CHAT_LINK = "<a href=\"https://t.me/+%s\">\"Перейти в чат\"</a>";
+
 
     private final ReportingTelegramBot reportingTelegramBot;
 
@@ -27,28 +25,25 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
     }
 
     @Override
-    @SneakyThrows
-    public void sendMessageWithKeys(SendMessage message) {
-        reportingTelegramBot.execute(message);
-    }
-
-    @Override
     public void sendMessageWithKeys(SendMessage message, ReplyKeyboard keyboardMarkup) {
-        Objects.requireNonNull(keyboardMarkup, "Keyboard markup is require!");
+        Validate.notNull(keyboardMarkup, "Keyboard markup is required to send it to telegramBot!");
+        Validate.notNull(message, "SendMessage is required to send it to telegramBot!");
         message.setReplyMarkup(keyboardMarkup);
         message.enableHtml(true);
-        sendMessageWithKeys(message);
+        sendMessage2Telegram(message);
     }
 
     @Override
     public void sendMessage(Long chatId, String message) {
-        sendMessage(String.valueOf(chatId), message);
+        Validate.notNull(chatId, "ChatId is required to send message to telegramBot!");
+        Validate.notBlank(message, "Message is required to send it to telegramBot!");
+        sendMessage(chatId.toString(), message);
     }
 
     @Override
-    @SneakyThrows
     public void sendMessage(String chatId, String message) {
-        if (isBlank(message)) return;
+        Validate.notNull(chatId, "ChatId is required to send message to telegramBot!");
+        Validate.notBlank(message, "Message is required to send it to telegramBot!");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -56,19 +51,30 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         sendMessage.setText(message);
         sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
 
-        reportingTelegramBot.execute(sendMessage);
+        sendMessage2Telegram(sendMessage);
     }
 
     @Override
-    public void sendMessage(String chatId, List<String> messages) {
-        if (isEmpty(messages)) return;
-        messages.forEach(m -> sendMessage(chatId, m));
+    public void sendLink2UserChat(Long chatId, EmployeeTO employee) {
+        Validate.notNull(chatId, "ChatId is required to send message to telegramBot!");
+        Validate.notNull(employee, "Employee is required to create link to his chat!");
+
+        String userName = employee.getFullName();
+        if (StringUtils.isBlank(userName)) {
+            userName = "телеграм бота";
+        }
+
+        String link = USER_CHAT_LINK.formatted(employee.getPhone());
+        String message = "Кликни ссылку %s чтобы написать пользователю %s".formatted(link, userName);
+        sendMessage(chatId, message);
     }
 
-    @Override
-    public void sendMessage(Long chatId, List<String> messages) {
-        if (isEmpty(messages)) return;
-        sendMessage(String.valueOf(chatId), messages);
+    private void sendMessage2Telegram(SendMessage message) {
+        try {
+            reportingTelegramBot.execute(message);
+        } catch (TelegramApiException e) {
+            log.error("Can't send message to telegram API. Message: {}. Reason: {}", message, e.getMessage(), e);
+        }
     }
 
 }

@@ -29,6 +29,9 @@ public class User {
     @Column(name = "surname")
     private String surname;
 
+    @Column(name = "telegram_nickname")
+    private String telegramNickname;
+
     @Column(name = "phone", nullable = false)
     private String phone;
 
