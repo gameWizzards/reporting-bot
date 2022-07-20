@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
+    private final String GREEN_CIRCLE_UNICODE = "\uD83D\uDFE2";
+    private final String RED_CIRCLE_UNICODE = "\uD83D\uDD34";
     private final ReportService reportService;
     private final TelegramUserService userService;
     private final SendBotMessageService sendBotMessageService;
@@ -148,8 +150,8 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
 
         String month = Month.getNameByOrdinal(statisticDate.getMonthValue());
         String startMessage = existManipulateReportDataLock ?
-                "%s заблокирован для изменений. %s не может создавать/удалять/изменять отчеты за этот период.".formatted(month, employeeTO.getFullName())
-                : "%s все еще может создавать/удалять/изменять отчеты за %s.".formatted(employeeTO.getFullName(), month);
+                "%s %s заблокирован для изменений. %s не может создавать/удалять/изменять отчеты за этот период.".formatted(RED_CIRCLE_UNICODE, month, employeeTO.getFullName())
+                : "%s %s все еще может создавать/удалять/изменять отчеты за %s.".formatted(GREEN_CIRCLE_UNICODE, employeeTO.getFullName(), month);
         String message = """
                 %s
                            
@@ -204,16 +206,16 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
                 lockService.saveLock(employeeTO.getId(), statisticDate);
                 message = """
                         Отчеты за %s успешно заблокированы!
-                        %s не сможет создавать/удалять/изменять отчеты за этот период.
-                        """.formatted(Month.getNameByOrdinal(statisticDate.getMonthValue()), employeeTO.getFullName());
+                        %s %s не сможет создавать/удалять/изменять отчеты за этот период.
+                        """.formatted(Month.getNameByOrdinal(statisticDate.getMonthValue()), RED_CIRCLE_UNICODE, employeeTO.getFullName());
             }
             case UNLOCK_EDIT_REPORT_DATA -> {
                 lockService.deleteLock(employeeTO.getId(), statisticDate);
                 message = """
                         Отчеты за %s доступны для изменеий.
-                        %s сможет создавать/удалять/изменять отчеты за этот период.
+                        %s %s сможет создавать/удалять/изменять отчеты за этот период.
                         Не забудь заблокировать отчеты когда появится возможность.
-                        """.formatted(Month.getNameByOrdinal(statisticDate.getMonthValue()), employeeTO.getFullName());
+                        """.formatted(Month.getNameByOrdinal(statisticDate.getMonthValue()), GREEN_CIRCLE_UNICODE, employeeTO.getFullName());
             }
         }
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), message);

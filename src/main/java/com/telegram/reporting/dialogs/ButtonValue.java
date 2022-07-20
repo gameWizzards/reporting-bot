@@ -30,8 +30,8 @@ public enum ButtonValue {
     // employee statistic dialog
     EMPLOYEE_STATISTIC_START_DIALOG("\uD83D\uDCCA Стат. сотрудников"),
     CHOICE_ANOTHER_EMPLOYEE("Выбрать другого сотрудника"),
-    LOCK_EDIT_REPORT_DATA("Заблокировать период"),
-    UNLOCK_EDIT_REPORT_DATA("Открыть доступ"),
+    LOCK_EDIT_REPORT_DATA("\uD83D\uDD34 Заблокировать период"),
+    UNLOCK_EDIT_REPORT_DATA("\uD83D\uDFE2 Открыть доступ"),
 
     // list users dialog
     LIST_USERS_START_DIALOG("\uD83D\uDCCB Список пользователей"),
