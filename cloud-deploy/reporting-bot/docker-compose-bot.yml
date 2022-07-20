@@ -34,6 +34,8 @@ services:
     volumes:
       - ${BOT_VOLUME_PATH}:/root/.m2/
       - /home/reporting-bot/reporting-bot-logs/:/tmp/reporting-bot-logs/
+    ports:
+      - "8008:8008"
     networks:
       - reporting-bot-network
 
