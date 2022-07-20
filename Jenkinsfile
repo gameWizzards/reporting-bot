@@ -23,32 +23,36 @@ pipeline {
     stages{
         stage('Checkout') {
             steps{
-                checkout scm
                 script{
-                    withCredentials([usernamePassword(credentialsId: 'RepoBotHostDOCreds', passwordVariable: 'USER_SECRET', usernameVariable: 'USER_LOGIN')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'RepoBotHostDO-pk-Creds', keyFileVariable: 'USER_SECRET', usernameVariable: 'USER_LOGIN')]) {
                         remote.user = USER_LOGIN
-                        remote.password = USER_SECRET
-                        sshCommand remote: remote, command: 'docker exec reporting-bot ps -ef | grep java | grep -v grep | awk \'{print \$2}\' | docker exec -i reporting-bot xargs -r kill'
-                        sshCommand remote: remote, command: 'docker exec reporting-bot mkdir -p ' + "$TESTDIR"
-                        sshCommand remote: remote, command: 'docker exec reporting-bot rm -rf ' + "$TESTDIR/$APPDIR/"
-                        sshCommand remote: remote, command: 'docker exec reporting-bot mkdir ' + "$TESTDIR/$APPDIR/"
-                        sshCommand remote: remote, command: 'docker exec reporting-bot git clone -b master https://github.com/gameWizzards/reporting-bot.git ' + "$TESTDIR/$APPDIR/"
+                        remote.identityFile = USER_SECRET
+                        sshCommand remote: remote, command: String.format('docker exec reporting-bot ps -ef | grep java | grep -v grep | awk \'{print \$2}\' | docker exec -i reporting-bot xargs -r kill; docker exec reporting-bot mkdir -p %s; docker exec reporting-bot rm -rf %s; docker exec reporting-bot mkdir %s; docker exec reporting-bot git clone -b master https://github.com/gameWizzards/reporting-bot.git %s;',
+                                                                            "$TESTDIR",
+                                                                            "$TESTDIR/$APPDIR/",
+                                                                            "$TESTDIR/$APPDIR/",
+                                                                            "$TESTDIR/$APPDIR/")
                     }
                 }
             }
         }
         stage('Unit_tests') {
             steps {
-                //sshCommand remote: remote, command: 'docker exec reporting-bot mvn test -f ' + "$TESTDIR/$APPDIR"
-                // For generating an artifact, is needed to use 'verify'
-                sshCommand remote: remote, command: 'docker exec reporting-bot mvn verify -f ' + "$TESTDIR/$APPDIR"
+                script{
+                    withCredentials([sshUserPrivateKey(credentialsId: 'RepoBotHostDO-pk-Creds', keyFileVariable: 'USER_SECRET', usernameVariable: 'USER_LOGIN')]) {
+                         remote.user = USER_LOGIN
+                         remote.identityFile = USER_SECRET
+                         sshCommand remote: remote, command: String.format('docker exec reporting-bot mvn verify -f %s;',
+                                                                            "$TESTDIR/$APPDIR")
+                    }
+                }
             }
-
         }
         stage('Integration_tests') {
             steps{
                 echo 'Here will be integration tests'
-                //sshCommand remote: remote, command: 'docker exec reporting-bot mvn verify -f ' + "$TESTDIR/$APPDIR"
+                //sshCommand remote: remote, command: String.format('docker exec reporting-bot mvn verify -f %s',
+                                                                     //"$TESTDIR/$APPDIR")
             }
         }
         stage('Deploy') {
@@ -58,10 +62,25 @@ pipeline {
                 }
             }
             steps{
-                sshCommand remote: remote, command: 'docker exec reporting-bot mkdir -p ' + "$WORKDIR"
-                sshCommand remote: remote, command: 'docker exec reporting-bot cp ' + "$TESTDIR/$APPDIR/target/$APPNAME $WORKDIR/"
-                sshCommand remote: remote, command: 'docker exec reporting-bot java -Dspring.profiles.active=' + "$SPRING_PROFILE -jar $WORKDIR/$APPNAME >/dev/null 2>&1 &"
+                script{
+                    withCredentials([sshUserPrivateKey(credentialsId: 'RepoBotHostDO-pk-Creds', keyFileVariable: 'USER_SECRET', usernameVariable: 'USER_LOGIN')]) {
+                        remote.user = USER_LOGIN
+                        remote.identityFile = USER_SECRET
+                        sshCommand remote: remote, command: String.format('docker exec reporting-bot mkdir -p %s; docker exec reporting-bot cp %s/target/%s %s; docker exec reporting-bot java -Dspring.profiles.active=%s -jar %s >/dev/null 2>&1 &',
+                                                                            "$WORKDIR",
+                                                                            "$TESTDIR/$APPDIR",
+                                                                            "$APPNAME",
+                                                                            "$WORKDIR/",
+                                                                            "$SPRING_PROFILE",
+                                                                            "$WORKDIR/$APPNAME")
+                    }
+                }
             }
         }
     }
+    post {
+        always {
+            telegramSend(message: "Job = ${JOB_NAME}. Status = ${currentBuild.getCurrentResult()}")
+        }
+   }
 }
