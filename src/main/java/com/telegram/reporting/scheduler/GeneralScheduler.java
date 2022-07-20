@@ -1,6 +1,8 @@
 package com.telegram.reporting.scheduler;
 
 import com.telegram.reporting.repository.dto.EmployeeTO;
+import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.LockUpdateReportService;
 import com.telegram.reporting.service.TelegramUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,15 +35,18 @@ public class GeneralScheduler {
     public void lockEditReport() {
         log.info("LockEditReport job started");
         LocalDate statisticMonth = LocalDate.now().minusMonths(offsetMinusMonth);
-        List<EmployeeTO> employeeTOs = userService.findEmployeesWithExistReportsByMonth(statisticMonth);
-        List<Long> notLockedIds = employeeTOs.stream()
-                .map(EmployeeTO::getId)
+        UserFilter filter = UserFilter.builder()
+                .userStatus(UserFilter.UserStatus.ACTIVE, UserFilter.UserStatus.DELETED)
+                .build();
+        List<User> users = userService.findUsers(filter);
+        List<Long> notLockedIds = users.stream()
+                .map(User::getId)
                 .filter(id -> !lockService.lockExist(id, statisticMonth))
                 .toList();
 
         notLockedIds.forEach(id -> lockService.saveLock(id, statisticMonth));
 
         log.info("LockEditReport job was finished successfully. Employee with reports = %d. Didn't lock = %d"
-                .formatted(employeeTOs.size(), notLockedIds.size()));
+                .formatted(users.size(), notLockedIds.size()));
     }
 }
