@@ -70,7 +70,7 @@ public class MessageConvertorUtils {
 
     public static String convertToListUsersMessage(List<User> users) {
         if (CollectionUtils.isEmpty(users)) {
-            return "";
+            return "Нет пользователей этой категории";
         }
 
         StringBuilder message = new StringBuilder();

@@ -10,4 +10,6 @@ public interface GuardValidator {
     <S, E> boolean validateTime(StateContext<S, E> context);
 
     <S, E> boolean validateNote(StateContext<S, E> context);
+
+    <S, E> boolean validatePhoneInput(StateContext<S, E> context);
 }

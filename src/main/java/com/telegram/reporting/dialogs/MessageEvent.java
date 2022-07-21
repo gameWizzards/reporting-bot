@@ -52,7 +52,8 @@ public enum MessageEvent {
     SHOW_DELETED_USERS,
 
     // add new user dialog
-    RUN_ADD_NEW_USER_DIALOG,
+    RUN_ADD_EMPLOYEE_DIALOG,
+    VALIDATE_PHONE_INPUT,
 
     //general
     CHOOSE_TIME_RECORD,
