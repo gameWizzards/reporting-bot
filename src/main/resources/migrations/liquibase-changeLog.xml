@@ -243,4 +243,41 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="add_columns_2_user" author="cyberdyne_systems">
+        <addColumn schemaName="public" tableName="user">
+            <column name="created" type="timestamp"/>
+            <column name="activated" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <sql dbms="postgresql">
+            UPDATE "public"."user"
+            SET "activated"=current_timestamp-'1 month'::interval, "created"=current_timestamp-'1 month'::interval
+            WHERE "name" IS NOT NULL;
+        </sql>
+
+        <sql dbms="postgresql">
+            UPDATE "public"."user"
+            SET "created"=current_timestamp-'1 month'::interval
+            WHERE "name" IS NULL;
+        </sql>
+
+        <addNotNullConstraint
+                schemaName="public"
+                tableName="user"
+                columnName="created"
+                constraintName="user_created_not_nullable_const"
+        />
+        <addUniqueConstraint
+                schemaName="public"
+                tableName="user"
+                columnNames="phone"
+                constraintName="user_phone_unique_const"
+                initiallyDeferred="true"
+                deferrable="true"
+                disabled="false"
+        />
+    </changeSet>
+
 </databaseChangeLog>

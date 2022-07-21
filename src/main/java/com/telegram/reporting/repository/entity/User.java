@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -32,11 +33,17 @@ public class User {
     @Column(name = "telegram_nickname")
     private String telegramNickname;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
+
+    @Column(name = "created", nullable = false, updatable = false)
+    private LocalDateTime created;
+
+    @Column(name = "activated")
+    private LocalDateTime activated;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)

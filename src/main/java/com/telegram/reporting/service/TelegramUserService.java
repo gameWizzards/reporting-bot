@@ -22,4 +22,6 @@ public interface TelegramUserService {
     User verifyContact(Message message);
 
     List<EmployeeTO> findEmployeesWithExistReportsByMonth(LocalDate statisticMonth);
+
+    Optional<User> findByPhone(String phone);
 }

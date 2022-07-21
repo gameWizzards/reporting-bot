@@ -1,5 +1,6 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.exception.PhoneFormatException;
 import com.telegram.reporting.repository.UserRepository;
 import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.entity.Role;
@@ -14,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -27,6 +29,10 @@ public class TelegramUserServiceImpl implements TelegramUserService {
 
     @Override
     public User save(User user) {
+        Validate.notNull(user, "User is required to save him)");
+        if (user.getCreated() == null) {
+            user.setCreated(LocalDateTime.now());
+        }
         return userRepository.save(user);
     }
 
@@ -74,7 +80,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
             return null;
         }
 
-        return updateUser(user, contact, message.getChatId(), message.getFrom().getUserName());
+        return activateUser(user, contact, message.getChatId(), message.getFrom().getUserName());
     }
 
     @Override
@@ -88,7 +94,17 @@ public class TelegramUserServiceImpl implements TelegramUserService {
                 .toList();
     }
 
-    private User updateUser(User user, Contact contact, Long chatId, String telegramNickName) {
+    @Override
+    public Optional<User> findByPhone(String phone) {
+        Validate.notBlank(phone, "Phone is required to search by it");
+        String fullFormatPhoneRegex = "^380[0-9]{9}";
+        if (!phone.matches(fullFormatPhoneRegex)) {
+            throw new PhoneFormatException("Wrong phone number format. Allowed 380971112233. Input=%s".formatted(phone));
+        }
+        return Optional.ofNullable(userRepository.findByPhone(phone));
+    }
+
+    private User activateUser(User user, Contact contact, Long chatId, String telegramNickName) {
         user.setChatId(chatId);
         if (StringUtils.isBlank(user.getName())) {
             user.setName(contact.getFirstName());
@@ -101,6 +117,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         }
         user.setTelegramNickname(telegramNickName);
         user.setRoles(Set.of(Role.EMPLOYEE_ROLE));
+        user.setActivated(LocalDateTime.now());
         return save(user);
     }
 }

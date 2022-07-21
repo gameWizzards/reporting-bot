@@ -27,20 +27,21 @@ public enum ButtonValue {
     STATISTIC_START_DIALOG("\uD83D\uDCC8 Статистика"),
     PREVIOUS_MONTH_STATISTIC("Показать за прошлый месяц"),
 
-    // employee statistic dialog
+    // manager employee statistic dialog
     EMPLOYEE_STATISTIC_START_DIALOG("\uD83D\uDCCA Стат. сотрудников"),
     CHOICE_ANOTHER_EMPLOYEE("Выбрать другого сотрудника"),
     LOCK_EDIT_REPORT_DATA("\uD83D\uDD34 Заблокировать период"),
     UNLOCK_EDIT_REPORT_DATA("\uD83D\uDFE2 Открыть доступ"),
 
-    // list users dialog
+    // manager add new user dialog
+    ADD_EMPLOYEE_START_DIALOG("\uD83D\uDC77 Добавить сотрудника"),
+
+    // admin list users dialog
     LIST_USERS_START_DIALOG("\uD83D\uDCCB Список пользователей"),
     USER_STATUS_ACTIVE("Активные"),
     USER_STATUS_NOT_VERIFIED("На верифифкации"),
     USER_STATUS_DELETED("Удаленные"),
 
-    // add new user dialog
-    ADD_NEW_USER_START_DIALOG("Добавить пользователя"),
 
     // general
     YES("Да"),
