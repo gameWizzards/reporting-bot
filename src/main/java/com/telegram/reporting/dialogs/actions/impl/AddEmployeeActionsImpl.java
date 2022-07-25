@@ -29,7 +29,8 @@ public class AddEmployeeActionsImpl implements AddEmployeeActions {
     @Override
     public void requestInputEmployeePhone(StateContext<AddEmployeeState, MessageEvent> context) {
         String message = """
-                Для добавления нового сотрудника введи его номер телефона. Но лучше скопируй и вставь. Это позволит избежать ошибок))
+                Для добавления нового сотрудника введи его номер телефона.
+                Но лучше скопируй и вставь. Это позволит избежать ошибок))
                 Допустимо сокращенное (097...) и полное (+380...) написание""";
         ReplyKeyboardMarkup keyboardMarkup = KeyboardUtils.createKeyboardMarkup(false, KeyboardUtils.createRowButtons(ButtonValue.RETURN_MANAGER_MENU.text(), ButtonValue.RETURN_MAIN_MENU.text()));
         sendBotMessageService.sendMessageWithKeys(new SendMessage(TelegramUtils.currentChatIdString(context), message), keyboardMarkup);

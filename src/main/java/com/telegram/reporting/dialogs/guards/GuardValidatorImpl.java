@@ -139,7 +139,7 @@ public class GuardValidatorImpl implements GuardValidator {
         if (isCorrectPhoneFormat) {
             User user = userService.findByPhone(fullFormatPhone).orElse(null);
             if (user != null) {
-                String userInfo = user.getActivated() != null ? user.getFullName() : "нет имени т.к. пользователь еще не активировал свой аккаунт";
+                String userInfo = user.isActivated() ? user.getFullName() : "нет имени т.к. пользователь еще не авторизировался";
                 String errMessage = """
                 Ты не можешь добавить этот номер т.к. пользователь с таким номером телефона уже существует!
                 Инфо о пользователе:

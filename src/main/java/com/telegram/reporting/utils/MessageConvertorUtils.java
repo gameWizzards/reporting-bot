@@ -3,6 +3,7 @@ package com.telegram.reporting.utils;
 import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Report;
+import com.telegram.reporting.repository.entity.Role;
 import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.repository.entity.User;
 import org.apache.commons.lang3.Validate;
@@ -108,7 +109,10 @@ public class MessageConvertorUtils {
         Long ordinalNumber = 1L;
         StringBuilder listEmployeeMessage = new StringBuilder();
         for (EmployeeTO employeeTO : employeeTOS) {
-            String statusEmployee = employeeTO.isDeleted() ? "Уволен" : "Активный";
+            String statusEmployee = employeeTO.isDeleted() ? "Удаленный" : "Активный";
+            String fullName = employeeTO.isActivated()
+                    ? employeeTO.getFullName()
+                    : "Пользователь еще не авторизировался";
             employeeTO.setOrdinalNumber(ordinalNumber);
 
             listEmployeeMessage.append(ordinalNumber)
@@ -117,10 +121,36 @@ public class MessageConvertorUtils {
                             %s
                             Тел. - +%s
                             Статус - %s
-                            """.formatted(employeeTO.getFullName(), employeeTO.getPhone(), statusEmployee))
+                            """.formatted(fullName, employeeTO.getPhone(), statusEmployee))
                     .append("\n");
             ordinalNumber++;
         }
         return listEmployeeMessage.toString();
+    }
+
+    public static String convert2EmployeeStatusInfoMessage(EmployeeTO employeeTO) {
+        String fullName = employeeTO.isActivated()
+                ? employeeTO.getFullName()
+                : "Пользователь еще не авторизировался";
+        String roles = employeeTO.getRoles().stream()
+                .map(MessageConvertorUtils::convertRole2Text)
+                .collect(Collectors.joining(", "));
+        String status = employeeTO.isDeleted() ? "Удаленный" : "Активный";
+
+        return """
+                %s
+                Тел. - +%s
+                Роли - %s
+                Статус - %s
+                """.formatted(fullName, employeeTO.getPhone(), roles, status);
+    }
+
+    private static String convertRole2Text(Role role) {
+        return switch (role) {
+            case EMPLOYEE_ROLE -> "Сотрудник";
+            case MANAGER_ROLE -> "Менеджер";
+            case ADMIN_ROLE -> "Администратор";
+            default -> "Не найдена, сообщите об ошибке!";
+        };
     }
 }

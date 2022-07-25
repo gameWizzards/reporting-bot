@@ -52,7 +52,7 @@ public class ListUsersActionsImpl implements ListUsersActions {
 
         KeyboardRow buttons = switch (userStatus) {
             case ACTIVE -> KeyboardUtils.createRowButtons(ButtonValue.USER_STATUS_NOT_VERIFIED.text(), ButtonValue.USER_STATUS_DELETED.text());
-            case NOT_VERIFIED -> KeyboardUtils.createRowButtons(ButtonValue.USER_STATUS_ACTIVE.text(), ButtonValue.USER_STATUS_DELETED.text());
+            case ACTIVE_NOT_VERIFIED -> KeyboardUtils.createRowButtons(ButtonValue.USER_STATUS_ACTIVE.text(), ButtonValue.USER_STATUS_DELETED.text());
             case DELETED -> KeyboardUtils.createRowButtons(ButtonValue.USER_STATUS_ACTIVE.text(), ButtonValue.USER_STATUS_NOT_VERIFIED.text());
         };
         List<ButtonValue> menuButtons = List.of(ButtonValue.RETURN_ADMIN_MENU, ButtonValue.RETURN_MAIN_MENU);

@@ -11,6 +11,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class KeyboardUtils {
+    public static final List<ButtonValue> MANAGER_MENU_BUTTONS = List.of(ButtonValue.RETURN_MANAGER_MENU, ButtonValue.RETURN_MAIN_MENU);
+    public static final List<ButtonValue> ADMIN_MENU_BUTTONS = List.of(ButtonValue.RETURN_ADMIN_MENU, ButtonValue.RETURN_MAIN_MENU);
 
     private KeyboardUtils() {
     }

@@ -43,7 +43,7 @@ public class ListUsersStateMachineHandler implements StateMachineHandler {
                 yield MessageEvent.SHOW_ACTIVE_USERS;
             }
             case USER_STATUS_NOT_VERIFIED ->  {
-                variables.put(ContextVariable.USER_STATUS, UserFilter.UserStatus.NOT_VERIFIED);
+                variables.put(ContextVariable.USER_STATUS, UserFilter.UserStatus.ACTIVE_NOT_VERIFIED);
                 yield MessageEvent.SHOW_NOT_VERIFIED_USERS;
             }
             case USER_STATUS_DELETED ->  {

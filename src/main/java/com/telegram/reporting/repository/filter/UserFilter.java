@@ -15,7 +15,7 @@ public record UserFilter(String name, String surname,
 
     public enum UserStatus {
         ACTIVE,
-        NOT_VERIFIED,
+        ACTIVE_NOT_VERIFIED,
         DELETED
     }
 

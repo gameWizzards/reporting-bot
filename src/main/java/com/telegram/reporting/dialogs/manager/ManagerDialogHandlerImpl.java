@@ -25,16 +25,19 @@ public class ManagerDialogHandlerImpl implements DialogHandler, SubDialogHandler
     private final Map<Long, StateMachineHandler> stateMachineHandlers;
     private final StateMachineHandler employeeStatisticHandler;
     private final StateMachineHandler addEmployeeHandler;
+    private final StateMachineHandler employeeStatusHandler;
     private final SendBotMessageService sendBotMessageService;
 
 
     public ManagerDialogHandlerImpl(@Qualifier("EmployeeStatisticStateMachineHandler") StateMachineHandler employeeStatisticHandler,
                                     @Qualifier("AddEmployeeStateMachineHandler") StateMachineHandler addEmployeeHandler,
+                                    @Qualifier("EmployeeStatusStateMachineHandler") StateMachineHandler employeeStatusHandler,
                                     SendBotMessageService sendBotMessageService) {
         stateMachineHandlers = new ConcurrentHashMap<>();
 
         this.employeeStatisticHandler = employeeStatisticHandler;
         this.addEmployeeHandler = addEmployeeHandler;
+        this.employeeStatusHandler = employeeStatusHandler;
 
         this.sendBotMessageService = sendBotMessageService;
     }
@@ -71,6 +74,7 @@ public class ManagerDialogHandlerImpl implements DialogHandler, SubDialogHandler
         StateMachineHandler handler = switch (buttonValue) {
             case EMPLOYEE_STATISTIC_START_DIALOG -> employeeStatisticHandler.initStateMachine(chatId);
             case ADD_EMPLOYEE_START_DIALOG -> addEmployeeHandler.initStateMachine(chatId);
+            case EMPLOYEE_STATUS_START_DIALOG -> employeeStatusHandler.initStateMachine(chatId);
             default -> null;
         };
         stateMachineHandlers.put(chatId, handler);
@@ -111,7 +115,7 @@ public class ManagerDialogHandlerImpl implements DialogHandler, SubDialogHandler
     public List<KeyboardRow> getSubMenuButtons() {
         return List.of(
                 KeyboardUtils.createButton(ButtonValue.EMPLOYEE_STATISTIC_START_DIALOG.text()),
-                KeyboardUtils.createButton(ButtonValue.ADD_EMPLOYEE_START_DIALOG.text()));
+                KeyboardUtils.createRowButtons(ButtonValue.ADD_EMPLOYEE_START_DIALOG.text(), ButtonValue.EMPLOYEE_STATUS_START_DIALOG.text()));
     }
 
     @Override
