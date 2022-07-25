@@ -37,6 +37,8 @@ public class GeneralScheduler {
     public void lockEditReport() {
         log.info("LockEditReport job started");
         Integer offsetMinusMonth = env.getProperty("lockEditReport.offset.minusMonth", Integer.class);
+        Validate.notNull(offsetMinusMonth, "Offset of month from scheduler-props file is required for locking reports to update!");
+
         LocalDate statisticMonth = LocalDate.now().minusMonths(offsetMinusMonth);
         UserFilter filter = UserFilter.builder()
                 .userStatus(UserFilter.UserStatus.ACTIVE, UserFilter.UserStatus.DELETED)
