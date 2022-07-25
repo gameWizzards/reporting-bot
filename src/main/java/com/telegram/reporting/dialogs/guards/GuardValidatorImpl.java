@@ -45,8 +45,19 @@ public class GuardValidatorImpl implements GuardValidator {
         if (userInput.matches(regexDay) || userInput.matches(regexDayMonth) || userInput.matches(regexFullDate)) {
             LocalDate reportDate = DateTimeUtils.convertUserInputToDate(userInput);
             User user = userService.findByChatId(chatId).orElseThrow(() -> new TelegramUserException("Can't find user with chatId =%d".formatted(chatId)));
-            boolean existManipulateReportDataLock = lockService.lockExist(user.getId(), reportDate);
 
+            if (reportDate.isBefore(user.getActivated().toLocalDate())) {
+                String activatedDate = DateTimeUtils.toDefaultFormat(user.getActivated().toLocalDate());
+                String lockMessage = """
+                        %s, ты авторизировался %s. Ты не можешь выбрать дату для создания/удаления/изменения отчетов раньше чем ты авторизировался!
+                        Введи любую дату начиная с %s!фв
+                        """.formatted(user.getName(), activatedDate, activatedDate);
+                sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId.toString(), lockMessage),
+                        KeyboardUtils.createMainMenuButtonMarkup());
+                return false;
+            }
+
+            boolean existManipulateReportDataLock = lockService.lockExist(user.getId(), reportDate);
             if (existManipulateReportDataLock) {
                 String lockMessage = """
                         %s, ты не можешь создавать/удалять/изменять отчеты за %s.
