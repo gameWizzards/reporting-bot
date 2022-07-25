@@ -63,6 +63,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
                 case ACTIVE -> result.addAll(userRepository.findActiveUsers(filter.name(), filter.surname()));
                 case DELETED -> result.addAll(userRepository.findDeletedUsers(filter.name(), filter.surname()));
                 case ACTIVE_NOT_VERIFIED -> result.addAll(userRepository.findActiveNotVerifiedUsers());
+                case DELETED_NOT_VERIFIED -> result.addAll(userRepository.findDeleteNotVerifiedUsers());
             }
         }
 
@@ -108,6 +109,12 @@ public class TelegramUserServiceImpl implements TelegramUserService {
             throw new PhoneFormatException("Wrong phone number format. Allowed 380971112233. Input=%s".formatted(phone));
         }
         return Optional.ofNullable(userRepository.findByPhone(phone));
+    }
+
+    @Override
+    public void removeNotAuthorizedUsers(User user) {
+        Validate.notNull(user, "User is required to delete");
+        userRepository.delete(user);
     }
 
     private User activateUser(User user, Contact contact, Long chatId, String telegramNickName) {

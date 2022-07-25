@@ -15,8 +15,10 @@ public record UserFilter(String name, String surname,
 
     public enum UserStatus {
         ACTIVE,
+        DELETED,
         ACTIVE_NOT_VERIFIED,
-        DELETED
+        DELETED_NOT_VERIFIED,
+
     }
 
     public static class UserFilterBuilder {

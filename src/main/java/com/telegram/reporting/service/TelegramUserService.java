@@ -26,4 +26,6 @@ public interface TelegramUserService {
     List<EmployeeTO> findEmployeesWithExistReportsByMonth(LocalDate statisticMonth);
 
     Optional<User> findByPhone(String phone);
+
+    void removeNotAuthorizedUsers(User user);
 }

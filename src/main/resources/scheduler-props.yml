@@ -2,3 +2,8 @@ lockEditReport:
   cron: "0 0 2 1,11 * *"
   offset:
     minusMonth: 2
+
+removeNotAuthorizedUsers:
+  cron: "0 0 1 * * *"
+  offset:
+    minusDays: 20

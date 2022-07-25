@@ -1,4 +1,4 @@
-# DB configurations:
+# Application configurations:
 spring:
   datasource:
     url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/reporting
