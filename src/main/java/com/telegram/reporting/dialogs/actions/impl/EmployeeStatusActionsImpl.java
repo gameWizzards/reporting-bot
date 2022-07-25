@@ -261,9 +261,8 @@ public class EmployeeStatusActionsImpl implements EmployeeStatusActions {
     public void requestReturnToListEmployees(StateContext<EmployeeStatusState, MessageEvent> context) {
         String message = "Хочешь выбрать другого сотрудника?";
         context.getExtendedState().getVariables().remove(ContextVariable.TARGET_EMPLOYEE_JSON);
-        List<ButtonValue> menuButtons = List.of(ButtonValue.RETURN_MANAGER_MENU, ButtonValue.RETURN_MAIN_MENU);
         sendBotMessageService.sendMessageWithKeys(new SendMessage(TelegramUtils.currentChatIdString(context), message),
-                KeyboardUtils.createKeyboardMarkup(menuButtons, KeyboardUtils.createButton(ButtonValue.CHOICE_ANOTHER_EMPLOYEE.text())));
+                KeyboardUtils.createKeyboardMarkup(KeyboardUtils.MANAGER_MENU_BUTTONS, KeyboardUtils.createButton(ButtonValue.CHOICE_ANOTHER_EMPLOYEE.text())));
 
     }
 
