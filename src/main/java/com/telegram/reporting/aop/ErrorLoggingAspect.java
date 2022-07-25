@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @Aspect
 @Component
-public class StateMachineErrorLoggingAspect {
+public class ErrorLoggingAspect {
 
     private final SendBotMessageService sendBotMessageService;
 
-    public StateMachineErrorLoggingAspect(SendBotMessageService sendBotMessageService) {
+    public ErrorLoggingAspect(SendBotMessageService sendBotMessageService) {
         this.sendBotMessageService = sendBotMessageService;
     }
 
-    @Pointcut("execution(* com.telegram.reporting.service.*.* (..))")
+    @Pointcut("execution(* com.telegram.reporting..* (..))")
     public void servicePackagePointcut() {
     }
 
