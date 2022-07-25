@@ -20,6 +20,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT u FROM User u WHERE u.deleted=false AND u.activated IS NULL")
     List<User> findActiveNotVerifiedUsers();
 
+    @Query(value = "SELECT u FROM User u WHERE u.deleted=true AND u.activated IS NULL")
+    List<User> findDeleteNotVerifiedUsers();
+
     @Query(value = """
             SELECT u FROM User u WHERE (:name is null or u.name=:name) AND (:surname is null or u.surname=:surname)
             AND u.deleted=false AND u.activated IS NOT NULL""")
