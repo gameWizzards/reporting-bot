@@ -57,13 +57,12 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
         String chatId = String.valueOf(TelegramUtils.currentChatId(context));
         String date = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.DATE);
         LocalDate statisticDate = DateTimeUtils.parseDefaultDate(date);
-        List<ButtonValue> menuButtons = List.of(ButtonValue.RETURN_MANAGER_MENU, ButtonValue.RETURN_MAIN_MENU);
         List<EmployeeTO> employeeTOs = userService.findEmployeesWithExistReportsByMonth(statisticDate);
 
         if (employeeTOs.isEmpty()) {
             String message = "За %s ни у одного сотрудника нет отчетов. Попробуй ввести новую дату".formatted(Month.getNameByOrdinal(statisticDate.getMonthValue()));
             sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId, message),
-                    KeyboardUtils.createKeyboardMarkup(menuButtons, KeyboardUtils.createButton(ButtonValue.INPUT_NEW_DATE.text())));
+                    KeyboardUtils.createKeyboardMarkup(KeyboardUtils.MANAGER_MENU_BUTTONS, KeyboardUtils.createButton(ButtonValue.INPUT_NEW_DATE.text())));
             return;
         }
 
@@ -82,7 +81,7 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
         SendMessage sendMessage = new SendMessage(chatId, message);
         KeyboardRow[] buttonsWithRows = KeyboardUtils.createButtonsWithRows(buttons, 10);
 
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(menuButtons, buttonsWithRows));
+        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(KeyboardUtils.MANAGER_MENU_BUTTONS, buttonsWithRows));
 
     }
 
@@ -163,9 +162,8 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
         variables.put(ContextVariable.EXIST_LOCK_EDIT_REPORT, existManipulateReportDataLock);
 
         KeyboardRow rowButtons = KeyboardUtils.createRowButtons(ButtonValue.YES.text(), ButtonValue.NO.text());
-        List<ButtonValue> menuButtons = List.of(ButtonValue.RETURN_MANAGER_MENU, ButtonValue.RETURN_MAIN_MENU);
         sendBotMessageService.sendMessageWithKeys(new SendMessage(TelegramUtils.currentChatIdString(context), message),
-                KeyboardUtils.createKeyboardMarkup(menuButtons, rowButtons));
+                KeyboardUtils.createKeyboardMarkup(KeyboardUtils.MANAGER_MENU_BUTTONS, rowButtons));
     }
 
     @Override
@@ -186,9 +184,8 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
                 ButtonValue.UNLOCK_EDIT_REPORT_DATA : ButtonValue.LOCK_EDIT_REPORT_DATA;
 
         KeyboardRow rowButtons = KeyboardUtils.createRowButtons(changeLockEditReportStatus.text(), ButtonValue.CANCEL.text());
-        List<ButtonValue> menuButtons = List.of(ButtonValue.RETURN_MANAGER_MENU, ButtonValue.RETURN_MAIN_MENU);
         sendBotMessageService.sendMessageWithKeys(new SendMessage(TelegramUtils.currentChatIdString(context), message),
-                KeyboardUtils.createKeyboardMarkup(menuButtons, rowButtons));
+                KeyboardUtils.createKeyboardMarkup(KeyboardUtils.MANAGER_MENU_BUTTONS, rowButtons));
     }
 
     @Override
@@ -225,9 +222,8 @@ public class EmployeeStatisticActionsImpl implements EmployeeStatisticActions {
     @Override
     public void requestReturnToListEmployees(StateContext<EmployeeStatisticState, MessageEvent> context) {
         String message = "Хочешь просмотреть отчеты другого сотрудника?";
-        List<ButtonValue> menuButtons = List.of(ButtonValue.RETURN_MANAGER_MENU, ButtonValue.RETURN_MAIN_MENU);
         sendBotMessageService.sendMessageWithKeys(new SendMessage(TelegramUtils.currentChatIdString(context), message),
-                KeyboardUtils.createKeyboardMarkup(menuButtons, KeyboardUtils.createButton(ButtonValue.CHOICE_ANOTHER_EMPLOYEE.text())));
+                KeyboardUtils.createKeyboardMarkup(KeyboardUtils.MANAGER_MENU_BUTTONS, KeyboardUtils.createButton(ButtonValue.CHOICE_ANOTHER_EMPLOYEE.text())));
 
     }
 }

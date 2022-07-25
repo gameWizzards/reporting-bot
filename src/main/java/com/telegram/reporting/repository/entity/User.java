@@ -59,4 +59,8 @@ public class User {
     public String getFullName() {
         return name + " " + surname;
     }
+
+    public boolean isActivated() {
+        return activated != null;
+    }
 }

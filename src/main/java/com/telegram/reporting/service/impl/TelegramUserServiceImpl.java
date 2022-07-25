@@ -37,6 +37,12 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     }
 
     @Override
+    public Optional<User> findById(Long id) {
+        Validate.notNull(id, "Id is required to find user by it");
+        return userRepository.findById(id);
+    }
+
+    @Override
     public Optional<User> findByChatId(Long chatId) {
         return Optional.ofNullable(userRepository.findByChatId(chatId));
     }
@@ -54,9 +60,9 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         List<User> result = new ArrayList<>();
         for (UserFilter.UserStatus status : filter.userStatus()) {
             switch (status) {
-                case ACTIVE -> result.addAll(userRepository.findUsers(filter.name(), filter.surname(), false));
-                case DELETED -> result.addAll(userRepository.findUsers(filter.name(), filter.surname(), true));
-                case NOT_VERIFIED -> result.addAll(userRepository.findAllNotVerified());
+                case ACTIVE -> result.addAll(userRepository.findActiveUsers(filter.name(), filter.surname()));
+                case DELETED -> result.addAll(userRepository.findDeletedUsers(filter.name(), filter.surname()));
+                case ACTIVE_NOT_VERIFIED -> result.addAll(userRepository.findActiveNotVerifiedUsers());
             }
         }
 

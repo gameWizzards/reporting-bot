@@ -33,8 +33,18 @@ public enum ButtonValue {
     LOCK_EDIT_REPORT_DATA("\uD83D\uDD34 Заблокировать период"),
     UNLOCK_EDIT_REPORT_DATA("\uD83D\uDFE2 Открыть доступ"),
 
-    // manager add new user dialog
+    // manager add new employee dialog
     ADD_EMPLOYEE_START_DIALOG("\uD83D\uDC77 Добавить сотрудника"),
+
+    // manager edit employee status dialog
+    EMPLOYEE_STATUS_START_DIALOG("\uD83D\uDC65 Статус сотрудника"),
+    CHOICE_ANOTHER_LIST_EMPLOYEES("Выбрать другой список"),
+    CHANGE_EMPLOYEE_STATUS("Изменить статус"),
+    CHANGE_EMPLOYEE_ROLE("Изменить роль"),
+    ACTIVATE_EMPLOYEE("\uD83D\uDFE2В активные"),
+    DELETE_EMPLOYEE("\uD83D\uDD34В удаленные"),
+    ADD_MANAGER_ROLE("\uD83D\uDFE2Добавить роль менеджера"),
+    REMOVE_MANAGER_ROLE("\uD83D\uDD34Удалить роль менеджера"),
 
     // admin list users dialog
     LIST_USERS_START_DIALOG("\uD83D\uDCCB Список пользователей"),

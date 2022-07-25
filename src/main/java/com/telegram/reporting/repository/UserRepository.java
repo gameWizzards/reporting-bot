@@ -17,13 +17,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT u FROM User u WHERE u.chatId=?1")
     User findByChatId(Long chatId);
 
-    @Query(value = "SELECT u FROM User u WHERE u.deleted=false AND u.chatId IS NULL")
-    List<User> findAllNotVerified();
+    @Query(value = "SELECT u FROM User u WHERE u.deleted=false AND u.activated IS NULL")
+    List<User> findActiveNotVerifiedUsers();
 
     @Query(value = """
             SELECT u FROM User u WHERE (:name is null or u.name=:name) AND (:surname is null or u.surname=:surname)
-            AND (:deleted is null or u.deleted=:deleted) AND u.chatId IS NOT NULL""")
-    List<User> findUsers(@Param("name") String name, @Param("surname") String surname, @Param("deleted") Boolean deleted);
+            AND u.deleted=false AND u.activated IS NOT NULL""")
+    List<User> findActiveUsers(@Param("name") String name, @Param("surname") String surname);
+
+    @Query(value = """
+            SELECT u FROM User u WHERE (:name is null or u.name=:name) AND (:surname is null or u.surname=:surname)
+            AND u.deleted=true""")
+    List<User> findDeletedUsers(@Param("name") String name, @Param("surname") String surname);
 
     @Query(value = """
             SELECT u FROM User u LEFT JOIN u.reports r WHERE u.chatId IS NOT NULL

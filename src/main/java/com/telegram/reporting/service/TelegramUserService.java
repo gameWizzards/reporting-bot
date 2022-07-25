@@ -13,6 +13,8 @@ public interface TelegramUserService {
 
     User save(User user);
 
+    Optional<User> findById(Long id);
+
     Optional<User> findByChatId(Long chatId);
 
     List<User> findAll();
