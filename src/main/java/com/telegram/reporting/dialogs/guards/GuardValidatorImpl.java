@@ -49,8 +49,8 @@ public class GuardValidatorImpl implements GuardValidator {
             if (reportDate.isBefore(user.getActivated().toLocalDate())) {
                 String activatedDate = DateTimeUtils.toDefaultFormat(user.getActivated().toLocalDate());
                 String lockMessage = """
-                        %s, ты авторизировался %s. Ты не можешь выбрать дату для создания/удаления/изменения отчетов раньше чем ты авторизировался!
-                        Введи любую дату начиная с %s!фв
+                        %s, ты авторизировался в боте %s. Ты не можешь выбрать дату для создания/удаления/изменения отчетов раньше чем ты авторизировался!
+                        Введи любую дату начиная с %s!
                         """.formatted(user.getName(), activatedDate, activatedDate);
                 sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId.toString(), lockMessage),
                         KeyboardUtils.createMainMenuButtonMarkup());
