@@ -54,6 +54,7 @@ public class ListUsersActionsImpl implements ListUsersActions {
             case ACTIVE -> KeyboardUtils.createRowButtons(ButtonValue.USER_STATUS_NOT_VERIFIED.text(), ButtonValue.USER_STATUS_DELETED.text());
             case ACTIVE_NOT_VERIFIED -> KeyboardUtils.createRowButtons(ButtonValue.USER_STATUS_ACTIVE.text(), ButtonValue.USER_STATUS_DELETED.text());
             case DELETED -> KeyboardUtils.createRowButtons(ButtonValue.USER_STATUS_ACTIVE.text(), ButtonValue.USER_STATUS_NOT_VERIFIED.text());
+            default -> null;
         };
         sendBotMessageService.sendMessageWithKeys(new SendMessage(TelegramUtils.currentChatIdString(context), "Показать прользователей других категорий?"),
                 KeyboardUtils.createKeyboardMarkup(KeyboardUtils.ADMIN_MENU_BUTTONS, buttons));
