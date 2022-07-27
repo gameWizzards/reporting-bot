@@ -12,20 +12,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class DateTimeUtilsTest {
     private String expectedErrorMessage;
-    private String validDate = "12.02.2012";
-    private String validDateTime = "12.02.2012 04:35:15";
-
 
     @Test
     void parseDefaultDate_inputValid_success() {
+        var validDate = "12.02.2012";
         var expectedDate = LocalDate.of(2012, 2, 12);
-        var parsedDate = DateTimeUtils.parseDefaultDate(validDate);
-        assertEquals(expectedDate, parsedDate);
+        var actualDate = DateTimeUtils.parseDefaultDate(validDate);
+        assertEquals(expectedDate, actualDate);
     }
 
     @Test
@@ -46,9 +46,10 @@ class DateTimeUtilsTest {
 
     @Test
     void parseDefaultDateTime_inputValid_success() {
+        var validDateTime = "12.02.2012 04:35:15";
         var expectedDateTime = LocalDateTime.of(2012, 2, 12, 4, 35, 15);
-        var parseDateTime = DateTimeUtils.parseDefaultDateTime(validDateTime);
-        assertEquals(expectedDateTime, parseDateTime);
+        var actualDateTime = DateTimeUtils.parseDefaultDateTime(validDateTime);
+        assertEquals(expectedDateTime, actualDateTime);
     }
 
     @Test

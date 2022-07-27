@@ -1,11 +1,20 @@
 package com.telegram.reporting.utils;
 
 import com.telegram.reporting.dialogs.ButtonValue;
+import com.telegram.reporting.repository.dto.TimeRecordTO;
+import com.telegram.reporting.repository.entity.TimeRecord;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class KeyboardUtilsTest {
@@ -111,6 +120,27 @@ class KeyboardUtilsTest {
 
     @Test
     public void createKeyboardMarkup_kulls_provideCustomErrorMessage() {
-
+//        List<String> phones = List.of(
+//                "097 111 22 335",
+//                "0971112233",
+//                "(097) 111 22 33",
+//                "(097)-111-22-33",
+//                "+380 97 1112233",
+//                "+380 (97) 1112233",
+//                "+380 (67)-995-33-65",
+//                "+380 (07)-995-33-65",
+//                "+380971112233");
+//        for (String phone : phones) {
+//
+//
+//        String fullFormatPhoneRegex = "^380[0-9]{9}";
+//        String specSymbolsRegex = "[()\\-+ ]";
+//        String clearedInput = phone.replaceAll(specSymbolsRegex, "");
+//        String fullFormatPhone = !clearedInput.startsWith("3") ? "38" + clearedInput : clearedInput;
+//
+//        if (fullFormatPhone.matches(fullFormatPhoneRegex)) {
+//            System.out.println(fullFormatPhone);
+//        }
+//        }
     }
 }
