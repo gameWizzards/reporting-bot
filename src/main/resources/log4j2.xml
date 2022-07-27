@@ -13,18 +13,17 @@
         <Console name="ConsoleOutput" target="SYSTEM_OUT">
             <PatternLayout
                     pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}  %highlight{%-5p} [%.30C] (%.20t) -> %m%n%wEx"
-                    disableAnsi="false" />
+                    charset="UTF-8"/>
         </Console>
 
         <!-- Setting the filename and logging pattern for log file. Also setting
             up a rolling policy with rolling done daily and when file size is 10MB -->
         <RollingFile name="LogFile"
                      fileName="${LOG_PATH}/${LOG_FILE_NAME}.log"
-                     filePattern="${LOG_PATH}/$${date:yyyy-MM}/${LOG_FILE_NAME}-%d{dd-MMMM-yyyy}-%i.log.gz">
-            <PatternLayout>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%.30C] (%.20t) -> %m%n%wEx
-                </pattern>
-            </PatternLayout>
+                     filePattern="${LOG_PATH}/$${date:yyyy-MM}/%d{yyyy-MM-dd}-${LOG_FILE_NAME}-%i.log.gz">
+            <PatternLayout
+                pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%.30C] (%.20t) -> %m%n%wEx"
+                charset="UTF-8"/>
             <Policies>
                 <OnStartupTriggeringPolicy />
                 <SizeBasedTriggeringPolicy size="10 MB" />
