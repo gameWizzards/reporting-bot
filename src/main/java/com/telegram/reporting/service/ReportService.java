@@ -11,7 +11,7 @@ public interface ReportService {
 
     void delete(Long reportId);
 
-    Report getReport(LocalDate date, Long chatId);
+    Report getReportByDateAndChatId(LocalDate date, Long chatId);
 
     List<Report> getReportsBelongMonth(LocalDate statisticDate, Long chatId);
 

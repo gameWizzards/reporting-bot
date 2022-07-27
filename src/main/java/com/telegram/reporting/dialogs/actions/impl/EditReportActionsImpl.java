@@ -87,7 +87,8 @@ public class EditReportActionsImpl implements EditReportActions {
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecordJson, TimeRecordTO.class);
         String message;
 
-        ButtonValue button = ButtonValue.getByText(buttonValue).orElseThrow(() -> new MismatchButtonValueException("Can't find appropriate enum of ButtonValue with value = %s".formatted(buttonValue)));
+        ButtonValue button = ButtonValue.getByText(buttonValue)
+                .orElseThrow(() -> new MismatchButtonValueException("Can't find appropriate enum of ButtonValue with value = %s".formatted(buttonValue)));
 
         switch (button) {
             case SPEND_TIME -> {
@@ -206,12 +207,11 @@ public class EditReportActionsImpl implements EditReportActions {
         String editTimeRecord = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.TARGET_TIME_RECORD_JSON);
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecord, TimeRecordTO.class);
         TimeRecord timeRecord = timeRecordService.getById(trTO.getId());
+        Category category = categoryService.getCategoryByName(trTO.getCategoryName());
 
         timeRecord.setHours(trTO.getHours());
         timeRecord.setNote(trTO.getNote());
-        Optional<Category> category = categoryService.getByName(trTO.getCategoryName());
-        category.ifPresent(timeRecord::setCategory);
-
+        timeRecord.setCategory(category);
 
         timeRecordService.save(timeRecord);
         context.getExtendedState().getVariables().remove(ContextVariable.TARGET_TIME_RECORD_JSON);

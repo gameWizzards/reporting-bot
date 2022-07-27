@@ -1,6 +1,7 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.exception.PhoneFormatException;
+import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.UserRepository;
 import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.entity.Role;
@@ -16,7 +17,10 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class TelegramUserServiceImpl implements TelegramUserService {
@@ -37,14 +41,17 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        Validate.notNull(id, "Id is required to find user by it");
-        return userRepository.findById(id);
+    public User findById(Long id) {
+        Validate.notNull(id, "UserId is required to find user by it");
+        return userRepository.findById(id)
+                .orElseThrow(() -> new TelegramUserException("Can't find user with id = %s".formatted(id)));
     }
 
     @Override
-    public Optional<User> findByChatId(Long chatId) {
-        return Optional.ofNullable(userRepository.findByChatId(chatId));
+    public User findByChatId(Long chatId) {
+        Validate.notNull(chatId, "ChatId is required to find user by it");
+        return userRepository.findByChatId(chatId)
+                .orElse(null);
     }
 
     @Override
@@ -82,11 +89,10 @@ public class TelegramUserServiceImpl implements TelegramUserService {
             return null;
         }
         Contact contact = message.getContact();
-        User user = userRepository.findByPhone(contact.getPhoneNumber().replaceAll(" ", ""));
-        if (user == null) {
-            return null;
-        }
+        String phone = contact.getPhoneNumber().replaceAll(" ", "");
 
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new TelegramUserException("Can't find user to verify with phone number = %s".formatted(phone)));
         return activateUser(user, contact, message.getChatId(), message.getFrom().getUserName());
     }
 
@@ -102,13 +108,14 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     }
 
     @Override
-    public Optional<User> findByPhone(String phone) {
+    public User findByPhone(String phone) {
         Validate.notBlank(phone, "Phone is required to search by it");
         String fullFormatPhoneRegex = "^380[0-9]{9}";
         if (!phone.matches(fullFormatPhoneRegex)) {
             throw new PhoneFormatException("Wrong phone number format. Allowed 380971112233. Input=%s".formatted(phone));
         }
-        return Optional.ofNullable(userRepository.findByPhone(phone));
+        return userRepository.findByPhone(phone)
+                .orElse(null);
     }
 
     @Override

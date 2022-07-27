@@ -1,5 +1,6 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.exception.MismatchCategoryException;
 import com.telegram.reporting.repository.CategoryRepository;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.service.CategoryService;
@@ -7,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -18,9 +18,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<Category> getByName(String name) {
+    public Category getCategoryByName(String name) {
         Objects.requireNonNull(name, "Can't find category. Param 'name' is required");
-        return Optional.ofNullable(categoryRepository.getByName(name));
+        return categoryRepository.getByName(name)
+                .orElseThrow(() -> new MismatchCategoryException("Can't find category by name = %s".formatted(name)));
     }
 
     @Override

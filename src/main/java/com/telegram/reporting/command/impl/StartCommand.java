@@ -7,15 +7,14 @@ import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.KeyboardUtils;
 import com.telegram.reporting.utils.TelegramUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.Optional;
+import java.util.Objects;
 
-/**
- * Start {@link Command}.
- */
+@Slf4j
 public non-sealed class StartCommand implements Command {
 
     public final static String START_MESSAGE = """
@@ -46,9 +45,11 @@ public non-sealed class StartCommand implements Command {
         message.setChatId(chatId.toString());
         message.setText(START_MESSAGE);
 
-        Optional<User> user = telegramUserService.findByChatId(chatId);
+        User user = telegramUserService.findByChatId(chatId);
 
-        if (user.isEmpty()) {
+        if (Objects.isNull(user)) {
+            log.error("Can't find user by chatId={}. TelegramUser={}", chatId, update.getMessage().getFrom());
+
             KeyboardRow shareContact = KeyboardUtils.createButton(ButtonValue.SHARE_PHONE.text());
             shareContact.get(0).setRequestContact(true);
             sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(false, shareContact));

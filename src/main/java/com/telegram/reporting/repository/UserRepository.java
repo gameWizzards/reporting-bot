@@ -7,15 +7,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT u FROM User u WHERE u.phone=?1")
-    User findByPhone(String phone);
+    Optional<User> findByPhone(String phone);
 
     @Query(value = "SELECT u FROM User u WHERE u.chatId=?1")
-    User findByChatId(Long chatId);
+    Optional<User> findByChatId(Long chatId);
 
     @Query(value = "SELECT u FROM User u WHERE u.deleted=false AND u.activated IS NULL")
     List<User> findActiveNotVerifiedUsers();

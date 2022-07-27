@@ -6,15 +6,22 @@ import com.telegram.reporting.dialogs.Message;
 import com.telegram.reporting.dialogs.MessageEvent;
 import com.telegram.reporting.dialogs.actions.CreateReportActions;
 import com.telegram.reporting.dialogs.general.create_report.CreateReportState;
-import com.telegram.reporting.exception.MismatchCategoryException;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.repository.entity.User;
-import com.telegram.reporting.service.*;
-import com.telegram.reporting.utils.*;
+import com.telegram.reporting.service.CategoryService;
+import com.telegram.reporting.service.ReportService;
+import com.telegram.reporting.service.SendBotMessageService;
+import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.TimeRecordService;
+import com.telegram.reporting.utils.DateTimeUtils;
+import com.telegram.reporting.utils.JsonUtils;
+import com.telegram.reporting.utils.KeyboardUtils;
+import com.telegram.reporting.utils.MessageConvertorUtils;
+import com.telegram.reporting.utils.TelegramUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.statemachine.StateContext;
@@ -129,10 +136,10 @@ public class CreateReportActionsImpl implements CreateReportActions {
         String reportCategoryType = (String) context.getExtendedState().getVariables().get(ContextVariable.REPORT_CATEGORY_TYPE);
 
         String userMessageCategoryAccepted = """
-                        Ты выбрал категорию отчета - "%s". Категория принята.
-                                        
-                        %s
-                        """.formatted(reportCategoryType,
+                Ты выбрал категорию отчета - "%s". Категория принята.
+                                
+                %s
+                """.formatted(reportCategoryType,
                 Message.USER_TIME_INPUT.text());
 
         SendMessage sendMessage = new SendMessage(TelegramUtils.currentChatIdString(context), userMessageCategoryAccepted);
@@ -221,14 +228,16 @@ public class CreateReportActionsImpl implements CreateReportActions {
         String timeRecordJson = (String) variables.get(ContextVariable.TIME_RECORDS_JSON);
         Long chatId = (Long) variables.get(ContextVariable.CHAT_ID);
 
-        Report report = reportService.getReport(DateTimeUtils.parseDefaultDate(date), chatId);
+        Report report = reportService.getReportByDateAndChatId(DateTimeUtils.parseDefaultDate(date), chatId);
 
         if (report == null) {
             report = new Report();
 
-            Optional<User> user = telegramUserService.findByChatId(chatId);
+            User user = Optional.ofNullable(telegramUserService.findByChatId(chatId))
+                    .orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = %s".formatted(chatId)));
+
             report.setDate(DateTimeUtils.parseDefaultDate(date));
-            report.setUser(user.orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = %s".formatted(chatId))));
+            report.setUser(user);
         }
 
         report.setTimeRecords(convertToTimeRecordEntities(timeRecordJson, report));
@@ -248,10 +257,10 @@ public class CreateReportActionsImpl implements CreateReportActions {
         List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);
         List<TimeRecord> entities = new ArrayList<>();
         for (TimeRecordTO trTO : trTOS) {
-            Optional<Category> categoryOptional = categoryService.getByName(trTO.getCategoryName());
+            Category category = categoryService.getCategoryByName(trTO.getCategoryName());
             TimeRecord timeRecord = new TimeRecord(trTO);
             timeRecord.setId(trTO.getId());
-            timeRecord.setCategory(categoryOptional.orElseThrow(() -> new MismatchCategoryException("Can't find category by name = %s".formatted(trTO.getCategoryName()))));
+            timeRecord.setCategory(category);
             timeRecord.setReport(report);
             entities.add(timeRecord);
         }

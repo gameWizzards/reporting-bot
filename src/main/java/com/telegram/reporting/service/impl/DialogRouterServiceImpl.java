@@ -18,7 +18,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -118,15 +123,15 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     }
 
     private User getDialogPrincipalUser(Long chatId) {
-        Optional<User> user = telegramUserService.findByChatId(chatId);
-        if (user.isEmpty() || user.get().isDeleted()) {
-            String reason = user.isEmpty() ? "Твоя учетная запись не найдена" : "Твоя учетная запись удалена";
+        User user = telegramUserService.findByChatId(chatId);
+        if (Objects.isNull(user) || user.isDeleted()) {
+            String reason = user.isDeleted() ? "Твоя учетная запись удалена" : "Твоя учетная запись не найдена";
             sendBotMessageService.sendMessage(chatId, "Похоже у тебя нет доступа к боту. Причина: %s. Свяжись с тем кто может обновить твою учетную запись!".formatted(reason));
             principalUsers.remove(chatId);
             throw new TelegramUserException("User is not available to set his as principal. ChatId: %s. User: %s".formatted(chatId, user));
         }
-        principalUsers.put(chatId, user.get());
-        return user.get();
+        principalUsers.put(chatId, user);
+        return user;
     }
 
     private void removeUnusedHandlers(Long chatId) {

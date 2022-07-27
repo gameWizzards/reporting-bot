@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -44,7 +45,8 @@ public class GuardValidatorImpl implements GuardValidator {
 
         if (userInput.matches(regexDay) || userInput.matches(regexDayMonth) || userInput.matches(regexFullDate)) {
             LocalDate reportDate = DateTimeUtils.convertUserInputToDate(userInput);
-            User user = userService.findByChatId(chatId).orElseThrow(() -> new TelegramUserException("Can't find user with chatId =%d".formatted(chatId)));
+            User user = Optional.ofNullable(userService.findByChatId(chatId))
+                    .orElseThrow(() -> new TelegramUserException("Can't find user with chatId =%d".formatted(chatId)));
 
             if (reportDate.isBefore(user.getActivated().toLocalDate())) {
                 String activatedDate = DateTimeUtils.toDefaultFormat(user.getActivated().toLocalDate());
@@ -148,8 +150,10 @@ public class GuardValidatorImpl implements GuardValidator {
         boolean isCorrectPhoneFormat = fullFormatPhone.matches(fullFormatPhoneRegex);
 
         if (isCorrectPhoneFormat) {
-            User user = userService.findByPhone(fullFormatPhone).orElse(null);
+            User user = userService.findByPhone(fullFormatPhone);
             if (user != null) {
+                log.error("Try to create new user with phone number which already use by user. Phone = {}. Existed user = {}",fullFormatPhone, user);
+
                 String userInfo = user.isActivated() ? user.getFullName() : "нет имени т.к. пользователь еще не авторизировался";
                 String errMessage = """
                 Ты не можешь добавить этот номер т.к. пользователь с таким номером телефона уже существует!

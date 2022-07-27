@@ -177,8 +177,7 @@ public class EmployeeStatusActionsImpl implements EmployeeStatusActions {
 
         ButtonValue buttonValue = ButtonValue.getByText(textButtonValue)
                 .orElseThrow(() -> new MismatchButtonValueException("Can't find button with name=%s".formatted(textButtonValue)));
-        User user = userService.findById(employeeTO.getId())
-                .orElseThrow(() -> new TelegramUserException("Can't find user with id = %s".formatted(employeeTO.getId())));
+        User user = userService.findById(employeeTO.getId());
 
         switch (buttonValue) {
             case ACTIVATE_EMPLOYEE -> user.setDeleted(false);
@@ -229,8 +228,7 @@ public class EmployeeStatusActionsImpl implements EmployeeStatusActions {
 
         ButtonValue buttonValue = ButtonValue.getByText(textButtonValue)
                 .orElseThrow(() -> new MismatchButtonValueException("Can't find button with name=%s".formatted(textButtonValue)));
-        User user = userService.findById(employeeTO.getId())
-                .orElseThrow(() -> new TelegramUserException("Can't find user with id = %s".formatted(employeeTO.getId())));
+        User user = userService.findById(employeeTO.getId());
 
         switch (buttonValue) {
             case ADD_MANAGER_ROLE -> user.getRoles().add(Role.MANAGER_ROLE);

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TimeRecordRepository extends JpaRepository<TimeRecord, Long> {
@@ -23,5 +24,5 @@ public interface TimeRecordRepository extends JpaRepository<TimeRecord, Long> {
     void delete(Long reportId);
 
     @Query(value = "SELECT tr FROM TimeRecord tr WHERE tr.id=?1")
-    TimeRecord getById(Long reportId);
+    Optional<TimeRecord> getTimeRecordById(Long reportId);
 }

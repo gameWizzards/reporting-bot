@@ -13,9 +13,9 @@ public interface TelegramUserService {
 
     User save(User user);
 
-    Optional<User> findById(Long id);
+    User findById(Long id);
 
-    Optional<User> findByChatId(Long chatId);
+    User findByChatId(Long chatId);
 
     List<User> findAll();
 
@@ -25,7 +25,7 @@ public interface TelegramUserService {
 
     List<EmployeeTO> findEmployeesWithExistReportsByMonth(LocalDate statisticMonth);
 
-    Optional<User> findByPhone(String phone);
+    User findByPhone(String phone);
 
     void removeNotAuthorizedUsers(User user);
 }

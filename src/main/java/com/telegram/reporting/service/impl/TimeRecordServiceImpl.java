@@ -7,11 +7,9 @@ import com.telegram.reporting.service.ReportService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,31 +28,23 @@ public class TimeRecordServiceImpl implements TimeRecordService {
 
     @Override
     public TimeRecord getById(Long id) {
-        if (id == null) {
-            return null;
-        }
-        return timeRecordRepository.getById(id);
+        Validate.notNull(id, "Id is required to getting the TimeRecord!");
+        return timeRecordRepository.getTimeRecordById(id)
+                .orElseThrow(() -> new RuntimeException("Can't find timeRecord by id=%s".formatted(id)));
     }
 
     @Override
     public TimeRecord save(TimeRecord timeRecord) {
-        if (timeRecord == null) {
-            return null;
-        }
+        Validate.notNull(timeRecord, "TimeRecord object is required to save it!");
         return timeRecordRepository.saveAndFlush(timeRecord);
     }
 
     @Override
     public List<TimeRecordTO> getTimeRecordTOs(String date, Long chatId) {
-        if (StringUtils.isBlank(date) || chatId == null) {
-            return null;
-        }
+        Validate.notNull(chatId, "ChatId is required to get the TimeRecords!");
+        Validate.notNull(date, "Date is required to get the TimeRecords!");
         LocalDate localDate = DateTimeUtils.parseDefaultDate(date);
         List<TimeRecord> trs = timeRecordRepository.getTimeRecordsByReportDateAndUserChatId(localDate, chatId);
-
-        if (CollectionUtils.isEmpty(trs)) {
-            return null;
-        }
 
         return trs.stream()
                 .map(TimeRecordTO::new)
@@ -65,8 +55,7 @@ public class TimeRecordServiceImpl implements TimeRecordService {
     @Transactional
     public void deleteByTimeRecordTO(TimeRecordTO timeRecordTO) {
         Validate.notNull(timeRecordTO, "Required not null TimeRecordTO object to remove time record");
-        String errorMessage = "Required to have timeRecordId when make remove. %s".formatted(timeRecordTO);
-        Validate.notNull(timeRecordTO.getId(), errorMessage);
+        Validate.notNull(timeRecordTO.getId(), "Required to have timeRecordId when make remove. %s".formatted(timeRecordTO));
 
         long timeRecordCount = timeRecordRepository.countTimeRecordsInReport(timeRecordTO.getReportId());
         boolean isLastElement = timeRecordCount == 1;

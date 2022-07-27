@@ -25,16 +25,16 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void delete(Long id) {
-        Validate.notNull(id, "Required id to make remove.");
+        Validate.notNull(id, "Required reportId to make remove.");
         reportRepository.delete(id);
     }
 
     @Override
-    public Report getReport(LocalDate date, Long chatId) {
-        if (date == null || chatId == null) {
-            throw new NullPointerException("Date and chatId objects are required for get report!");
-        }
-        return reportRepository.getByDate(date, chatId);
+    public Report getReportByDateAndChatId(LocalDate date, Long chatId) {
+        Validate.notNull(chatId, "ChatId is required to get the report!");
+        Validate.notNull(date, "Date is required to get the report!");
+        return reportRepository.getReportByDateAndChatId(date, chatId)
+                .orElse(null);
     }
 
     @Override
