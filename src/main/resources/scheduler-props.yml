@@ -7,3 +7,12 @@ removeNotAuthorizedUsers:
   cron: "0 0 1 * * *"
   offset:
     minusDays: 20
+
+reportRemainder:
+  endWeek:
+    cron: "0 0 19 * * 4"
+    notification: "%s, впереди выходные и работа на заказах, отправь отчеты за работу в будние дни)"
+  afterWeekend:
+    cron: "0 0 11 * * 1"
+    notification: "%s, выходные прошли, не забудь отправить отчеты)"
+  excludeEmployeeByChatId: 666582175,831351389
