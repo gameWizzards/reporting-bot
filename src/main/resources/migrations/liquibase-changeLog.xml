@@ -280,4 +280,23 @@
         />
     </changeSet>
 
+    <changeSet id="create_setting_table" author="cyberdyne_systems">
+        <createTable tableName="setting">
+            <column name="key" type="VARCHAR(255)">
+                <constraints primaryKey="true" primaryKeyName="settings_key_pk" nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql dbms="postgresql">
+            INSERT INTO "public"."setting" (key, value) VALUES
+            ('scheduling.general.lock.edit.report.offset.month', '2'),
+            ('scheduling.general.remove.unauthorized.user.offset.days', '20'),
+            ('scheduling.notification.end.week.remainder.enable', 'true'),
+            ('scheduling.notification.after.weekend.remainder.enable', 'true'),
+            ('scheduling.notification.exclude.employee.chat.ids', '666582175,831351389');
+        </sql>
+    </changeSet>
 </databaseChangeLog>

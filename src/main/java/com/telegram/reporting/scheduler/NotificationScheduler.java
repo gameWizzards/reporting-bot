@@ -3,55 +3,59 @@ package com.telegram.reporting.scheduler;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.SendBotMessageService;
+import com.telegram.reporting.service.SettingService;
 import com.telegram.reporting.service.TelegramUserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @EnableAsync
 @Component
-@PropertySource(value = "classpath:scheduler-props.yml", factory = YamlPropertySourceFactory.class)
+@RequiredArgsConstructor
 public class NotificationScheduler {
 
-    private final Environment env;
+    private final SettingService settingService;
     private final TelegramUserService userService;
     private final SendBotMessageService sendBotMessageService;
 
-    public NotificationScheduler(Environment env, TelegramUserService userService,
-                                 SendBotMessageService sendBotMessageService) {
-        this.env = env;
-        this.userService = userService;
-        this.sendBotMessageService = sendBotMessageService;
-    }
-
-    @Scheduled(cron = "${reportRemainder.endWeek.cron}")
+    @Scheduled(cron = "0 0 19 * * 4")
     public void endWeekReportRemainder() {
-        log.info("Execute EndWeekReportRemainder");
-        String message = Optional.ofNullable(env.getProperty("reportRemainder.endWeek.notification")).orElse("Empty notification (((");
-        executeReminderNotification(message);
+        var isEnable = Boolean.parseBoolean(
+                settingService.getValue("scheduling.notification.end.week.remainder.enable")
+                        .orElse("false"));
+        if (isEnable) {
+            log.info("Execute EndWeekReportRemainder");
+            var message = "%s, впереди выходные и работа на заказах, отправь отчеты за работу в будние дни)";
+            executeReminderNotification(message);
+        }
     }
 
-    @Scheduled(cron = "${reportRemainder.afterWeekend.cron}")
+    @Scheduled(cron = "0 0 11 * * 1")
     public void afterWeekendReportRemainder() {
-        log.info("Execute AfterWeekendReportRemainder");
-        String message = Optional.ofNullable(env.getProperty("reportRemainder.afterWeekend.notification")).orElse("Empty notification (((");
-        executeReminderNotification(message);
+        var isEnable = Boolean.parseBoolean(
+                settingService.getValue("scheduling.notification.after.weekend.remainder.enable")
+                        .orElse("false"));
+        if (isEnable) {
+            log.info("Execute AfterWeekendReportRemainder");
+            var message = "%s, выходные прошли, не забудь отправить отчеты)";
+            executeReminderNotification(message);
+        }
     }
 
-  
     private void executeReminderNotification(String message) {
         StringBuilder listChatIdsLogging = new StringBuilder();
-        String excludeEmployeeByChatIds = Optional.ofNullable(env.getProperty("reportRemainder.excludeEmployeeByChatId")).orElse("Empty notification (((");
-        List<Long> excludeChatIds = Arrays.stream(excludeEmployeeByChatIds.split(",")).mapToLong(Long::parseLong).boxed().toList();
-        
+        String excludeEmployeeByChatIds = settingService.getValue("scheduling.notification.exclude.employee.chat.ids").orElse("");
+        List<Long> excludeChatIds = Arrays.stream(excludeEmployeeByChatIds.split(","))
+                .mapToLong(Long::parseLong)
+                .boxed()
+                .toList();
+
         UserFilter filter = UserFilter.builder()
                 .userStatus(UserFilter.UserStatus.ACTIVE)
                 .build();
