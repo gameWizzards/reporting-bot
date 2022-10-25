@@ -107,7 +107,7 @@ public class GeneralActionsImpl implements GeneralActions {
     public <S, E> void handleUserDateInput(StateContext<S, E> context) {
         String userInput = (String) context.getExtendedState().getVariables().get(ContextVariable.DATE);
 
-        LocalDate reportDate = DateTimeUtils.convertUserInputToDate(userInput);
+        LocalDate reportDate = DateTimeUtils.parseShortDateToLocalDate(userInput);
 
         String formattedReportDate = DateTimeUtils.toDefaultFormat(reportDate);
         sendBotMessageService.sendMessage(TelegramUtils.currentChatId(context), "Дата принята = %s".formatted(formattedReportDate));

@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DateTimeUtils {
+public final class DateTimeUtils {
     public static final String DEFAULT_DATE_FORMAT = "dd.MM.yyyy";
     public static final String DEFAULT_DATE_TIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
     public static final String DEFAULT_DATE_PATTERN = "(\\d{2})\\.(\\d{2})\\.(\\d{4})";
@@ -39,10 +39,10 @@ public class DateTimeUtils {
         return dateTime.format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT));
     }
 
-    public static LocalDate convertUserInputToDate(String userInput) {
+    public static LocalDate parseShortDateToLocalDate(String shortDate) {
         final LocalDate localDate = LocalDate.now();
         //handle user input to date
-        Integer[] parsedDate = parseUserInput(userInput);
+        Integer[] parsedDate = parseUserDateInput(shortDate);
         return switch (parsedDate.length) {
             case 1 -> LocalDate.of(localDate.getYear(), localDate.getMonth(), parsedDate[0]);
             case 2 -> LocalDate.of(localDate.getYear(), parsedDate[1], parsedDate[0]);
@@ -51,7 +51,15 @@ public class DateTimeUtils {
         };
     }
 
-    private static Integer[] parseUserInput(String userInput) {
+    public static boolean isBelongToPeriod(LocalDate checkedDate, LocalDate startPeriod, LocalDate finishPeriod) {
+        if (Objects.isNull(checkedDate) || Objects.isNull(startPeriod) || Objects.isNull(finishPeriod)) {
+            return false;
+        }
+        return (checkedDate.isEqual(startPeriod) || checkedDate.isAfter(startPeriod))
+                && (checkedDate.isEqual(finishPeriod) || checkedDate.isBefore(finishPeriod));
+    }
+
+    private static Integer[] parseUserDateInput(String userInput) {
         String[] date = userInput
                 .replaceAll("\\D+", "-")
                 .split("-");

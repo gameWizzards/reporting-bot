@@ -44,7 +44,7 @@ public class GuardValidatorImpl implements GuardValidator {
         String userInput = TelegramUtils.getContextVariableValueAsString(context, ContextVariable.DATE);
 
         if (userInput.matches(regexDay) || userInput.matches(regexDayMonth) || userInput.matches(regexFullDate)) {
-            LocalDate reportDate = DateTimeUtils.convertUserInputToDate(userInput);
+            LocalDate reportDate = DateTimeUtils.parseShortDateToLocalDate(userInput);
             User user = Optional.ofNullable(userService.findByChatId(chatId))
                     .orElseThrow(() -> new TelegramUserException("Can't find user with chatId =%d".formatted(chatId)));
 

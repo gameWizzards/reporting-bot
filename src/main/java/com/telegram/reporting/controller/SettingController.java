@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -30,7 +30,7 @@ public class SettingController {
     @GetMapping
     public SettingTO getSetting(@Valid @RequestParam("key") @NotBlank(message = "Request param 'key' must not be blank") String key) {
         Optional<String> value = settingService.getValue(key);
-        return new SettingTO(key, value.orElseThrow(() -> new NotFoundException("Setting not found by key - '%s'".formatted(key))));
+        return new SettingTO(key, value.orElseThrow(() -> new NoSuchElementException("Setting not found by key - '%s'".formatted(key))));
     }
 
     @GetMapping("/all")

@@ -1,6 +1,7 @@
 
 package com.telegram.reporting.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.NotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ControllerAdvice
 public class ExceptionMapper extends ResponseEntityExceptionHandler {
 
@@ -40,8 +42,8 @@ public class ExceptionMapper extends ResponseEntityExceptionHandler {
         return createResponse(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Object> handleNotFoundException(NotFoundException ex, NativeWebRequest request) {
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Object> handleNotFoundException(NoSuchElementException ex, NativeWebRequest request) {
         HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
         String method = "%s - %s".formatted(servletRequest.getMethod(), servletRequest.getServletPath());
 
@@ -52,6 +54,7 @@ public class ExceptionMapper extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> createResponse(Map<String, String> errors, HttpStatus statusCode) {
         Map<String, Map<String, String>> body = new HashMap<>();
+        log.error("Error in REST API. Errors - '{}'. StatusCode - {}", errors, statusCode);
         body.put("errors", errors);
         return new ResponseEntity<>(body, statusCode);
     }

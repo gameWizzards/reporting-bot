@@ -299,4 +299,16 @@
             ('scheduling.notification.exclude.employee.chat.ids', '666582175,831351389');
         </sql>
     </changeSet>
+
+    <changeSet id="add_period_notifications_setting" author="cyberdyne_systems">
+        <sql dbms="postgresql">
+            INSERT INTO "public"."setting" (key, value) VALUES
+            ('scheduling.notification.start.report.reminder','1.03'),
+            ('scheduling.notification.finish.report.reminder','1.11');
+
+            DELETE FROM "public"."setting"
+            WHERE "key"='scheduling.notification.end.week.remainder.enable'
+            OR "key"='scheduling.notification.after.weekend.remainder.enable';
+        </sql>
+    </changeSet>
 </databaseChangeLog>
