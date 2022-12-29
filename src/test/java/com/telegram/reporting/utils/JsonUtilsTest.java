@@ -37,7 +37,7 @@ class JsonUtilsTest {
         timeRecordTO.setNote(timeRecordNote);
         timeRecordTO.setHours(2);
         timeRecordTO.setCreated(LocalDateTime.now());
-        timeRecordTO.setCategoryName("Category name");
+        timeRecordTO.setCategoryNameKey("Category name");
 
         var json = JsonUtils.serializeItem(timeRecordTO);
 
