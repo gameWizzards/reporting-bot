@@ -7,6 +7,7 @@ import com.telegram.reporting.exception.JsonUtilsException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
@@ -15,7 +16,7 @@ public class JsonUtils {
 
     public static String serializeItem(Object item) {
         try {
-            if (item == null) {
+            if (Objects.isNull(item)) {
                 throw new NullPointerException("Can't serialize NULL");
             }
 
@@ -49,7 +50,7 @@ public class JsonUtils {
         if (StringUtils.isBlank(json)) {
             throw new NullPointerException("Can't deserialize json without value");
         }
-        if (clazz == null) {
+        if (Objects.isNull(clazz)) {
             throw new NullPointerException("Can't deserialize json without class type. Json: %s".formatted(json));
         }
     }

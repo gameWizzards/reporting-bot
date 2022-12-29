@@ -21,10 +21,12 @@ public class Category {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "name_key")
+    private String nameKey;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "description_key")
+    private String descriptionKey;
 
+    @Column(name = "deleted")
+    private boolean deleted;
 }

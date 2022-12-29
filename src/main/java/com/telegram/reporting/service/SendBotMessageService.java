@@ -13,5 +13,7 @@ public interface SendBotMessageService {
     void sendMessage(String chatId, String message);
 
     void sendLink2UserChat(Long chatId, EmployeeTO employee);
+    // TODO remove after some time when all old based dialogs migrate to new button's schema
+    void removeReplyKeyboard (Long chatId, String message);
 
 }

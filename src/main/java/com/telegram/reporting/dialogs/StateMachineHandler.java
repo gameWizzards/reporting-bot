@@ -1,10 +1,11 @@
 package com.telegram.reporting.dialogs;
 
 public interface StateMachineHandler {
-
-    void handleMessage(Long chatId, ButtonValue buttonValue);
+    void handleButtonClick(Long chatId, ButtonLabelKey buttonLabelKey);
 
     void handleUserInput(Long chatId, String userInput);
 
     StateMachineHandler initStateMachine(Long chatId);
+
+    void removeDialogData(Long chatId);
 }

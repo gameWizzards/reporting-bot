@@ -13,14 +13,14 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode()
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TimeRecordTO implements Serializable, Ordinal{
+public class TimeRecordTO implements Serializable, Ordinal {
 
     private Long id;
     private Long ordinalNumber;
     private Long reportId;
     private Integer hours;
     private String note;
-    private String categoryName;
+    private String categoryNameKey;
 
     @JsonFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT)
     private LocalDateTime created;
@@ -33,7 +33,7 @@ public class TimeRecordTO implements Serializable, Ordinal{
         this.reportId = timeRecord.getReport().getId();
         this.hours = timeRecord.getHours();
         this.note = timeRecord.getNote();
-        this.categoryName = timeRecord.getCategory().getName();
+        this.categoryNameKey = timeRecord.getCategory().getNameKey();
         this.created = timeRecord.getCreated();
     }
 

@@ -1,18 +1,16 @@
 package com.telegram.reporting.bot;
 
-import com.telegram.reporting.command.CommandContainer;
-import com.telegram.reporting.exception.TelegramUserException;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.bot.command.CommandContainer;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
-import com.telegram.reporting.utils.TelegramUtils;
+import com.telegram.reporting.utils.CommonUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+@Slf4j
 @Component
 public class ReportingTelegramBot extends TelegramLongPollingBot {
 
@@ -22,38 +20,20 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
     private String token;
 
     private final DialogRouterService dialogRouterService;
-    private final SendBotMessageService sendBotMessageService;
-    private final TelegramUserService telegramUserService;
     private final CommandContainer commandContainer;
 
-    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService, @Lazy SendBotMessageService sendBotMessageService,
-                                TelegramUserService telegramUserService, CommandContainer commandContainer) {
+    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService, CommandContainer commandContainer) {
         this.dialogRouterService = dialogRouterService;
-        this.sendBotMessageService = sendBotMessageService;
-        this.telegramUserService = telegramUserService;
         this.commandContainer = commandContainer;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.getMessage().hasContact()) {
-            User user = telegramUserService.verifyContact(update.getMessage());
-            if (user == null) {
-                sendBotMessageService.sendMessage(TelegramUtils.currentChatId(update), "Кажеться твой номер не добавили в список разрешенных. Свяжись с тем кто может добавить твой номер в White list!");
-                throw new TelegramUserException("This user is not registered yet! Phone = +%s. ChatId = %s.".formatted(update.getMessage().getContact().getPhoneNumber(), TelegramUtils.currentChatId(update)));
-            }
-            dialogRouterService.startFlow(user.getChatId());
+        if (CommonUtils.hasMessageText(update) && CommonUtils.isTelegramCommand(update)) {
+            commandContainer.findCommand(CommonUtils.getMessageText(update)).execute(update);
             return;
         }
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            String message = TelegramUtils.getMessage(update);
-
-            if (message.startsWith(TelegramUtils.COMMAND_PREFIX)) {
-                commandContainer.findCommand(TelegramUtils.getCommandIdentifier(message), update.getMessage().getFrom().getUserName()).execute(update);
-            } else {
-                dialogRouterService.handleTelegramUpdateEvent(update);
-            }
-        }
+        dialogRouterService.handleTelegramUpdateEvent(update);
     }
 
     @Override

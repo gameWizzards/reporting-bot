@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Validated
 @RestController
 @RequestMapping("/settings")
 @RequiredArgsConstructor
-@Validated
 public class SettingController {
 
     private final SettingService settingService;

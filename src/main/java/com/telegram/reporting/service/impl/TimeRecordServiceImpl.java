@@ -2,29 +2,32 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.repository.TimeRecordRepository;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
+import com.telegram.reporting.repository.entity.Category;
+import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.repository.entity.TimeRecord;
+import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.ReportService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.DateTimeUtils;
+import com.telegram.reporting.utils.JsonUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TimeRecordServiceImpl implements TimeRecordService {
     private final TimeRecordRepository timeRecordRepository;
     private final ReportService reportService;
+    private final CategoryService categoryService;
 
-    public TimeRecordServiceImpl(TimeRecordRepository timeRecordRepository,
-                                 ReportService reportService) {
-        this.timeRecordRepository = timeRecordRepository;
-        this.reportService = reportService;
-    }
 
     @Override
     public TimeRecord getById(Long id) {
@@ -66,5 +69,20 @@ public class TimeRecordServiceImpl implements TimeRecordService {
         }
 
         timeRecordRepository.delete(timeRecordTO.getId());
+    }
+
+    @Override
+    public List<TimeRecord> convertToTimeRecordEntities(String timeRecordJson, Report report) {
+        List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);
+        List<TimeRecord> entities = new ArrayList<>();
+        for (TimeRecordTO trTO : trTOS) {
+            Category category = categoryService.getCategoryByName(trTO.getCategoryNameKey());
+            TimeRecord timeRecord = new TimeRecord(trTO);
+            timeRecord.setId(trTO.getId());
+            timeRecord.setCategory(category);
+            timeRecord.setReport(report);
+            entities.add(timeRecord);
+        }
+        return entities;
     }
 }

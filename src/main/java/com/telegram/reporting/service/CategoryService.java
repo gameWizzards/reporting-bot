@@ -6,7 +6,15 @@ import java.util.List;
 
 public interface CategoryService {
 
+    Category findById(Long id);
+
+    List<Category> getAll(boolean includeDeleted);
+
     Category getCategoryByName(String name);
 
-    List<Category> getAll();
+    boolean isCategory(String name);
+
+    Category update(Category category);
+
+    void delete(Long id);
 }

@@ -1,5 +1,6 @@
 package com.telegram.reporting.repository.entity;
 
+import com.telegram.reporting.utils.LocaleConverter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -7,6 +8,7 @@ import lombok.ToString;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,6 +22,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -69,11 +73,15 @@ public class User {
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Report> reports;
 
+    @Column(name = "locale")
+    @Convert(converter = LocaleConverter.class)
+    private Locale locale;
+
     public String getFullName() {
         return name + " " + surname;
     }
 
     public boolean isActivated() {
-        return activated != null;
+        return Objects.nonNull(activated);
     }
 }

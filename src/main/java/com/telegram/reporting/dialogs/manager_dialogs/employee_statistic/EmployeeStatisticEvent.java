@@ -1,0 +1,12 @@
+package com.telegram.reporting.dialogs.manager_dialogs.employee_statistic;
+
+public enum EmployeeStatisticEvent {
+    RUN_EMPLOYEE_STATISTIC_DIALOG,
+    VALIDATE_USER_MONTH_INPUT,
+    RETURN_TO_USER_DATE_INPUTTING,
+    CHOOSE_EMPLOYEE,
+    CHOOSE_ANOTHER_EMPLOYEE,
+    CONFIRM_CHANGE_LOCK_REPORT_STATUS,
+    DECLINE_CHANGE_LOCK_REPORT_STATUS,
+    HANDLE_LOCK_REPORT_DATA_TO_EDIT,
+}

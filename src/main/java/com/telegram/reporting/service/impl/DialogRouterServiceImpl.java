@@ -1,26 +1,30 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.dialogs.ButtonValue;
+import com.telegram.reporting.dialogs.ButtonLabelKey;
 import com.telegram.reporting.dialogs.DialogHandler;
-import com.telegram.reporting.dialogs.Message;
+import com.telegram.reporting.dialogs.MessageKey;
 import com.telegram.reporting.dialogs.SubDialogHandler;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
+import com.telegram.reporting.service.I18nButtonService;
+import com.telegram.reporting.service.I18nMessageService;
+import com.telegram.reporting.service.RuntimeDialogManager;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
-import com.telegram.reporting.utils.KeyboardUtils;
-import com.telegram.reporting.utils.TelegramUtils;
+import com.telegram.reporting.utils.CommonUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,132 +32,158 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DialogRouterServiceImpl implements DialogRouterService {
 
-    private final Map<Long, DialogHandler> dialogHandlers;
-    private final Map<Long, User> principalUsers;
+    private final Map<Long, DialogHandler> activeDialogHandlers = new ConcurrentHashMap<>();
+    // TODO consider to have opportunity disable some dialog handlers by bean condition or through interface boolean method
+    // TODO Also change to Strategy pattern
+    // TODO Change impl to dialog and sub-dialogs
     private final List<DialogHandler> existingDialogHandlers;
-
-    private final DialogHandler generalDialogHandler;
-    private final DialogHandler managerDialogHandler;
-    private final DialogHandler adminDialogHandler;
 
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
-
-    public DialogRouterServiceImpl(@Qualifier("GeneralDialogHandler") DialogHandler generalDialogHandler,
-                                   @Qualifier("ManagerDialogHandler") DialogHandler managerDialogHandler,
-                                   @Qualifier("AdminDialogHandler") DialogHandler adminDialogHandler,
-                                   SendBotMessageService sendBotMessageService, TelegramUserService telegramUserService) {
-
-        this.generalDialogHandler = generalDialogHandler;
-        this.managerDialogHandler = managerDialogHandler;
-        this.adminDialogHandler = adminDialogHandler;
-
-        this.sendBotMessageService = sendBotMessageService;
-        this.telegramUserService = telegramUserService;
-
-        existingDialogHandlers = List.of(generalDialogHandler, managerDialogHandler, adminDialogHandler);
-        dialogHandlers = new ConcurrentHashMap<>();
-        principalUsers = new ConcurrentHashMap<>();
-    }
+    private final RuntimeDialogManager runtimeDialogManager;
+    private final I18nMessageService i18NMessageService;
+    private final I18nButtonService i18nButtonService;
 
     @Override
     public void handleTelegramUpdateEvent(Update update) {
-        String input = TelegramUtils.getMessage(update);
-        Long chatId = TelegramUtils.currentChatId(update);
+        Long chatId = CommonUtils.currentChatId(update);
 
-        Optional<ButtonValue> optionalButtonValue = ButtonValue.getByText(input);
+        // handle simple button, contact sharing, Message exists
+        if (CommonUtils.hasContact(update)) {
+            sendBotMessageService.removeReplyKeyboard(chatId, i18NMessageService.getMessage(chatId, MessageKey.PD_SUCCESS_CONTACT_SHARING));
+            try {
+                User user = telegramUserService.verifyContact(update.getMessage());
+                startFlow(user.getChatId(), user.getLocale());
 
-        if (optionalButtonValue.isPresent()) {
-            ButtonValue buttonValue = optionalButtonValue.get();
+            } catch (TelegramUserException e) {
+                log.error("Can't verify contact! Reason: {}", e.getMessage(), e);
+                sendBotMessageService.sendMessage(chatId, i18NMessageService.getMessage(chatId, MessageKey.PD_FAILED_CONTACT_CHECKING));
+            }
+            return;
+        }
+
+        // TODO add checking to prevent access to dialog when Role was removed
+        //  (Bag example - if remove role Manager and click to old button then Manager menu start)
+        Locale principalUserLocale = runtimeDialogManager.getPrincipalUserLocale(chatId);
+        // handle InlineMarkup button, Callback exists or user input
+        if (CommonUtils.isInlineCallbackButton(update)) {
+            String buttonCallbackData = CommonUtils.getButtonCallbackData(update);
+            ButtonLabelKey buttonLabelKey = ButtonLabelKey.getByKey(buttonCallbackData);
+
+            // handle dynamic ordinal buttons which don't have mapping on ButtonLabelKey
+            if (Objects.isNull(buttonLabelKey) && CommonUtils.isDynamicOrdinalInlineButton(buttonCallbackData)) {
+                activeDialogHandlers.get(chatId).handleTelegramUserInput(chatId, buttonCallbackData);
+                return;
+            }
 
             // return to root menu when click 'main menu' button
-            if (ButtonValue.RETURN_MAIN_MENU.equals(buttonValue)) {
-                startFlow(chatId);
+            if (ButtonLabelKey.COMMON_RETURN_MAIN_MENU.equals(buttonLabelKey)) {
+                startFlow(chatId, principalUserLocale);
                 return;
             }
 
             // bind handlers when buttonValue contains name of particular dialog
             // if user doesn't exist go to startFlow on next condition
-            if (!dialogHandlers.containsKey(chatId) && principalUsers.get(chatId) != null && !principalUsers.get(chatId).isDeleted()) {
-                bindDialogHandler(chatId, buttonValue);
+            if (!activeDialogHandlers.containsKey(chatId) && isAllowStartDialog(chatId)) {
+                bindDialogHandler(chatId, buttonLabelKey);
             }
 
+            // TODO refactor this case!! It's not necessary to have only this option
             // when dialog in telegram remained on some step (different from starter) with buttons but app was reloaded
             // that means that there is no handler for the dialog - start from root menu
-            if (!dialogHandlers.containsKey(chatId)) {
-                sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
-                startFlow(chatId);
+            if (!activeDialogHandlers.containsKey(chatId)) {
+                sendBotMessageService.sendMessage(chatId,
+                        i18NMessageService.getMessage(chatId, MessageKey.COMMON_WARNING_SOMETHING_GOING_WRONG));
+                startFlow(chatId, principalUserLocale);
                 return;
             }
-        }
 
-        // when dialog in telegram remain on some step with user input but app was reloaded
-        // that means that is no handler for the dialog - start from root menu
-        if (!dialogHandlers.containsKey(chatId)) {
-            sendBotMessageService.sendMessage(chatId, Message.GENERAL_ERROR_MESSAGE.text());
-            startFlow(chatId);
+            activeDialogHandlers.get(chatId).handleInlineButtonInput(chatId, buttonLabelKey);
             return;
         }
-        dialogHandlers.get(chatId).handleTelegramInput(chatId, input);
+
+        //TODO refactor this case!! It's not necessary to have only this option
+        // when dialog in telegram remain on some step with user input but app was reloaded
+        // that means that is no handler for the dialog - start from root menu
+        if (!activeDialogHandlers.containsKey(chatId)) {
+            log.error("Can't find appropriate active handler to chat [{}].", chatId);
+            sendBotMessageService.sendMessage(chatId,
+                    i18NMessageService.getMessage(chatId, MessageKey.COMMON_WARNING_SOMETHING_GOING_WRONG));
+            startFlow(chatId, principalUserLocale);
+            return;
+        }
+
+        String input = CommonUtils.getMessageText(update);
+        activeDialogHandlers.get(chatId).handleTelegramUserInput(chatId, input);
     }
 
     @Override
-    public void startFlow(Long chatId) {
-        removeUnusedHandlers(chatId);
+    @SuppressWarnings("unchecked")
+    public void startFlow(Long chatId, Locale locale) {
+        removeDialogRelatedData(chatId);
         User user = getDialogPrincipalUser(chatId);
 
-        final String startFlowMessage = """
-                Окей %s.
-                Выбери диалог.
-                """.formatted(user.getName());
+        final String startFlowMessage = i18NMessageService.getMessage(
+                chatId,
+                MessageKey.PD_START_FLOW_MESSAGE,
+                user.getName());
 
-        KeyboardRow[] keyboardRows = existingDialogHandlers.stream()
-                .filter(handler -> checkDialogAccessibility(handler, user))
+        List<List<InlineKeyboardButton>> buttonRows = existingDialogHandlers.stream()
+                .filter(handler -> CommonUtils.hasAccess(handler, user))
+                .sorted(Comparator.comparing(DialogHandler::displayOrder))
                 .map(DialogHandler::getRootMenuButtons)
                 .flatMap(Collection::stream)
-                .toArray(KeyboardRow[]::new);
+                .map(labelKeys -> i18nButtonService.createInlineButtonRows(chatId, labelKeys))
+                .flatMap(Collection::stream)
+                .toList();
+
         SendMessage sendMessage = new SendMessage(chatId.toString(), startFlowMessage);
-        sendBotMessageService.sendMessageWithKeys(sendMessage, KeyboardUtils.createKeyboardMarkup(false, keyboardRows));
+        sendBotMessageService.sendMessageWithKeys(sendMessage, new InlineKeyboardMarkup(buttonRows));
     }
 
-    private boolean checkDialogAccessibility(DialogHandler handler, User user) {
-        return !Collections.disjoint(handler.roleAccessibility(), user.getRoles());
+
+    private boolean isAllowStartDialog(Long chatId) {
+        return runtimeDialogManager.containsPrincipalUser(chatId)
+                && !runtimeDialogManager.getPrincipalUser(chatId).isDeleted();
     }
 
     private User getDialogPrincipalUser(Long chatId) {
         User user = telegramUserService.findByChatId(chatId);
         if (Objects.isNull(user) || user.isDeleted()) {
-            String reason = user.isDeleted() ? "Твоя учетная запись удалена" : "Твоя учетная запись не найдена";
-            sendBotMessageService.sendMessage(chatId, "Похоже у тебя нет доступа к боту. Причина: %s. Свяжись с тем кто может обновить твою учетную запись!".formatted(reason));
-            principalUsers.remove(chatId);
+            String reason = Objects.isNull(user)
+                    ? i18NMessageService.getMessage(chatId, MessageKey.PD_ACCOUNT_NOT_FOUND)
+                    : i18NMessageService.getMessage(chatId, MessageKey.PD_ACCOUNT_DELETED);
+
+            sendBotMessageService.sendMessage(chatId,
+                    i18NMessageService.getMessage(chatId, MessageKey.PD_FAILED_ACCOUNT_CHECKING, reason));
+
+            runtimeDialogManager.removePrincipalUser(chatId);
             throw new TelegramUserException("User is not available to set his as principal. ChatId: %s. User: %s".formatted(chatId, user));
         }
-        principalUsers.put(chatId, user);
+
+        runtimeDialogManager.addPrincipalUser(chatId, user);
         return user;
     }
 
-    private void removeUnusedHandlers(Long chatId) {
-        Optional<DialogHandler> optionalHandler = Optional.ofNullable(dialogHandlers.get(chatId));
-        optionalHandler.ifPresent(handler -> handler.removeStateMachineHandler(chatId));
-        dialogHandlers.remove(chatId);
+    private void removeDialogRelatedData(Long chatId) {
+        runtimeDialogManager.removePrincipalUser(chatId);
+        Optional.ofNullable(activeDialogHandlers.remove(chatId))
+                .ifPresent(handler -> handler.removeStateMachineHandler(chatId));
     }
 
-    private void bindDialogHandler(Long chatId, ButtonValue buttonValue) {
-        if (generalDialogHandler.belongToDialogStarter(buttonValue)) {
-            generalDialogHandler.createStateMachineHandler(chatId, buttonValue);
-            dialogHandlers.put(chatId, generalDialogHandler);
-            return;
-        }
-        if (managerDialogHandler.belongToDialogStarter(buttonValue)) {
-            dialogHandlers.put(chatId, managerDialogHandler);
-            ((SubDialogHandler) managerDialogHandler).startSubDialogFlow(chatId);
-            return;
-        }
-        if (adminDialogHandler.belongToDialogStarter(buttonValue)) {
-            dialogHandlers.put(chatId, adminDialogHandler);
-            ((SubDialogHandler) adminDialogHandler).startSubDialogFlow(chatId);
-        }
+    private void bindDialogHandler(Long chatId, ButtonLabelKey buttonLabelKey) {
+        existingDialogHandlers.stream()
+                .filter(handler -> handler.belongToDialogStarter(buttonLabelKey))
+                .forEach(dialogHandler -> {
+                    if (dialogHandler instanceof SubDialogHandler) {
+                        ((SubDialogHandler) dialogHandler).startSubDialogFlow(chatId);
+                    } else {
+                        dialogHandler.createStateMachineHandler(chatId, buttonLabelKey);
+                    }
+                    activeDialogHandlers.put(chatId, dialogHandler);
+                });
     }
 }

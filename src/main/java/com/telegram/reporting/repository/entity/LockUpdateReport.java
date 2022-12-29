@@ -21,7 +21,7 @@ public class LockUpdateReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
+    //TODO change to mapping
     @Column(name = "user_id", nullable = false)
     private Long userId;
 

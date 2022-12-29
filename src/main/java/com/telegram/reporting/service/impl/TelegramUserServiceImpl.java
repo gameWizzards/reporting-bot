@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -34,7 +35,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     @Override
     public User save(User user) {
         Validate.notNull(user, "User is required to save him)");
-        if (user.getCreated() == null) {
+        if (Objects.isNull(user.getCreated())) {
             user.setCreated(LocalDateTime.now());
         }
         return userRepository.save(user);
@@ -76,23 +77,22 @@ public class TelegramUserServiceImpl implements TelegramUserService {
 
         if (!CollectionUtils.isEmpty(filter.roles())) {
             return result.stream()
-                    .filter(res -> !Collections.disjoint(res.getRoles(), filter.roles()))
+                    .filter(user -> containsRoleInFilter(user, filter))
                     .toList();
         }
-
         return result;
     }
 
     @Override
     public User verifyContact(Message message) {
-        if (message == null || message.getContact() == null) {
+        if (Objects.isNull(message) || Objects.isNull(message.getContact())) {
             return null;
         }
         Contact contact = message.getContact();
         String phone = contact.getPhoneNumber().replaceAll(" ", "");
 
         User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new TelegramUserException("Can't find user to verify with phone number = %s".formatted(phone)));
+                .orElseThrow(() -> new TelegramUserException("User with phone number [%s] is not registered yet! ChatId = %s.".formatted(phone, message.getChatId())));
         return activateUser(user, contact, message.getChatId(), message.getFrom().getUserName());
     }
 
@@ -139,5 +139,9 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         user.setRoles(Set.of(Role.EMPLOYEE_ROLE));
         user.setActivated(LocalDateTime.now());
         return save(user);
+    }
+
+    private boolean containsRoleInFilter(User user, UserFilter filter) {
+        return !Collections.disjoint(user.getRoles(), filter.roles());
     }
 }

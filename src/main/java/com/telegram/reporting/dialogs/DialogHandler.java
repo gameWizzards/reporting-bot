@@ -1,21 +1,24 @@
 package com.telegram.reporting.dialogs;
 
 import com.telegram.reporting.repository.entity.Role;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.List;
 
 public interface DialogHandler {
 
-    void handleTelegramInput(Long chatId, String input);
+    void handleTelegramUserInput(Long chatId, String input);
 
-    void createStateMachineHandler(Long chatId, ButtonValue buttonValue);
+    void handleInlineButtonInput(Long chatId, ButtonLabelKey buttonLabelKey);
 
-    List<KeyboardRow> getRootMenuButtons();
+    void createStateMachineHandler(Long chatId, ButtonLabelKey buttonLabelKey);
+
+    List<List<ButtonLabelKey>> getRootMenuButtons();
 
     void removeStateMachineHandler(Long chatId);
 
-    boolean belongToDialogStarter(ButtonValue buttonValue);
+    boolean belongToDialogStarter(ButtonLabelKey buttonLabelKey);
 
     List<Role> roleAccessibility();
+
+    Integer displayOrder();
 }

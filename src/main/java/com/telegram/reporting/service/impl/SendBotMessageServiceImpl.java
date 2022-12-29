@@ -1,13 +1,16 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.bot.ReportingTelegramBot;
+import com.telegram.reporting.dialogs.MessageKey;
 import com.telegram.reporting.repository.dto.EmployeeTO;
+import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -15,13 +18,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 @Service
 public class SendBotMessageServiceImpl implements SendBotMessageService {
-    private final String USER_CHAT_LINK = "<a href=\"https://t.me/+%s\">\"Перейти в чат\"</a>";
-
-
     private final ReportingTelegramBot reportingTelegramBot;
+    private final I18nMessageService i18NMessageService;
 
-    public SendBotMessageServiceImpl(ReportingTelegramBot reportingTelegramBot) {
+    public SendBotMessageServiceImpl(@Lazy ReportingTelegramBot reportingTelegramBot, I18nMessageService i18NMessageService) {
         this.reportingTelegramBot = reportingTelegramBot;
+        this.i18NMessageService = i18NMessageService;
     }
 
     @Override
@@ -29,6 +31,14 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         Validate.notNull(keyboardMarkup, "Keyboard markup is required to send it to telegramBot!");
         Validate.notNull(message, "SendMessage is required to send it to telegramBot!");
         message.setReplyMarkup(keyboardMarkup);
+        message.enableHtml(true);
+        sendMessage2Telegram(message);
+    }
+
+    public void sendMessageWithKeys(SendMessage message, InlineKeyboardMarkup inlineKeyboardMarkup) {
+        Validate.notNull(inlineKeyboardMarkup, "Keyboard markup is required to send it to telegramBot!");
+        Validate.notNull(message, "SendMessage is required to send it to telegramBot!");
+        message.setReplyMarkup(inlineKeyboardMarkup);
         message.enableHtml(true);
         sendMessage2Telegram(message);
     }
@@ -59,14 +69,16 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         Validate.notNull(chatId, "ChatId is required to send message to telegramBot!");
         Validate.notNull(employee, "Employee is required to create link to his chat!");
 
-        String userName = employee.getFullName();
-        if (StringUtils.isBlank(userName)) {
-            userName = "телеграм бота";
-        }
+        String link = i18NMessageService.getMessage(chatId, MessageKey.COMMON_USER_CHAT_LINK, employee.getPhone());
 
-        String link = USER_CHAT_LINK.formatted(employee.getPhone());
-        String message = "Кликни ссылку %s чтобы написать пользователю %s".formatted(link, userName);
-        sendMessage(chatId, message);
+        sendMessage(chatId, i18NMessageService.getMessage(chatId, MessageKey.COMMON_REQUEST_GO_USER_CHAT, link, employee.getFullName()));
+    }
+
+    @Override
+    public void removeReplyKeyboard(Long chatId, String message) {
+        SendMessage sendMessage = new SendMessage(chatId.toString(), message);
+        sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
+        sendMessage2Telegram(sendMessage);
     }
 
     private void sendMessage2Telegram(SendMessage message) {

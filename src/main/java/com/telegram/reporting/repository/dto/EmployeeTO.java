@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -43,7 +44,7 @@ public class EmployeeTO implements Serializable, Ordinal {
     }
 
     public boolean isActivated() {
-        return activated != null;
+        return Objects.nonNull(activated);
     }
 
     @Override
