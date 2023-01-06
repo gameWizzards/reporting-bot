@@ -1,6 +1,6 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.dialogs.I18nKey;
+import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.I18nPropsResolver;
 import com.telegram.reporting.service.RuntimeDialogManager;

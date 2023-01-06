@@ -1,10 +1,10 @@
 package com.telegram.reporting.dialogs.general_dialogs.language;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
-import com.telegram.reporting.dialogs.MessageKey;
-import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.i18n.MessageKey;
+import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
@@ -21,9 +21,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-@Component("LanguageStateMachineHandler")
-public class LanguageStateMachineHandler implements StateMachineHandler {
+public class LanguageDialogProcessor implements DialogProcessor {
 
     private final Map<Long, StateMachine<LanguageState, LanguageEvent>> stateMachines = new ConcurrentHashMap<>();
     private final StateMachineFactory<LanguageState, LanguageEvent> stateMachineFactory;
@@ -55,7 +55,7 @@ public class LanguageStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
+    public DialogProcessor initDialogProcessor(Long chatId) {
         StateMachine<LanguageState, LanguageEvent> stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.CHAT_ID, chatId);
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.LOG_PREFIX, CommonUtils.createLogPrefix("Language", chatId));
@@ -67,6 +67,11 @@ public class LanguageStateMachineHandler implements StateMachineHandler {
     @Override
     public void removeDialogData(Long chatId) {
         stateMachines.get(chatId).getExtendedState().getVariables().clear();
+    }
+
+    @Override
+    public ButtonLabelKey startDialogButtonKey() {
+        return ButtonLabelKey.GL_START_DIALOG;
     }
 }
 

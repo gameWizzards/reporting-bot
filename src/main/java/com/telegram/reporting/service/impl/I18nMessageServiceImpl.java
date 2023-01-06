@@ -1,8 +1,8 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
-import com.telegram.reporting.dialogs.I18nKey;
-import com.telegram.reporting.dialogs.MessageKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.i18n.I18nKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Report;
@@ -13,7 +13,7 @@ import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.I18nPropsResolver;
 import com.telegram.reporting.utils.DateTimeUtils;
-import com.telegram.reporting.utils.MonthKey;
+import com.telegram.reporting.i18n.MonthKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;

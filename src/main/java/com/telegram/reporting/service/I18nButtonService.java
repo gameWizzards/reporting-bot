@@ -1,6 +1,6 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.repository.dto.Ordinal;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;

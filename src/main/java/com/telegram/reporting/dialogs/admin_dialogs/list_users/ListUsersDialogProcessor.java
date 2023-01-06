@@ -1,10 +1,10 @@
 package com.telegram.reporting.dialogs.admin_dialogs.list_users;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
-import com.telegram.reporting.dialogs.MessageKey;
-import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.i18n.MessageKey;
+import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.I18nMessageService;
@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-@Component("ListUsersStateMachineHandler")
-public class ListUsersStateMachineHandler implements StateMachineHandler {
+public class ListUsersDialogProcessor implements DialogProcessor {
 
     private final Map<Long, StateMachine<ListUsersState, ListUsersEvent>> stateMachines = new ConcurrentHashMap<>();
     private final StateMachineFactory<ListUsersState, ListUsersEvent> stateMachineFactory;
@@ -66,7 +66,7 @@ public class ListUsersStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
+    public DialogProcessor initDialogProcessor(Long chatId) {
         StateMachine<ListUsersState, ListUsersEvent> stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.CHAT_ID, chatId);
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.LOG_PREFIX, CommonUtils.createLogPrefix("ListUsers", chatId));
@@ -78,6 +78,11 @@ public class ListUsersStateMachineHandler implements StateMachineHandler {
     @Override
     public void removeDialogData(Long chatId) {
         stateMachines.get(chatId).getExtendedState().getVariables().clear();
+    }
+
+    @Override
+    public ButtonLabelKey startDialogButtonKey() {
+        return ButtonLabelKey.ALU_START_DIALOG;
     }
 }
 

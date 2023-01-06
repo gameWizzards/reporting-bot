@@ -47,14 +47,13 @@ public class RuntimeDialogManagerImpl implements RuntimeDialogManager {
     public Locale getPrincipalUserLocale(long chatId) {
         User user = principalUsers.get(chatId);
         if (Objects.isNull(user)) {
-            //if authorized user in dialog and app was restarted
+            //if user is authorized and his stuck in dialog when app was restarted
             user = userService.findByChatId(chatId);
             principalUsers.put(chatId, user);
         }
         return Objects.nonNull(user) ? principalUsers.get(chatId).getLocale() : I18nPropsResolver.DEFAULT_LOCALE;
     }
 
-    // TODO use this to check access to dialogs in case when role was deleted but dialogs buttons remained in telegram chat story
     @Override
     public Set<Role> getPrincipalUserRoles(long chatId) {
         return principalUsers.get(chatId).getRoles();

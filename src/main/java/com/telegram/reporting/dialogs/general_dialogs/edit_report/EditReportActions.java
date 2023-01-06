@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.general_dialogs.edit_report;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.service.impl.MenuButtons;
-import com.telegram.reporting.dialogs.MessageKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.TimeRecord;

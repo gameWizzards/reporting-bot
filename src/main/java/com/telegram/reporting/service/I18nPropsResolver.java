@@ -1,6 +1,6 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.dialogs.I18nKey;
+import com.telegram.reporting.i18n.I18nKey;
 
 import java.util.Locale;
 

@@ -1,5 +1,7 @@
 package com.telegram.reporting.dialogs;
 
+import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;

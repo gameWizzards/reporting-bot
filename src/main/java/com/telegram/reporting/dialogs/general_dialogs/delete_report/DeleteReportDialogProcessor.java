@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.general_dialogs.delete_report;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
-import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
 import com.telegram.reporting.utils.CommonUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +19,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-@Component("DeleteReportStateMachineHandler")
-public class DeleteReportStateMachineHandler implements StateMachineHandler {
+public class DeleteReportDialogProcessor implements DialogProcessor {
 
     private final Map<Long, StateMachine<DeleteReportState, DeleteReportEvent>> stateMachines = new ConcurrentHashMap<>();
     private final StateMachineFactory<DeleteReportState, DeleteReportEvent> stateMachineFactory;
@@ -70,7 +70,7 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
+    public DialogProcessor initDialogProcessor(Long chatId) {
         StateMachine<DeleteReportState, DeleteReportEvent> stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.CHAT_ID, chatId);
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.LOG_PREFIX, CommonUtils.createLogPrefix("Delete_report", chatId));
@@ -82,6 +82,11 @@ public class DeleteReportStateMachineHandler implements StateMachineHandler {
     @Override
     public void removeDialogData(Long chatId) {
         stateMachines.get(chatId).getExtendedState().getVariables().clear();
+    }
+
+    @Override
+    public ButtonLabelKey startDialogButtonKey() {
+        return ButtonLabelKey.GDR_START_DIALOG;
     }
 }
 

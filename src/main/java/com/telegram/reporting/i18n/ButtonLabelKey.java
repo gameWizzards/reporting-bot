@@ -1,8 +1,8 @@
-package com.telegram.reporting.dialogs;
+package com.telegram.reporting.i18n;
 
 import java.util.Arrays;
 
-public enum ButtonLabelKey implements I18nKey  {
+public enum ButtonLabelKey implements I18nKey {
     // admin dialogs
     ASD_ADMIN_START_SUB_DIALOG("admin.start.sub-root.menu"),
 

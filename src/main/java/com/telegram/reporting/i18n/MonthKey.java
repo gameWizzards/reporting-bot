@@ -1,6 +1,4 @@
-package com.telegram.reporting.utils;
-
-import com.telegram.reporting.dialogs.I18nKey;
+package com.telegram.reporting.i18n;
 
 import java.util.stream.Stream;
 

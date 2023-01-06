@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.manager_dialogs.add_employee;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
-import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
 import com.telegram.reporting.utils.CommonUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +19,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-@Component("AddEmployeeStateMachineHandler")
-public class AddEmployeeStateMachineHandler implements StateMachineHandler {
+public class AddEmployeeDialogProcessor implements DialogProcessor {
 
     private final Map<Long, StateMachine<AddEmployeeState, AddEmployeeEvent>> stateMachines = new ConcurrentHashMap<>();
 
@@ -64,7 +64,7 @@ public class AddEmployeeStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
+    public DialogProcessor initDialogProcessor(Long chatId) {
         StateMachine<AddEmployeeState, AddEmployeeEvent> stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.CHAT_ID, chatId);
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.LOG_PREFIX, CommonUtils.createLogPrefix("AddEmployee", chatId));
@@ -76,5 +76,10 @@ public class AddEmployeeStateMachineHandler implements StateMachineHandler {
     @Override
     public void removeDialogData(Long chatId) {
         stateMachines.get(chatId).getExtendedState().getVariables().clear();
+    }
+
+    @Override
+    public ButtonLabelKey startDialogButtonKey() {
+        return ButtonLabelKey.MAE_START_DIALOG;
     }
 }

@@ -1,10 +1,10 @@
 package com.telegram.reporting.dialogs.general_dialogs.statistic;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
-import com.telegram.reporting.dialogs.MessageKey;
-import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.i18n.MessageKey;
+import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-@Component("StatisticStateMachineHandler")
-public class StatisticStateMachineHandler implements StateMachineHandler {
+public class StatisticDialogProcessor implements DialogProcessor {
 
     private final Map<Long, StateMachine<StatisticState, StatisticEvent>> stateMachines = new ConcurrentHashMap<>();
     private final StateMachineFactory<StatisticState, StatisticEvent> stateMachineFactory;
@@ -57,7 +57,7 @@ public class StatisticStateMachineHandler implements StateMachineHandler {
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
+    public DialogProcessor initDialogProcessor(Long chatId) {
         StateMachine<StatisticState, StatisticEvent> stateMachine = stateMachineFactory.getStateMachine();
 
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.CHAT_ID, chatId);
@@ -74,6 +74,11 @@ public class StatisticStateMachineHandler implements StateMachineHandler {
     @Override
     public void removeDialogData(Long chatId) {
         stateMachines.get(chatId).getExtendedState().getVariables().clear();
+    }
+
+    @Override
+    public ButtonLabelKey startDialogButtonKey() {
+        return ButtonLabelKey.GS_START_DIALOG;
     }
 }
 

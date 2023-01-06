@@ -1,8 +1,8 @@
 package com.telegram.reporting.dialogs.admin_dialogs.list_users;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
-import com.telegram.reporting.dialogs.MessageKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.I18nButtonService;
@@ -46,27 +46,24 @@ public class ListUsersActions {
     }
 
     public void sendSelectionStatusButtons(StateContext<ListUsersState, ListUsersEvent> context) {
+        Long chatId = CommonUtils.currentChatId(context);
         UserFilter.UserStatus userStatus = (UserFilter.UserStatus) context.getExtendedState()
                 .getVariables()
                 .getOrDefault(ContextVarKey.USER_STATUS, UserFilter.UserStatus.ACTIVE);
-        Long chatId = CommonUtils.currentChatId(context);
-// TODO CHANGE ROW BUTTONS CREATION
-        ButtonLabelKey[] singleRow = switch (userStatus) {
-            case ACTIVE ->
-                    new ButtonLabelKey[]{ButtonLabelKey.ALU_USER_STATUS_NOT_VERIFIED, ButtonLabelKey.ALU_USER_STATUS_DELETED};
 
-            case ACTIVE_NOT_VERIFIED ->
-                    new ButtonLabelKey[]{ButtonLabelKey.ALU_USER_STATUS_ACTIVE, ButtonLabelKey.ALU_USER_STATUS_DELETED};
+        ReplyKeyboard inlineMarkup = switch (userStatus) {
+            case ACTIVE -> i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.ADMIN_MENU,
+                    ButtonLabelKey.ALU_USER_STATUS_NOT_VERIFIED, ButtonLabelKey.ALU_USER_STATUS_DELETED);
 
-            case DELETED ->
-                    new ButtonLabelKey[]{ButtonLabelKey.ALU_USER_STATUS_ACTIVE, ButtonLabelKey.ALU_USER_STATUS_NOT_VERIFIED};
-            default ->
-                    throw new IllegalArgumentException("Unsupported user status in ListUsers dialog. Requested status=" + userStatus);
+            case ACTIVE_NOT_VERIFIED -> i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.ADMIN_MENU,
+                    ButtonLabelKey.ALU_USER_STATUS_ACTIVE, ButtonLabelKey.ALU_USER_STATUS_DELETED);
+
+            case DELETED -> i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.ADMIN_MENU,
+                    ButtonLabelKey.ALU_USER_STATUS_ACTIVE, ButtonLabelKey.ALU_USER_STATUS_NOT_VERIFIED);
+            default -> throw new IllegalArgumentException("Unsupported user status in ListUsers dialog. Requested status=" + userStatus);
         };
 
         String message = i18NMessageService.getMessage(chatId, MessageKey.ALU_SHOW_ANOTHER_CATEGORY_USERS);
-
-        ReplyKeyboard inlineMarkup = i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.ADMIN_MENU, singleRow);
 
         sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId.toString(), message), inlineMarkup);
     }

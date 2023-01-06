@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 //@SpringBootTest
-class CreateReportStateMachineHandlerTest {
+class CreateReportDialogProcessorTest {
 
 
 //    private StateMachine<CreateReportState, MessageEvent> stateMachine;

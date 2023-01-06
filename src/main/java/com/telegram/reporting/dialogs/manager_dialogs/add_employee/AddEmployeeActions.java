@@ -1,9 +1,9 @@
 package com.telegram.reporting.dialogs.manager_dialogs.add_employee;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.service.impl.MenuButtons;
-import com.telegram.reporting.dialogs.MessageKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;

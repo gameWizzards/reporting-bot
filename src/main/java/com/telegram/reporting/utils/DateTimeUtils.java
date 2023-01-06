@@ -1,5 +1,7 @@
 package com.telegram.reporting.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,6 +59,13 @@ public final class DateTimeUtils {
         }
         return (checkedDate.isEqual(startPeriod) || checkedDate.isAfter(startPeriod))
                 && (checkedDate.isEqual(finishPeriod) || checkedDate.isBefore(finishPeriod));
+    }
+
+    public static LocalDate getStatisticMonth(String statisticDate) {
+        if (StringUtils.isBlank(statisticDate)) {
+            return LocalDate.now();
+        }
+        return parseDefaultDate(statisticDate);
     }
 
     private static Integer[] parseUserDateInput(String userInput) {

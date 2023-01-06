@@ -1,8 +1,8 @@
 package com.telegram.reporting.dialogs.manager_dialogs.employee_statistic;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
-import com.telegram.reporting.dialogs.MessageKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.entity.Report;
@@ -16,7 +16,7 @@ import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.utils.CommonUtils;
 import com.telegram.reporting.utils.DateTimeUtils;
 import com.telegram.reporting.utils.JsonUtils;
-import com.telegram.reporting.utils.MonthKey;
+import com.telegram.reporting.i18n.MonthKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;

@@ -1,7 +1,7 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
-import com.telegram.reporting.dialogs.I18nKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.repository.dto.Ordinal;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.service.CategoryService;
@@ -46,7 +46,7 @@ public class I18nButtonServiceImpl implements I18nButtonService {
 
     @Override
     public List<List<InlineKeyboardButton>> getLanguageInlineButtons(Long chatId) {
-        // TODO change implementation to autogenerate all available locale buttons
+        //TODO change implementation to autogenerate all available locale buttons
         return createInlineButtonRows(chatId,
                 List.of(ButtonLabelKey.GL_UA_LOCALE),
                 List.of(ButtonLabelKey.GL_RU_LOCALE));

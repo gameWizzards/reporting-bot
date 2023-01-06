@@ -1,11 +1,15 @@
 package com.telegram.reporting.dialogs;
 
-public interface StateMachineHandler {
+import com.telegram.reporting.i18n.ButtonLabelKey;
+
+public interface DialogProcessor {
     void handleButtonClick(Long chatId, ButtonLabelKey buttonLabelKey);
 
     void handleUserInput(Long chatId, String userInput);
 
-    StateMachineHandler initStateMachine(Long chatId);
+    DialogProcessor initDialogProcessor(Long chatId);
 
     void removeDialogData(Long chatId);
+
+    ButtonLabelKey startDialogButtonKey();
 }

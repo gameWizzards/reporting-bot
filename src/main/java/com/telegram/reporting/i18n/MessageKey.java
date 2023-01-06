@@ -1,4 +1,4 @@
-package com.telegram.reporting.dialogs;
+package com.telegram.reporting.i18n;
 
 public enum MessageKey implements I18nKey {
 

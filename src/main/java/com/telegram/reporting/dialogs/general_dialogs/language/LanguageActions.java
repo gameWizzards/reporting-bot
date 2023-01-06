@@ -1,8 +1,8 @@
 package com.telegram.reporting.dialogs.general_dialogs.language;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
-import com.telegram.reporting.dialogs.MessageKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.I18nButtonService;

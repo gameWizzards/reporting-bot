@@ -1,7 +1,9 @@
 package com.telegram.reporting.dialogs;
 
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.repository.entity.Role;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface DialogHandler {
@@ -10,15 +12,21 @@ public interface DialogHandler {
 
     void handleInlineButtonInput(Long chatId, ButtonLabelKey buttonLabelKey);
 
-    void createStateMachineHandler(Long chatId, ButtonLabelKey buttonLabelKey);
+    void createDialogProcessor(Long chatId, ButtonLabelKey buttonLabelKey);
 
     List<List<ButtonLabelKey>> getRootMenuButtons();
 
-    void removeStateMachineHandler(Long chatId);
-
-    boolean belongToDialogStarter(ButtonLabelKey buttonLabelKey);
+    default boolean belongToRootMenuButtons(ButtonLabelKey buttonLabelKey) {
+        return getRootMenuButtons().stream()
+                .flatMap(Collection::stream)
+                .anyMatch(buttonLabelKey::equals);
+    }
 
     List<Role> roleAccessibility();
 
+    void removeDialogProcessor(Long chatId);
+
     Integer displayOrder();
+
+    DialogHandlerAlias dialogHandlerAlias();
 }

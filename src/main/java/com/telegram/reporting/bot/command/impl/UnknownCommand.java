@@ -1,7 +1,7 @@
 package com.telegram.reporting.bot.command.impl;
 
 import com.telegram.reporting.bot.command.Command;
-import com.telegram.reporting.dialogs.MessageKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.CommonUtils;

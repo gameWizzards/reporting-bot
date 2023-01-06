@@ -1,9 +1,8 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.DialogHandler;
-import com.telegram.reporting.dialogs.MessageKey;
-import com.telegram.reporting.dialogs.SubDialogHandler;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.DialogRouterService;
@@ -36,11 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DialogRouterServiceImpl implements DialogRouterService {
 
     private final Map<Long, DialogHandler> activeDialogHandlers = new ConcurrentHashMap<>();
-    // TODO consider to have opportunity disable some dialog handlers by bean condition or through interface boolean method
-    // TODO Also change to Strategy pattern
-    // TODO Change impl to dialog and sub-dialogs
-    private final List<DialogHandler> existingDialogHandlers;
 
+    private final List<DialogHandler> existingDialogHandlers;
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService telegramUserService;
     private final RuntimeDialogManager runtimeDialogManager;
@@ -65,8 +61,6 @@ public class DialogRouterServiceImpl implements DialogRouterService {
             return;
         }
 
-        // TODO add checking to prevent access to dialog when Role was removed
-        //  (Bag example - if remove role Manager and click to old button then Manager menu start)
         Locale principalUserLocale = runtimeDialogManager.getPrincipalUserLocale(chatId);
         // handle InlineMarkup button, Callback exists or user input
         if (CommonUtils.isInlineCallbackButton(update)) {
@@ -171,18 +165,14 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     private void removeDialogRelatedData(Long chatId) {
         runtimeDialogManager.removePrincipalUser(chatId);
         Optional.ofNullable(activeDialogHandlers.remove(chatId))
-                .ifPresent(handler -> handler.removeStateMachineHandler(chatId));
+                .ifPresent(handler -> handler.removeDialogProcessor(chatId));
     }
 
     private void bindDialogHandler(Long chatId, ButtonLabelKey buttonLabelKey) {
         existingDialogHandlers.stream()
-                .filter(handler -> handler.belongToDialogStarter(buttonLabelKey))
+                .filter(handler -> handler.belongToRootMenuButtons(buttonLabelKey))
                 .forEach(dialogHandler -> {
-                    if (dialogHandler instanceof SubDialogHandler) {
-                        ((SubDialogHandler) dialogHandler).startSubDialogFlow(chatId);
-                    } else {
-                        dialogHandler.createStateMachineHandler(chatId, buttonLabelKey);
-                    }
+                    dialogHandler.createDialogProcessor(chatId, buttonLabelKey);
                     activeDialogHandlers.put(chatId, dialogHandler);
                 });
     }

@@ -1,11 +1,12 @@
 package com.telegram.reporting.dialogs.manager_dialogs.employee_statistic;
 
-import com.telegram.reporting.dialogs.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
-import com.telegram.reporting.dialogs.StateMachineHandler;
+import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.utils.CommonUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.statemachine.StateMachine;
@@ -15,20 +16,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-@Component("EmployeeStatisticStateMachineHandler")
-public class EmployeeStatisticStateMachineHandler implements StateMachineHandler {
+@Component
+@RequiredArgsConstructor
+public class EmployeeStatisticDialogProcessor implements DialogProcessor {
 
     private final StateMachineFactory<EmployeeStatisticState, EmployeeStatisticEvent> stateMachineFactory;
     private final Map<Long, StateMachine<EmployeeStatisticState, EmployeeStatisticEvent>> stateMachines;
-
-
-    public EmployeeStatisticStateMachineHandler(StateMachineFactory<EmployeeStatisticState, EmployeeStatisticEvent> stateMachineFactory) {
-        this.stateMachineFactory = stateMachineFactory;
-        stateMachines = new ConcurrentHashMap<>();
-    }
 
     @Override
     public void handleButtonClick(Long chatId, ButtonLabelKey buttonLabelKey) {
@@ -74,11 +69,11 @@ public class EmployeeStatisticStateMachineHandler implements StateMachineHandler
         Optional.ofNullable(messageEvent)
                 .ifPresent(event ->
                         stateMachine.sendEvent(Mono.just(new GenericMessage<>(event)))
-                        .subscribe());
+                                .subscribe());
     }
 
     @Override
-    public StateMachineHandler initStateMachine(Long chatId) {
+    public DialogProcessor initDialogProcessor(Long chatId) {
         StateMachine<EmployeeStatisticState, EmployeeStatisticEvent> stateMachine = stateMachineFactory.getStateMachine();
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.CHAT_ID, chatId);
         stateMachine.getExtendedState().getVariables().put(ContextVarKey.LOG_PREFIX, CommonUtils.createLogPrefix("EmployeeStatistic", chatId));
@@ -91,5 +86,9 @@ public class EmployeeStatisticStateMachineHandler implements StateMachineHandler
     public void removeDialogData(Long chatId) {
         stateMachines.get(chatId).getExtendedState().getVariables().clear();
     }
-}
 
+    @Override
+    public ButtonLabelKey startDialogButtonKey() {
+        return ButtonLabelKey.MES_START_DIALOG;
+    }
+}
