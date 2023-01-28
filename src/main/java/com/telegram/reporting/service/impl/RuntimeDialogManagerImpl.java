@@ -1,12 +1,16 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.exception.TelegramUserException;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.entity.Role;
 import com.telegram.reporting.repository.entity.User;
-import com.telegram.reporting.service.I18nPropsResolver;
+import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.RuntimeDialogManager;
+import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
@@ -22,40 +26,58 @@ public class RuntimeDialogManagerImpl implements RuntimeDialogManager {
     private final Map<Long, User> principalUsers = new ConcurrentHashMap<>();
 
     private final TelegramUserService userService;
+    private final SendBotMessageService sendBotMessageService;
+    private final I18nMessageService i18nMessageService;
+
 
     @Override
-    public void addPrincipalUser(long chatId, User user) {
+    public void addPrincipalUser(Long chatId, User user) {
+        Validate.notNull(chatId, "ChatId is required to add user principal");
+        Validate.notNull(user, "User must not be null to add him ass user principal for chat: [%d]", chatId);
         principalUsers.put(chatId, user);
     }
 
     @Override
-    public void removePrincipalUser(long chatId) {
+    public void removePrincipalUser(Long chatId) {
         principalUsers.remove(chatId);
     }
 
     @Override
-    public boolean containsPrincipalUser(long chatId) {
+    public boolean containsPrincipalUser(Long chatId) {
         return principalUsers.containsKey(chatId);
     }
 
     @Override
-    public User getPrincipalUser(long chatId) {
-        return principalUsers.get(chatId);
-    }
-
-    @Override
-    public Locale getPrincipalUserLocale(long chatId) {
-        User user = principalUsers.get(chatId);
-        if (Objects.isNull(user)) {
-            //if user is authorized and his stuck in dialog when app was restarted
-            user = userService.findByChatId(chatId);
-            principalUsers.put(chatId, user);
+    public User getPrincipalUser(Long chatId) {
+        Validate.notNull(chatId, "ChatId is required to get user principal");
+        if (principalUsers.containsKey(chatId)) {
+            return principalUsers.get(chatId);
         }
-        return Objects.nonNull(user) ? principalUsers.get(chatId).getLocale() : I18nPropsResolver.DEFAULT_LOCALE;
+
+        User user = userService.findByChatId(chatId);
+        if (Objects.isNull(user) || user.isDeleted()) {
+            String reason = Objects.isNull(user)
+                    ? i18nMessageService.getMessage(chatId, MessageKey.PD_ACCOUNT_NOT_FOUND)
+                    : i18nMessageService.getMessage(chatId, MessageKey.PD_ACCOUNT_DELETED);
+
+            sendBotMessageService.sendMessage(chatId,
+                    i18nMessageService.getMessage(chatId, MessageKey.PD_FAILED_ACCOUNT_CHECKING, reason));
+
+            // if user deleted
+            removePrincipalUser(chatId);
+            throw new TelegramUserException("User is not available to set his as principal. ChatId: %s. User: %s".formatted(chatId, user));
+        }
+        addPrincipalUser(chatId, user);
+        return user;
     }
 
     @Override
-    public Set<Role> getPrincipalUserRoles(long chatId) {
-        return principalUsers.get(chatId).getRoles();
+    public Locale getPrincipalUserLocale(Long chatId) {
+        return getPrincipalUser(chatId).getLocale();
+    }
+
+    @Override
+    public Set<Role> getPrincipalUserRoles(Long chatId) {
+        return getPrincipalUser(chatId).getRoles();
     }
 }

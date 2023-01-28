@@ -5,7 +5,6 @@ import com.telegram.reporting.dialogs.DialogHandlerAlias;
 import com.telegram.reporting.dialogs.SubDialogHandlerDelegate;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.repository.entity.Role;
-import com.telegram.reporting.service.MenuStructureService;
 import com.telegram.reporting.strategy.SubDialogHandlerDelegateStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminDialogHandlerImpl implements DialogHandler {
     private final SubDialogHandlerDelegateStrategy subDialogHandlerDelegateStrategy;
-    private final MenuStructureService menuStructureService;
 
     private SubDialogHandlerDelegate subDialogDelegate;
 
@@ -59,8 +57,8 @@ public class AdminDialogHandlerImpl implements DialogHandler {
     }
 
     @Override
-    public List<List<ButtonLabelKey>> getRootMenuButtons() {
-        return menuStructureService.rootMenuButtons(dialogHandlerAlias());
+    public List<List<ButtonLabelKey>> getRootMenuTemplate() {
+        return subDialogDelegate.getRootMenuTemplate();
     }
 
     @Override

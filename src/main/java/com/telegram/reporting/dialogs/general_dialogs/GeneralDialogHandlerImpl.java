@@ -5,7 +5,7 @@ import com.telegram.reporting.dialogs.DialogHandlerAlias;
 import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.repository.entity.Role;
-import com.telegram.reporting.service.MenuStructureService;
+import com.telegram.reporting.service.MenuTemplateService;
 import com.telegram.reporting.strategy.DialogProcessorStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class GeneralDialogHandlerImpl implements DialogHandler {
     private final Map<Long, DialogProcessor> activeDialogProcessors = new ConcurrentHashMap<>();
 
     private final DialogProcessorStrategy processorStrategy;
-    private final MenuStructureService menuStructureService;
+    private final MenuTemplateService menuTemplateService;
 
     @Override
     public void handleInlineButtonInput(Long chatId, ButtonLabelKey buttonLabelKey) {
@@ -44,8 +44,8 @@ public class GeneralDialogHandlerImpl implements DialogHandler {
     }
 
     @Override
-    public List<List<ButtonLabelKey>> getRootMenuButtons() {
-        return menuStructureService.rootMenuButtons(dialogHandlerAlias());
+    public List<List<ButtonLabelKey>> getRootMenuTemplate() {
+        return menuTemplateService.rootMenuTemplate(dialogHandlerAlias());
     }
 
     @Override

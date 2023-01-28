@@ -1,6 +1,7 @@
 package com.telegram.reporting.dialogs;
 
 import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.i18n.MessageKey;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,13 +20,17 @@ public interface SubDialogHandlerDelegate {
 
     void startSubDialogFlow(Long chatId);
 
-    List<List<ButtonLabelKey>> getSubMenuButtons();
+    List<List<ButtonLabelKey>> getRootMenuTemplate();
+
+    List<List<ButtonLabelKey>> getSubMenuTemplate();
 
     default boolean belongToSubMenuButtons(ButtonLabelKey buttonLabelKey) {
-        return getSubMenuButtons().stream()
+        return getSubMenuTemplate().stream()
                 .flatMap(Collection::stream)
                 .anyMatch(buttonLabelKey::equals);
     }
 
     DialogHandlerAlias dialogHandlerAlias();
+
+    MessageKey getStartFlowMessageKey();
 }

@@ -1,8 +1,10 @@
 package com.telegram.reporting.service;
 
+import com.telegram.reporting.dialogs.DialogHandlerAlias;
 import com.telegram.reporting.i18n.ButtonLabelKey;
-import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.repository.dto.Ordinal;
+import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.service.impl.MenuButtons;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -17,6 +19,10 @@ public interface I18nButtonService {
 
     List<List<InlineKeyboardButton>> getLanguageInlineButtons(Long chatId);
 
+    List<List<InlineKeyboardButton>> getRootMenuButtons(Long chatId, User user);
+
+    List<List<InlineKeyboardButton>> getSubMenuButtons(Long chatId, DialogHandlerAlias dialogHandlerAlias);
+
     @SuppressWarnings("unchecked")
     List<List<InlineKeyboardButton>> createInlineButtonRows(Long chatId, List<ButtonLabelKey>... rowButtons);
 
@@ -29,5 +35,4 @@ public interface I18nButtonService {
     ReplyKeyboard createOrdinalButtonsInlineMarkup(Long chatId, MenuButtons addMenu, List<? extends Ordinal> ordinalButtons, int buttonsInRow);
 
     ReplyKeyboard createMainMenuInlineMarkup(Long chatId);
-
 }

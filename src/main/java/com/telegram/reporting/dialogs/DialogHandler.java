@@ -14,10 +14,10 @@ public interface DialogHandler {
 
     void createDialogProcessor(Long chatId, ButtonLabelKey buttonLabelKey);
 
-    List<List<ButtonLabelKey>> getRootMenuButtons();
+    List<List<ButtonLabelKey>> getRootMenuTemplate();
 
     default boolean belongToRootMenuButtons(ButtonLabelKey buttonLabelKey) {
-        return getRootMenuButtons().stream()
+        return getRootMenuTemplate().stream()
                 .flatMap(Collection::stream)
                 .anyMatch(buttonLabelKey::equals);
     }

@@ -1,9 +1,6 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.bot.ReportingTelegramBot;
-import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.dto.EmployeeTO;
-import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -19,11 +16,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Service
 public class SendBotMessageServiceImpl implements SendBotMessageService {
     private final ReportingTelegramBot reportingTelegramBot;
-    private final I18nMessageService i18NMessageService;
 
-    public SendBotMessageServiceImpl(@Lazy ReportingTelegramBot reportingTelegramBot, I18nMessageService i18NMessageService) {
+    public SendBotMessageServiceImpl(@Lazy ReportingTelegramBot reportingTelegramBot) {
         this.reportingTelegramBot = reportingTelegramBot;
-        this.i18NMessageService = i18NMessageService;
     }
 
     @Override
@@ -64,15 +59,6 @@ public class SendBotMessageServiceImpl implements SendBotMessageService {
         sendMessage2Telegram(sendMessage);
     }
 
-    @Override
-    public void sendLink2UserChat(Long chatId, EmployeeTO employee) {
-        Validate.notNull(chatId, "ChatId is required to send message to telegramBot!");
-        Validate.notNull(employee, "Employee is required to create link to his chat!");
-
-        String link = i18NMessageService.getMessage(chatId, MessageKey.COMMON_USER_CHAT_LINK, employee.getPhone());
-
-        sendMessage(chatId, i18NMessageService.getMessage(chatId, MessageKey.COMMON_REQUEST_GO_USER_CHAT, link, employee.getFullName()));
-    }
 
     @Override
     public void removeReplyKeyboard(Long chatId, String message) {

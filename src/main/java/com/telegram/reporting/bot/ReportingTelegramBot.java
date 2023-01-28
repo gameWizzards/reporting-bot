@@ -33,6 +33,7 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
             commandContainer.findCommand(CommonUtils.getMessageText(update)).execute(update);
             return;
         }
+        // TODO change Update object to Some Adapter(interface with 3 impl - user input, simple button, inline button)
         dialogRouterService.handleTelegramUpdateEvent(update);
     }
 

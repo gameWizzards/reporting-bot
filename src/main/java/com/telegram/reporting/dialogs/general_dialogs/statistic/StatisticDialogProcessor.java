@@ -1,11 +1,11 @@
 package com.telegram.reporting.dialogs.general_dialogs.statistic;
 
-import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
-import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
+import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.CommonUtils;

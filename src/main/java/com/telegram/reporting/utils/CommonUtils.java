@@ -69,7 +69,7 @@ public class CommonUtils {
         return update.getCallbackQuery().getData();
     }
 
-    public static boolean isInlineCallbackButton(Update update) {
+    public static boolean isInlineButton(Update update) {
         return update.hasCallbackQuery() && StringUtils.isNotBlank(update.getCallbackQuery().getData());
     }
 

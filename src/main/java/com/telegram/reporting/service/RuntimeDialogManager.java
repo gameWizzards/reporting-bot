@@ -8,15 +8,15 @@ import java.util.Set;
 
 public interface RuntimeDialogManager {
 
-    void addPrincipalUser(long chatId, User user);
+    void addPrincipalUser(Long chatId, User user);
 
-    void removePrincipalUser(long chatId);
+    void removePrincipalUser(Long chatId);
 
-    boolean containsPrincipalUser(long chatId);
+    boolean containsPrincipalUser(Long chatId);
 
-    User getPrincipalUser(long chatId);
+    User getPrincipalUser(Long chatId);
 
-    Locale getPrincipalUserLocale(long chatId);
+    Locale getPrincipalUserLocale(Long chatId);
 
-    Set<Role> getPrincipalUserRoles(long chatId);
+    Set<Role> getPrincipalUserRoles(Long chatId);
 }

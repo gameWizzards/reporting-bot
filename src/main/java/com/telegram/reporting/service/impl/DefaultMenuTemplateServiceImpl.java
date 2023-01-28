@@ -1,8 +1,8 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.DialogHandlerAlias;
-import com.telegram.reporting.service.MenuStructureService;
+import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.service.MenuTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class DefaultMenuStructureServiceImpl implements MenuStructureService {
+public class DefaultMenuTemplateServiceImpl implements MenuTemplateService {
     private final Map<DialogHandlerAlias, List<List<ButtonLabelKey>>> rootMenuStructure = new HashMap<>(3);
     private final Map<DialogHandlerAlias, List<List<ButtonLabelKey>>> subMenuStructure = new HashMap<>(2);
 
@@ -28,12 +28,12 @@ public class DefaultMenuStructureServiceImpl implements MenuStructureService {
     }
 
     @Override
-    public List<List<ButtonLabelKey>> rootMenuButtons(DialogHandlerAlias dialogHandlerAlias) {
+    public List<List<ButtonLabelKey>> rootMenuTemplate(DialogHandlerAlias dialogHandlerAlias) {
         return rootMenuStructure.get(dialogHandlerAlias);
     }
 
     @Override
-    public List<List<ButtonLabelKey>> subMenuButtons(DialogHandlerAlias dialogHandlerAlias) {
+    public List<List<ButtonLabelKey>> subMenuTemplate(DialogHandlerAlias dialogHandlerAlias) {
         return subMenuStructure.get(dialogHandlerAlias);
     }
 

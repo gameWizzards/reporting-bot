@@ -4,20 +4,25 @@ import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.I18nPropsResolver;
 import com.telegram.reporting.service.RuntimeDialogManager;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class I18nPropsResolverImpl implements I18nPropsResolver {
     private final MessageSource messageSource;
     private final RuntimeDialogManager runtimeDialogManager;
+
+    public I18nPropsResolverImpl(MessageSource messageSource,
+                                 @Lazy RuntimeDialogManager runtimeDialogManager) {
+        this.messageSource = messageSource;
+        this.runtimeDialogManager = runtimeDialogManager;
+    }
 
     @Override
     public String getPropsValue(Long chatId, String key) {

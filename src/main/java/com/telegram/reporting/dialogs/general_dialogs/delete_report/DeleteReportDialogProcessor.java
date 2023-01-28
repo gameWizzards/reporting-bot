@@ -1,10 +1,10 @@
 package com.telegram.reporting.dialogs.general_dialogs.delete_report;
 
-import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DefaultDialogListener;
 import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.utils.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

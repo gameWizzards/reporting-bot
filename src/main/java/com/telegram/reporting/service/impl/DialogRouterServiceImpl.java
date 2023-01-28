@@ -20,8 +20,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,7 +45,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     public void handleTelegramUpdateEvent(Update update) {
         Long chatId = CommonUtils.currentChatId(update);
 
-        // handle simple button, contact sharing, Message exists
+        // handle simple button, contact sharing
         if (CommonUtils.hasContact(update)) {
             sendBotMessageService.removeReplyKeyboard(chatId, i18NMessageService.getMessage(chatId, MessageKey.PD_SUCCESS_CONTACT_SHARING));
             try {
@@ -62,8 +60,8 @@ public class DialogRouterServiceImpl implements DialogRouterService {
         }
 
         Locale principalUserLocale = runtimeDialogManager.getPrincipalUserLocale(chatId);
-        // handle InlineMarkup button, Callback exists or user input
-        if (CommonUtils.isInlineCallbackButton(update)) {
+        // handle InlineMarkup button
+        if (CommonUtils.isInlineButton(update)) {
             String buttonCallbackData = CommonUtils.getButtonCallbackData(update);
             ButtonLabelKey buttonLabelKey = ButtonLabelKey.getByKey(buttonCallbackData);
 
@@ -115,24 +113,16 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void startFlow(Long chatId, Locale locale) {
         removeDialogRelatedData(chatId);
-        User user = getDialogPrincipalUser(chatId);
+        User user = runtimeDialogManager.getPrincipalUser(chatId);
 
         final String startFlowMessage = i18NMessageService.getMessage(
                 chatId,
                 MessageKey.PD_START_FLOW_MESSAGE,
                 user.getName());
 
-        List<List<InlineKeyboardButton>> buttonRows = existingDialogHandlers.stream()
-                .filter(handler -> CommonUtils.hasAccess(handler, user))
-                .sorted(Comparator.comparing(DialogHandler::displayOrder))
-                .map(DialogHandler::getRootMenuButtons)
-                .flatMap(Collection::stream)
-                .map(labelKeys -> i18nButtonService.createInlineButtonRows(chatId, labelKeys))
-                .flatMap(Collection::stream)
-                .toList();
+        List<List<InlineKeyboardButton>> buttonRows = i18nButtonService.getRootMenuButtons(chatId, user);
 
         SendMessage sendMessage = new SendMessage(chatId.toString(), startFlowMessage);
         sendBotMessageService.sendMessageWithKeys(sendMessage, new InlineKeyboardMarkup(buttonRows));
@@ -142,24 +132,6 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     private boolean isAllowStartDialog(Long chatId) {
         return runtimeDialogManager.containsPrincipalUser(chatId)
                 && !runtimeDialogManager.getPrincipalUser(chatId).isDeleted();
-    }
-
-    private User getDialogPrincipalUser(Long chatId) {
-        User user = telegramUserService.findByChatId(chatId);
-        if (Objects.isNull(user) || user.isDeleted()) {
-            String reason = Objects.isNull(user)
-                    ? i18NMessageService.getMessage(chatId, MessageKey.PD_ACCOUNT_NOT_FOUND)
-                    : i18NMessageService.getMessage(chatId, MessageKey.PD_ACCOUNT_DELETED);
-
-            sendBotMessageService.sendMessage(chatId,
-                    i18NMessageService.getMessage(chatId, MessageKey.PD_FAILED_ACCOUNT_CHECKING, reason));
-
-            runtimeDialogManager.removePrincipalUser(chatId);
-            throw new TelegramUserException("User is not available to set his as principal. ChatId: %s. User: %s".formatted(chatId, user));
-        }
-
-        runtimeDialogManager.addPrincipalUser(chatId, user);
-        return user;
     }
 
     private void removeDialogRelatedData(Long chatId) {

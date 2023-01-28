@@ -100,7 +100,8 @@ public class EmployeeStatisticActions {
                 employeeTO.getFullName(), monthStatisticMessage);
 
         sendBotMessageService.sendMessage(chatId, totalMonthEmployeeStatisticMessage);
-        sendBotMessageService.sendLink2UserChat(chatId, employeeTO);
+
+        sendLink2UserChat(chatId, employeeTO);
     }
 
     public void requestToLockDataToEdit(StateContext<EmployeeStatisticState, EmployeeStatisticEvent> context) {
@@ -178,5 +179,12 @@ public class EmployeeStatisticActions {
         ReplyKeyboard inlineMarkup = i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.MANAGER_MENU,
                 ButtonLabelKey.MES_CHOICE_ANOTHER_EMPLOYEE);
         sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId.toString(), message), inlineMarkup);
+    }
+
+    public void sendLink2UserChat(Long chatId, EmployeeTO employee) {
+
+        String link = i18NMessageService.getMessage(chatId, MessageKey.COMMON_USER_CHAT_LINK, employee.getPhone());
+
+        sendBotMessageService.sendMessage(chatId, i18NMessageService.getMessage(chatId, MessageKey.COMMON_REQUEST_GO_USER_CHAT, link, employee.getFullName()));
     }
 }

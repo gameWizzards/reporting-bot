@@ -1,12 +1,19 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.dialogs.DialogHandler;
+import com.telegram.reporting.dialogs.DialogHandlerAlias;
+import com.telegram.reporting.dialogs.DialogProcessor;
+import com.telegram.reporting.dialogs.SubDialogHandlerDelegate;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.repository.dto.Ordinal;
 import com.telegram.reporting.repository.entity.Category;
+import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nPropsResolver;
+import com.telegram.reporting.strategy.SubDialogHandlerDelegateStrategy;
+import com.telegram.reporting.utils.CommonUtils;
 import com.telegram.reporting.utils.KeyboardUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +25,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,6 +41,11 @@ import java.util.function.Predicate;
 public class I18nButtonServiceImpl implements I18nButtonService {
     private final I18nPropsResolver i18nPropsResolver;
     private final CategoryService categoryService;
+    private final List<DialogProcessor> dialogProcessors;
+    private final List<DialogHandler> dialogHandlers;
+    private final List<SubDialogHandlerDelegate> subDialogHandlers;
+    private final SubDialogHandlerDelegateStrategy subDialogHandlerDelegateStrategy;
+
 
     @Override
     public boolean hasAvailableCategoryButtons(String timeRecordsJson) {
@@ -42,14 +58,6 @@ public class I18nButtonServiceImpl implements I18nButtonService {
     @Override
     public String getButtonLabel(Long chatId, ButtonLabelKey labelKey) {
         return i18nPropsResolver.getPropsValue(chatId, labelKey);
-    }
-
-    @Override
-    public List<List<InlineKeyboardButton>> getLanguageInlineButtons(Long chatId) {
-        //TODO change implementation to autogenerate all available locale buttons
-        return createInlineButtonRows(chatId,
-                List.of(ButtonLabelKey.GL_UA_LOCALE),
-                List.of(ButtonLabelKey.GL_RU_LOCALE));
     }
 
     @Override
@@ -68,6 +76,58 @@ public class I18nButtonServiceImpl implements I18nButtonService {
         }
 
         return KeyboardUtils.separateInlineButtonsToRows(availableCategoryLabels, buttonsInRow);
+    }
+
+    @Override
+    public List<List<InlineKeyboardButton>> getLanguageInlineButtons(Long chatId) {
+        //TODO change implementation to autogenerate all available locale buttons
+        return createInlineButtonRows(chatId,
+                List.of(ButtonLabelKey.GL_UA_LOCALE),
+                List.of(ButtonLabelKey.GL_RU_LOCALE));
+    }
+
+    @Override
+    public List<List<InlineKeyboardButton>> getRootMenuButtons(Long chatId, User user) {
+        // getting all available dialog starter buttons
+        Set<ButtonLabelKey> availableMenuButtons = dialogProcessors.stream()
+                .map(DialogProcessor::startDialogButtonKey)
+                .collect(Collectors.toSet());
+
+        // adding all submenu button starters
+        subDialogHandlers.stream()
+                .map(SubDialogHandlerDelegate::getRootMenuTemplate)
+                .flatMap(Collection::stream)
+                .flatMap(Collection::stream)
+                .forEach(availableMenuButtons::add);
+
+        // filtering by access role & sorting the root menu template
+        List<List<ButtonLabelKey>> rootMenuTemplate = dialogHandlers.stream()
+                .filter(handler -> CommonUtils.hasAccess(handler, user))
+                .sorted(Comparator.comparing(DialogHandler::displayOrder))
+                .map(DialogHandler::getRootMenuTemplate)
+                .flatMap(Collection::stream)
+                // required to be able to remove not available buttons from template
+                .map(row -> (List<ButtonLabelKey>) new ArrayList<>(row))
+                .toList();
+
+        return convertTemplateToInlineButtons(chatId, rootMenuTemplate, availableMenuButtons);
+    }
+
+    @Override
+    public List<List<InlineKeyboardButton>> getSubMenuButtons(Long chatId, DialogHandlerAlias dialogHandlerAlias) {
+        // getting all available dialog starter buttons
+        Set<ButtonLabelKey> availableMenuButtons = dialogProcessors.stream()
+                .map(DialogProcessor::startDialogButtonKey)
+                .collect(Collectors.toSet());
+
+        // getting sub menu template
+        List<List<ButtonLabelKey>> subMenuTemplate = subDialogHandlerDelegateStrategy.getDelegate(dialogHandlerAlias)
+                .getSubMenuTemplate().stream()
+                // required to be able to remove not available buttons from template
+                .map(row -> (List<ButtonLabelKey>) new ArrayList<>(row))
+                .toList();
+
+        return convertTemplateToInlineButtons(chatId, subMenuTemplate, availableMenuButtons);
     }
 
     @Override
@@ -171,6 +231,29 @@ public class I18nButtonServiceImpl implements I18nButtonService {
             return category -> true;
         }
         return Predicate.not(timeRecordsJson::contains);
+    }
+
+    private List<List<InlineKeyboardButton>> convertTemplateToInlineButtons(Long chatId, List<List<ButtonLabelKey>> menuTemplate, Set<ButtonLabelKey> availableMenuButtons) {
+        List<List<ButtonLabelKey>> filteredSubMenu = new ArrayList<>();
+
+        // removing not available buttons from root menu template
+        for (List<ButtonLabelKey> menuRow : menuTemplate) {
+            List<ButtonLabelKey> toRemove = new ArrayList<>();
+            menuRow.forEach(label -> {
+                if (!availableMenuButtons.contains(label)) {
+                    toRemove.add(label);
+                }
+            });
+
+            menuRow.removeAll(toRemove);
+            filteredSubMenu.add(menuRow);
+        }
+
+        return filteredSubMenu.stream()
+                .filter(Predicate.not(Collection::isEmpty))
+                .map(labelKeys -> createInlineButtonRows(chatId, labelKeys))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 }
 
