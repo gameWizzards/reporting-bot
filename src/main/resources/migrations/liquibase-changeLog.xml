@@ -311,4 +311,49 @@
             OR "key"='scheduling.notification.after.weekend.remainder.enable';
         </sql>
     </changeSet>
+
+    <changeSet id="add_locale_to_user" author="cyberdyne_systems">
+        <addColumn tableName="user" schemaName="public">
+            <column name="locale" type="varchar(10)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="migrate_category_to_i18n_props" author="cyberdyne_systems">
+        <renameColumn schemaName="public" tableName="category" oldColumnName="name" newColumnName="name_key"/>
+        <renameColumn schemaName="public" tableName="category" oldColumnName="description" newColumnName="description_key"/>
+    </changeSet>
+
+    <changeSet id="update_category_data_to_i18n_props" author="cyberdyne_systems">
+        <sql dbms="postgresql">
+            UPDATE public.category
+            SET
+            name_key='common.category.on.storage',
+            description_key='common.category.on.storage.description'
+            WHERE name_key='На складе';
+
+            UPDATE public.category
+            SET
+            name_key='common.category.on.order',
+            description_key='common.category.on.order.description'
+            WHERE name_key='На заказе';
+
+            UPDATE public.category
+            SET
+            name_key='common.category.on.office',
+            description_key='common.category.on.office.description'
+            WHERE name_key='На офисе';
+
+            UPDATE public.category
+            SET
+            name_key='common.category.on.coordination',
+            description_key='common.category.on.coordination.description'
+            WHERE name_key='На координации';
+        </sql>
+    </changeSet>
+
+    <changeSet id="add_column_deleted_to_category" author="cyberdyne_systems">
+        <addColumn tableName="category" schemaName="public">
+            <column name="deleted" type="boolean" defaultValue="false"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
