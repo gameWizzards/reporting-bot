@@ -10,7 +10,6 @@
     </parent>
     <groupId>com.reporting.telegram</groupId>
     <artifactId>reporting-telegrambot</artifactId>
-    <version>2.0.0</version>
     <name>Reporting TelegramBot</name>
     <description>Reporting Telegram bot</description>
 
@@ -152,6 +151,8 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <finalName>${project.artifactId}</finalName>
     </build>
 
 </project>

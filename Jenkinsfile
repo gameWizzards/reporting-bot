@@ -3,7 +3,11 @@ def remote = [name: env.BOT_NAME, host: env.BOT_HOST, allowAnyHosts: true]
 pipeline {
     agent any
     parameters{
-       booleanParam(defaultValue: true, description: 'Deploy reporting-bot', name: 'enable_step_DEPLOY')
+
+            booleanParam(defaultValue: true, description: 'Deploy reporting-bot', name: 'enable_step_DEPLOY')
+
+            string(defaultValue: '', description: 'Build reporting-bot from version', trim: true, name: 'build_version')
+
     }
      options {
         skipDefaultCheckout true
@@ -17,7 +21,7 @@ pipeline {
         WORKDIR = "${BUILDDIR}/workdir"
         TESTDIR = "${BUILDDIR}/testdir"
         APPDIR = "reporting-bot"
-        APPNAME = "reporting-telegrambot-1.0.0.jar"
+        APPNAME = "reporting-telegrambot.jar"
         SPRING_PROFILE = "dev"
     }
     stages{
@@ -27,10 +31,11 @@ pipeline {
                     withCredentials([sshUserPrivateKey(credentialsId: 'RepoBotHostDO-pk-Creds', keyFileVariable: 'USER_SECRET', usernameVariable: 'USER_LOGIN')]) {
                         remote.user = USER_LOGIN
                         remote.identityFile = USER_SECRET
-                        sshCommand remote: remote, command: String.format('docker exec reporting-bot ps -ef | grep java | grep -v grep | awk \'{print \$2}\' | docker exec -i reporting-bot xargs -r kill; docker exec reporting-bot mkdir -p %s; docker exec reporting-bot rm -rf %s; docker exec reporting-bot mkdir %s; docker exec reporting-bot git clone -b master https://github.com/gameWizzards/reporting-bot.git %s;',
+                        sshCommand remote: remote, command: String.format('docker start reporting-bot; docker exec reporting-bot ps -ef | grep java | grep -v grep | awk \'{print \$2}\' | docker exec -i reporting-bot xargs -r kill; docker exec reporting-bot mkdir -p %s; docker exec reporting-bot rm -rf %s; docker exec reporting-bot mkdir %s; docker exec reporting-bot git clone --depth 1 --branch %s https://github.com/gameWizzards/reporting-bot.git %s;',
                                                                             "$TESTDIR",
                                                                             "$TESTDIR/$APPDIR/",
                                                                             "$TESTDIR/$APPDIR/",
+                                                                            params.build_version,
                                                                             "$TESTDIR/$APPDIR/")
                     }
                 }
