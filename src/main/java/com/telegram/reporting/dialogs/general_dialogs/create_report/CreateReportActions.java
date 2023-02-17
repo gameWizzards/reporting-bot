@@ -1,10 +1,8 @@
 package com.telegram.reporting.dialogs.general_dialogs.create_report;
 
-import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
-import com.telegram.reporting.service.impl.MenuButtons;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.Report;
@@ -14,9 +12,10 @@ import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.ReportService;
+import com.telegram.reporting.service.RuntimeDialogManager;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.service.TimeRecordService;
+import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.utils.CommonUtils;
 import com.telegram.reporting.utils.DateTimeUtils;
 import com.telegram.reporting.utils.JsonUtils;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,7 +41,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CreateReportActions {
     private final SendBotMessageService sendBotMessageService;
-    private final TelegramUserService telegramUserService;
+    private final RuntimeDialogManager runtimeDialogManager;
     private final ReportService reportService;
     private final TimeRecordService timeRecordService;
     private final I18nMessageService i18NMessageService;
@@ -149,7 +147,7 @@ public class CreateReportActions {
                 chatId,
                 MessageKey.GCR_INPUT_SPEND_TIME);
 
-        SendMessage sendMessage = new SendMessage(CommonUtils.currentChatIdString(context),
+        SendMessage sendMessage = new SendMessage(chatId.toString(),
                 String.join("\n\n", userCategoryAcceptedMessage, inputSpendTimeMessage));
 
         sendBotMessageService.sendMessageWithKeys(sendMessage, i18nButtonService.createMainMenuInlineMarkup(chatId));
@@ -234,8 +232,7 @@ public class CreateReportActions {
         if (Objects.isNull(report)) {
             report = new Report();
 
-            User user = Optional.ofNullable(telegramUserService.findByChatId(chatId))
-                    .orElseThrow(() -> new TelegramUserException("Can't find user who's related with chatId = %s".formatted(chatId)));
+            User user = runtimeDialogManager.getPrincipalUser(chatId);
 
             report.setDate(DateTimeUtils.parseDefaultDate(date));
             report.setUser(user);

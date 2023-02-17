@@ -154,7 +154,7 @@ public class EditReportActions {
 
         String message = i18NMessageService.getMessage(chatId, MessageKey.GER_REQUEST_SEND_CHANGES, timeRecordMessage);
 
-        SendMessage sendMessage = new SendMessage(CommonUtils.currentChatIdString(context), message);
+        SendMessage sendMessage = new SendMessage(chatId.toString(), message);
         ReplyKeyboard inlineMarkup = i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.MAIN_MENU,
                 ButtonLabelKey.GER_APPLY_DATA_CHANGES, ButtonLabelKey.COMMON_CANCEL);
 
@@ -182,7 +182,7 @@ public class EditReportActions {
         String date = CommonUtils.getContextVarAsString(context, ContextVarKey.DATE);
         String message = i18NMessageService.getMessage(chatId, MessageKey.GER_REQUEST_EDIT_ADDITIONAL_REPORT, date);
 
-        SendMessage sendMessage = new SendMessage(CommonUtils.currentChatIdString(context), message);
+        SendMessage sendMessage = new SendMessage(chatId.toString(), message);
 
         ReplyKeyboard inlineMarkup = i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.MAIN_MENU,
                 ButtonLabelKey.COMMON_YES, ButtonLabelKey.COMMON_NO);

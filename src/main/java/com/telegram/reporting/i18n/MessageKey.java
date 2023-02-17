@@ -32,6 +32,7 @@ public enum MessageKey implements I18nKey {
     COMMON_WARNING_SOMETHING_GOING_WRONG("common.warning.something.going.wrong"),
     COMMON_WARNING_USER_INPUT_INSTEAD_BTN("common.warning.user.input.instead.btn"),
     COMMON_WARNING_CLICK_ANOTHER_DIALOG_BUTTON("common.warning.click.another.dialog.btn"),
+    COMMON_WARNING_USER_STATUS_DELETED("common.warning.user.status.deleted"),
     COMMON_EMPLOYEE_ROLE("common.employee.role"),
     COMMON_MANAGER_ROLE("common.manager.role"),
     COMMON_ADMIN_ROLE("common.admin.role"),

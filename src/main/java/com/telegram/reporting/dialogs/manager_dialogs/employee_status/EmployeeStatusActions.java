@@ -39,7 +39,7 @@ public class EmployeeStatusActions {
         Long chatId = CommonUtils.currentChatId(context);
         String message = i18NMessageService.getMessage(chatId, MessageKey.MESTATUS_CHOOSE_EMPLOYEE_LIST);
 
-        sendBotMessageService.sendMessageWithKeys(new SendMessage(CommonUtils.currentChatIdString(context), message),
+        sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId.toString(), message),
                 i18nButtonService.createSingleRowInlineMarkup(chatId, MenuButtons.MANAGER_MENU,
                         ButtonLabelKey.ALU_USER_STATUS_ACTIVE, ButtonLabelKey.ALU_USER_STATUS_DELETED));
     }

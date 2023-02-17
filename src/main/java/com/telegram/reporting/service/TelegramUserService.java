@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface TelegramUserService {
 
@@ -16,8 +15,6 @@ public interface TelegramUserService {
     User findById(Long id);
 
     User findByChatId(Long chatId);
-
-    List<User> findAll();
 
     List<User> findUsers(UserFilter filter);
 

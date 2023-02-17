@@ -1,7 +1,7 @@
 package com.telegram.reporting.service;
 
 import java.time.LocalDate;
-
+//TODO change to Spring native cache
 public interface StatisticDialogCacheProvider {
 
     String getStatisticMessage(Long chatId, LocalDate statisticDate);
