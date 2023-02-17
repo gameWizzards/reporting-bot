@@ -7,7 +7,9 @@ import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.entity.Role;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.repository.filter.UserFilter;
+import com.telegram.reporting.service.I18nPropsResolver;
 import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -56,11 +58,6 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
     public List<User> findUsers(UserFilter filter) {
         Validate.notEmpty(filter.userStatus(), "Required to use UserStatus in UserFilter. UserStatus is empty or NULL");
         Validate.noNullElements(filter.userStatus(), "UserStatus in UserFilter contains NULL element");
@@ -86,10 +83,10 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     @Override
     public User verifyContact(Message message) {
         if (Objects.isNull(message) || Objects.isNull(message.getContact())) {
-            return null;
+            throw new IllegalArgumentException("Can't verify contact because message doesn't contains contact info");
         }
         Contact contact = message.getContact();
-        String phone = contact.getPhoneNumber().replaceAll(" ", "");
+        String phone = CommonUtils.normalizePhoneNumber(contact.getPhoneNumber());
 
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new TelegramUserException("User with phone number [%s] is not registered yet! ChatId = %s.".formatted(phone, message.getChatId())));
@@ -110,8 +107,8 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     @Override
     public User findByPhone(String phone) {
         Validate.notBlank(phone, "Phone is required to search by it");
-        String fullFormatPhoneRegex = "^380[0-9]{9}";
-        if (!phone.matches(fullFormatPhoneRegex)) {
+
+        if (!CommonUtils.isCorrectPhoneFormat(phone)) {
             throw new PhoneFormatException("Wrong phone number format. Allowed 380971112233. Input=%s".formatted(phone));
         }
         return userRepository.findByPhone(phone)
@@ -137,6 +134,7 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         }
         user.setTelegramNickname(telegramNickName);
         user.setRoles(Set.of(Role.EMPLOYEE_ROLE));
+        user.setLocale(I18nPropsResolver.DEFAULT_LOCALE);
         user.setActivated(LocalDateTime.now());
         return save(user);
     }

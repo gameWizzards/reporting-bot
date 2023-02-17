@@ -1,18 +1,18 @@
 package com.telegram.reporting.dialogs.guards;
 
-import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.exception.TelegramUserException;
+import com.telegram.reporting.i18n.MonthKey;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.LockUpdateReportService;
+import com.telegram.reporting.service.RuntimeDialogManager;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.CommonUtils;
 import com.telegram.reporting.utils.DateTimeUtils;
-import com.telegram.reporting.i18n.MonthKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;
@@ -21,7 +21,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -30,6 +29,7 @@ public class GuardValidator {
 
     private final SendBotMessageService sendBotMessageService;
     private final TelegramUserService userService;
+    private final RuntimeDialogManager runtimeDialogManager;
     private final LockUpdateReportService lockService;
     private final I18nButtonService i18nButtonService;
     private final I18nMessageService i18NMessageService;
@@ -44,8 +44,7 @@ public class GuardValidator {
 
         if (userInput.matches(regexDay) || userInput.matches(regexDayMonth) || userInput.matches(regexFullDate)) {
             LocalDate reportDate = DateTimeUtils.parseShortDateToLocalDate(userInput);
-            User user = Optional.ofNullable(userService.findByChatId(chatId))
-                    .orElseThrow(() -> new TelegramUserException("Can't find user with chatId =%d".formatted(chatId)));
+            User user = runtimeDialogManager.getPrincipalUser(chatId);
 
             if (reportDate.isBefore(user.getActivated().toLocalDate())) {
                 String activatedDate = DateTimeUtils.toDefaultFormat(user.getActivated().toLocalDate());
@@ -81,7 +80,7 @@ public class GuardValidator {
         String dateErrorMessage = i18NMessageService.getMessage(chatId, MessageKey.GUARD_WARNING_WRONG_DATE_FORMAT);
 
         sendBotMessageService.sendMessageWithKeys(
-                new SendMessage(CommonUtils.currentChatIdString(context), dateErrorMessage),
+                new SendMessage(chatId.toString(), dateErrorMessage),
                 i18nButtonService.createMainMenuInlineMarkup(chatId));
 
         return false;
@@ -101,7 +100,7 @@ public class GuardValidator {
         String monthFormatErrorMessage = i18NMessageService.getMessage(chatId, MessageKey.GUARD_WARNING_WRONG_MONTH_FORMAT);
 
         sendBotMessageService.sendMessageWithKeys(
-                new SendMessage(CommonUtils.currentChatIdString(context), monthFormatErrorMessage),
+                new SendMessage(chatId.toString(), monthFormatErrorMessage),
                 i18nButtonService.createMainMenuInlineMarkup(chatId));
 
         return false;
@@ -118,7 +117,7 @@ public class GuardValidator {
         String timeErrorMessage = i18NMessageService.getMessage(chatId, MessageKey.GUARD_WARNING_WRONG_TIME_FORMAT);
 
         sendBotMessageService.sendMessageWithKeys(
-                new SendMessage(CommonUtils.currentChatIdString(context), timeErrorMessage),
+                new SendMessage(chatId.toString(), timeErrorMessage),
                 i18nButtonService.createMainMenuInlineMarkup(chatId));
         return false;
     }
@@ -129,7 +128,7 @@ public class GuardValidator {
         String userInput = CommonUtils.getContextVarAsString(context, ContextVarKey.REPORT_NOTE);
         String lastButtonText = CommonUtils.getContextVarAsString(context, ContextVarKey.BUTTON_CALLBACK_VALUE);
         boolean isSkipNote = ButtonLabelKey.GCR_SKIP_NOTE.value().equals(lastButtonText);
-
+        // TODO add max size limitation of message
         if (isSkipNote || (Objects.nonNull(userInput) && userInput.trim().length() >= minNoteLength)) {
             return true;
         }
@@ -140,55 +139,48 @@ public class GuardValidator {
                 String.valueOf(minNoteLength));
 
         sendBotMessageService.sendMessageWithKeys(
-                new SendMessage(CommonUtils.currentChatIdString(context), noteErrorMessage),
+                new SendMessage(chatId.toString(), noteErrorMessage),
                 i18nButtonService.createMainMenuInlineMarkup(chatId));
         return false;
     }
 
     public <S, E> boolean validatePhoneInput(StateContext<S, E> context) {
-        String specSymbolsRegex = "[()\\-+ ]";
-        String fullFormatPhoneRegex = "^380[0-9]{9}";
-
-        String userInput = CommonUtils.getContextVarAsString(context, ContextVarKey.PHONE);
         Long chatId = CommonUtils.currentChatId(context);
+        String userInput = CommonUtils.getContextVarAsString(context, ContextVarKey.PHONE);
 
-        String clearedInput = userInput.replaceAll(specSymbolsRegex, "");
-        String fullFormatPhone = clearedInput.startsWith("0") ? "38" + clearedInput : clearedInput;
-        boolean isCorrectPhoneFormat = fullFormatPhone.matches(fullFormatPhoneRegex);
+        String normalizedPhoneNumber = CommonUtils.normalizePhoneNumber(userInput);
 
-        if (isCorrectPhoneFormat) {
-            User user = userService.findByPhone(fullFormatPhone);
-            if (Objects.nonNull(user)) {
-                log.error("Try to create new user with phone number which already use by user. Phone = {}. Existed user = {}", fullFormatPhone, user);
+        if (!CommonUtils.isCorrectPhoneFormat(normalizedPhoneNumber)) {
+            String phoneFormatErrMessage = i18NMessageService.getMessage(chatId, MessageKey.GUARD_WARNING_WRONG_PHONE_FORMAT);
 
-                String userInfo = user.isActivated()
-                        ? user.getFullName()
-                        : i18NMessageService.getMessage(chatId, MessageKey.GUARD_WARNING_FAILED_DISPLAY_USERNAME);
-
-                String errMessage = i18NMessageService.getMessage(
-                        chatId,
-                        MessageKey.GUARD_WARNING_DUPLICATE_ADDING_PHONE,
-                        fullFormatPhone,
-                        userInfo);
-
-                sendBotMessageService.sendMessageWithKeys(
-                        new SendMessage(CommonUtils.currentChatIdString(context), errMessage),
-                        i18nButtonService.createMainMenuInlineMarkup(chatId));
-                return false;
-            }
+            sendBotMessageService.sendMessageWithKeys(
+                    new SendMessage(chatId.toString(), phoneFormatErrMessage),
+                    i18nButtonService.createMainMenuInlineMarkup(chatId));
+            return false;
         }
 
-        if (isCorrectPhoneFormat) {
-            context.getExtendedState().getVariables().put(ContextVarKey.PHONE, fullFormatPhone);
-            return true;
+        User existingUser = userService.findByPhone(normalizedPhoneNumber);
+        if (Objects.nonNull(existingUser)) {
+            log.error("Try to create new user with phone number which already use by user. Phone = {}. Existed user = {}", normalizedPhoneNumber, existingUser);
+
+            String userInfo = existingUser.isActivated()
+                    ? existingUser.getFullName()
+                    : i18NMessageService.getMessage(chatId, MessageKey.GUARD_WARNING_FAILED_DISPLAY_USERNAME);
+
+            String errMessage = i18NMessageService.getMessage(
+                    chatId,
+                    MessageKey.GUARD_WARNING_DUPLICATE_ADDING_PHONE,
+                    normalizedPhoneNumber,
+                    userInfo);
+
+            sendBotMessageService.sendMessageWithKeys(
+                    new SendMessage(chatId.toString(), errMessage),
+                    i18nButtonService.createMainMenuInlineMarkup(chatId));
+            return false;
         }
 
-        String phoneFormatErrMessage = i18NMessageService.getMessage(chatId, MessageKey.GUARD_WARNING_WRONG_PHONE_FORMAT);
-
-        sendBotMessageService.sendMessageWithKeys(
-                new SendMessage(CommonUtils.currentChatIdString(context), phoneFormatErrMessage),
-                i18nButtonService.createMainMenuInlineMarkup(chatId));
-        return false;
+        context.getExtendedState().getVariables().put(ContextVarKey.PHONE, normalizedPhoneNumber);
+        return true;
     }
 
     private boolean isWithin24Hours(String userInput) {

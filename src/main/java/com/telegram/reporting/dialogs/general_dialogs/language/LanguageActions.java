@@ -8,6 +8,7 @@ import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.I18nPropsResolver;
+import com.telegram.reporting.service.RuntimeDialogManager;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.service.impl.MenuButtons;
@@ -28,7 +29,8 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class LanguageActions {
     private final SendBotMessageService sendBotMessageService;
-    private final TelegramUserService telegramUserService;
+    private final TelegramUserService userService;
+    private final RuntimeDialogManager runtimeDialogManager;
     private final I18nButtonService i18nButtonService;
     private final I18nMessageService i18nMessageService;
     private final DialogRouterService dialogRouterService;
@@ -56,9 +58,9 @@ public class LanguageActions {
                     throw new IllegalArgumentException("Can't match button value with existing locales. Button value: " + buttonLabelKey);
         };
 
-        User user = telegramUserService.findByChatId(chatId);
+        User user = runtimeDialogManager.getPrincipalUser(chatId);
         user.setLocale(chosenLocale);
-        telegramUserService.save(user);
+        userService.save(user);
 
         String chosenLanguage = i18nMessageService.getMessage(chatId, buttonLabelKey);
         sendBotMessageService.sendMessage(chatId, i18nMessageService.getMessage(chatId, MessageKey.GL_RESULT_CHANGING_LANGUAGE, chosenLanguage));

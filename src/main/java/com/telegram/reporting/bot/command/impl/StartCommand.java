@@ -40,14 +40,15 @@ public class StartCommand implements Command {
     @Override
     public void execute(Update update) {
         Long chatId = CommonUtils.currentChatId(update);
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId.toString());
-        message.setText(i18nMessageService.getMessage(chatId, MessageKey.PD_BOT_FIRST_GREETING));
 
         User user = telegramUserService.findByChatId(chatId);
 
         if (Objects.isNull(user)) {
-            log.error("Can't find user by chatId={}. TelegramUser={}", chatId, update.getMessage().getFrom());
+            log.warn("Can't find user by chatId={}. TelegramUser={}", chatId, update.getMessage().getFrom());
+
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId.toString());
+            message.setText(i18nMessageService.getMessage(chatId, MessageKey.PD_BOT_FIRST_GREETING));
 
             String buttonLabel = i18nButtonService.getButtonLabel(chatId, ButtonLabelKey.COMMON_SHARE_PHONE);
             KeyboardRow shareContact = KeyboardUtils.createSimpleButton(buttonLabel);

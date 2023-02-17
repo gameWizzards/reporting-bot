@@ -15,6 +15,7 @@ import java.util.Objects;
 
 @Slf4j
 public class CommonUtils {
+    private static final String PHONE_FORMAT_REGEX = "^380[0-9]{9}";
     private CommonUtils() {
     }
 
@@ -26,10 +27,6 @@ public class CommonUtils {
 
     public static <S, E> Long currentChatId(StateContext<S, E> context) {
         return getContextVar(context, Long.class, ContextVarKey.CHAT_ID);
-    }
-
-    public static <S, E> String currentChatIdString(StateContext<S, E> context) {
-        return getContextVar(context, Long.class, ContextVarKey.CHAT_ID).toString();
     }
 
     public static <S, E> String getContextVarAsString(StateContext<S, E> context, ContextVarKey key) {
@@ -106,5 +103,23 @@ public class CommonUtils {
 
     public static boolean hasAccess(DialogHandler handler, User user) {
          return !Collections.disjoint(handler.roleAccessibility(), user.getRoles());
+    }
+
+    public static String normalizePhoneNumber(String phone) {
+        if (StringUtils.isBlank(phone)) {
+            return "";
+        }
+
+        String specSymbolsRegex = "[()\\-+ ]";
+
+        String clearedInput = phone.replaceAll(specSymbolsRegex, "");
+        return clearedInput.startsWith("0")
+                ? "38" + clearedInput
+                : clearedInput;
+
+    }
+
+    public static boolean isCorrectPhoneFormat(String phone) {
+        return phone.matches(PHONE_FORMAT_REGEX);
     }
 }

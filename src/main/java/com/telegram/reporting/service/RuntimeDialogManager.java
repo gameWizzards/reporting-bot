@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface RuntimeDialogManager {
 
-    void addPrincipalUser(Long chatId, User user);
+    User addPrincipalUser(Long chatId);
 
     void removePrincipalUser(Long chatId);
 

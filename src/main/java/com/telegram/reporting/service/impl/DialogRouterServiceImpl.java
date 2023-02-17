@@ -53,7 +53,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
                 startFlow(user.getChatId(), user.getLocale());
 
             } catch (TelegramUserException e) {
-                log.error("Can't verify contact! Reason: {}", e.getMessage(), e);
+                log.error("Can't verify contact! Reason: {}", e.getMessage());
                 sendBotMessageService.sendMessage(chatId, i18NMessageService.getMessage(chatId, MessageKey.PD_FAILED_CONTACT_CHECKING));
             }
             return;
