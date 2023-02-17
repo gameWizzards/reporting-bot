@@ -21,7 +21,7 @@
         <apache.commons.version>3.12.0</apache.commons.version>
         <statemachine.version>3.0.1</statemachine.version>
         <jackson-datatype.version>2.13.2</jackson-datatype.version>
-        <liquibase.version>4.6.2</liquibase.version>
+        <liquibase.version>4.19.0</liquibase.version>
 
         <log4j2.version>2.17.2</log4j2.version>
 
