@@ -24,6 +24,8 @@ spring:
     properties:
       hibernate:
         format_sql: false
+  banner:
+    location: classpath:META-INF/banner.txt
 
 # TelegramBot configurations:
 bot:
@@ -33,8 +35,8 @@ bot:
 # Tomcat config:
 server:
   port: 8008
-  connection-timeout: 20s
   tomcat:
+    connection-timeout: 20s
     threads:
       max: 100
 
