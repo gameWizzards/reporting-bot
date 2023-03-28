@@ -66,8 +66,8 @@ public abstract class AbstractSubDialogHandlerDelegate implements SubDialogHandl
 
         List<List<InlineKeyboardButton>> subMenuDialogButtons = i18nButtonService.getSubMenuButtons(chatId, dialogHandlerAlias());
 
-        ReplyKeyboard inlineMarkup = i18nButtonService.createInlineMarkup(chatId, MenuButtons.MAIN_MENU, subMenuDialogButtons);
-        sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId.toString(), startFlowMessage), inlineMarkup);
+        ReplyKeyboard subMenuMarkup = i18nButtonService.createInlineMarkup(chatId, MenuButtons.MAIN_MENU, subMenuDialogButtons);
+        sendBotMessageService.sendMessageWithKeys(new SendMessage(chatId.toString(), startFlowMessage), subMenuMarkup);
     }
 
     @Override

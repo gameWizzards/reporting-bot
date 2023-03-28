@@ -1,5 +1,6 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.bot.event.SendContactEvent;
 import com.telegram.reporting.exception.PhoneFormatException;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.repository.UserRepository;
@@ -10,12 +11,10 @@ import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.I18nPropsResolver;
 import com.telegram.reporting.service.TelegramUserService;
 import com.telegram.reporting.utils.CommonUtils;
-import org.apache.commons.lang3.StringUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.telegram.telegrambots.meta.api.objects.Contact;
-import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,13 +25,10 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class TelegramUserServiceImpl implements TelegramUserService {
 
     private final UserRepository userRepository;
-
-    public TelegramUserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public User save(User user) {
@@ -80,17 +76,12 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         return result;
     }
 
-    @Override
-    public User verifyContact(Message message) {
-        if (Objects.isNull(message) || Objects.isNull(message.getContact())) {
-            throw new IllegalArgumentException("Can't verify contact because message doesn't contains contact info");
-        }
-        Contact contact = message.getContact();
-        String phone = CommonUtils.normalizePhoneNumber(contact.getPhoneNumber());
+    public User verifyContact(SendContactEvent event) {
+        User user = userRepository.findByPhone(event.normalizedPhoneNumber())
+                .orElseThrow(() -> new TelegramUserException("User with phone number [%s] is not registered yet! ChatId = %s."
+                        .formatted(event.normalizedPhoneNumber(), event.chatId())));
 
-        User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new TelegramUserException("User with phone number [%s] is not registered yet! ChatId = %s.".formatted(phone, message.getChatId())));
-        return activateUser(user, contact, message.getChatId(), message.getFrom().getUserName());
+        return activateUser(user, event);
     }
 
     @Override
@@ -121,18 +112,11 @@ public class TelegramUserServiceImpl implements TelegramUserService {
         userRepository.delete(user);
     }
 
-    private User activateUser(User user, Contact contact, Long chatId, String telegramNickName) {
-        user.setChatId(chatId);
-        if (StringUtils.isBlank(user.getName())) {
-            user.setName(contact.getFirstName());
-        }
-        if (StringUtils.isBlank(user.getSurname()) && StringUtils.isNotBlank(contact.getLastName())) {
-            user.setSurname(contact.getLastName());
-        } else {
-            // need for better identification in report or list of employee
-            user.setSurname(contact.getPhoneNumber());
-        }
-        user.setTelegramNickname(telegramNickName);
+    private User activateUser(User user, SendContactEvent event) {
+        user.setChatId(event.chatId());
+        user.setName(event.name());
+        user.setSurname(event.surname());
+        user.setTelegramNickname(event.nickName());
         user.setRoles(Set.of(Role.EMPLOYEE_ROLE));
         user.setLocale(I18nPropsResolver.DEFAULT_LOCALE);
         user.setActivated(LocalDateTime.now());

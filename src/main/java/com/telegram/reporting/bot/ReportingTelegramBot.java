@@ -1,8 +1,9 @@
 package com.telegram.reporting.bot;
 
 import com.telegram.reporting.bot.command.CommandContainer;
+import com.telegram.reporting.bot.event.CommandEvent;
+import com.telegram.reporting.bot.event.TelegramEvent;
 import com.telegram.reporting.service.DialogRouterService;
-import com.telegram.reporting.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -21,20 +22,25 @@ public class ReportingTelegramBot extends TelegramLongPollingBot {
 
     private final DialogRouterService dialogRouterService;
     private final CommandContainer commandContainer;
+    private final TelegramEventFactory eventFactory;
 
-    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService, CommandContainer commandContainer) {
+    public ReportingTelegramBot(@Lazy DialogRouterService dialogRouterService, CommandContainer commandContainer,
+                                TelegramEventFactory eventFactory) {
         this.dialogRouterService = dialogRouterService;
         this.commandContainer = commandContainer;
+        this.eventFactory = eventFactory;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (CommonUtils.hasMessageText(update) && CommonUtils.isTelegramCommand(update)) {
-            commandContainer.findCommand(CommonUtils.getMessageText(update)).execute(update);
+        TelegramEvent event = eventFactory.getEvent(update);
+
+        if (event instanceof CommandEvent commandEvent) {
+            commandContainer.findCommand(commandEvent.command()).execute(commandEvent);
             return;
         }
-        // TODO change Update object to Some Adapter(interface with 3 impl - user input, simple button, inline button)
-        dialogRouterService.handleTelegramUpdateEvent(update);
+
+        dialogRouterService.handleTelegramEvent(event);
     }
 
     @Override

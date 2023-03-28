@@ -1,5 +1,6 @@
 package com.telegram.reporting.bot.command.impl;
 
+import com.telegram.reporting.bot.event.CommandEvent;
 import com.telegram.reporting.bot.command.Command;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
@@ -9,13 +10,11 @@ import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TelegramUserService;
-import com.telegram.reporting.utils.CommonUtils;
 import com.telegram.reporting.utils.KeyboardUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.Objects;
@@ -38,13 +37,12 @@ public class StartCommand implements Command {
     }
 
     @Override
-    public void execute(Update update) {
-        Long chatId = CommonUtils.currentChatId(update);
+    public void execute(CommandEvent event) {
+        Long chatId = event.chatId();
+        User activatedUser = telegramUserService.findByChatId(event.chatId());
 
-        User user = telegramUserService.findByChatId(chatId);
-
-        if (Objects.isNull(user)) {
-            log.warn("Can't find user by chatId={}. TelegramUser={}", chatId, update.getMessage().getFrom());
+        if (Objects.isNull(activatedUser)) {
+            log.warn("Can't find activatedUser by chatId={}. TelegramUser={}", chatId, event.fromUser());
 
             SendMessage message = new SendMessage();
             message.setChatId(chatId.toString());
@@ -55,7 +53,7 @@ public class StartCommand implements Command {
             shareContact.get(0).setRequestContact(true);
             sendBotMessageService.sendMessageWithKeys(message, KeyboardUtils.createKeyboardMarkup(shareContact));
         } else {
-            dialogRouterService.startFlow(chatId, user.getLocale());
+            dialogRouterService.startFlow(chatId, activatedUser.getLocale());
         }
     }
 }

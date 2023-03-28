@@ -3,6 +3,7 @@ package com.telegram.reporting.utils;
 import com.telegram.reporting.bot.command.Command;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DialogHandler;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.repository.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Slf4j
 public class CommonUtils {
     private static final String PHONE_FORMAT_REGEX = "^380[0-9]{9}";
+
     private CommonUtils() {
     }
 
@@ -45,31 +47,16 @@ public class CommonUtils {
     }
 
     public static String getMessageText(Update update) {
-        if (Objects.nonNull(update.getMessage())) {
+        if (hasMessageText(update)) {
             return update.getMessage().getText().trim();
         }
-        return update.getCallbackQuery().getMessage().getText().trim();
+        return "";
     }
 
-    public static boolean hasMessageText(Update update) {
-        if (Objects.nonNull(update.getMessage())) {
-            return Objects.nonNull(update.getMessage().getText());
-        }
-        return Objects.nonNull(update.getCallbackQuery().getMessage().getText());
-    }
-
-    public static boolean hasContact(Update update) {
-        return Objects.nonNull(update.getMessage()) && update.getMessage().hasContact();
-    }
 
     public static String getButtonCallbackData(Update update) {
         return update.getCallbackQuery().getData();
     }
-
-    public static boolean isInlineButton(Update update) {
-        return update.hasCallbackQuery() && StringUtils.isNotBlank(update.getCallbackQuery().getData());
-    }
-
 
     public static String createLogPrefix(String dialogName, Long chatId) {
         return "%s-[%s]".formatted(chatId, dialogName);
@@ -88,21 +75,40 @@ public class CommonUtils {
     }
 
     public static boolean isTelegramCommand(Update update) {
-        String message = CommonUtils.getMessageText(update);
-        return message.startsWith(Command.COMMAND_PREFIX);
+        return hasMessageText(update) && getMessageText(update).startsWith(Command.COMMAND_PREFIX);
     }
 
-    public static boolean isDynamicOrdinalInlineButton(String buttonCallbackData) {
+    public static boolean isSendContact(Update update) {
+        return Objects.nonNull(update.getMessage()) && update.getMessage().hasContact();
+    }
+
+    public static boolean isInlineButton(Update update) {
+        return update.hasCallbackQuery() && StringUtils.isNotBlank(update.getCallbackQuery().getData());
+    }
+
+    public static boolean isDynamicOrdinalInlineButton(Update update) {
+        String buttonCallbackData = getButtonCallbackData(update);
+        boolean belongToExistingInlineButton = Objects.nonNull(ButtonLabelKey.getByKey(buttonCallbackData));
+
+        if (belongToExistingInlineButton) {
+            return false;
+        }
+
         try {
             Long.parseLong(buttonCallbackData);
             return true;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Received unappropriated callback data when try to check for Ordinal button. Callback data=" + buttonCallbackData);
+            log.error("Received unappropriated callback data when try to check for Ordinal button. Callback data=" + buttonCallbackData);
+            return false;
         }
     }
 
+    public static boolean isUserInput(Update update) {
+        return !isTelegramCommand(update);
+    }
+
     public static boolean hasAccess(DialogHandler handler, User user) {
-         return !Collections.disjoint(handler.roleAccessibility(), user.getRoles());
+        return !Collections.disjoint(handler.roleAccessibility(), user.getRoles());
     }
 
     public static String normalizePhoneNumber(String phone) {
@@ -116,10 +122,13 @@ public class CommonUtils {
         return clearedInput.startsWith("0")
                 ? "38" + clearedInput
                 : clearedInput;
-
     }
 
     public static boolean isCorrectPhoneFormat(String phone) {
         return phone.matches(PHONE_FORMAT_REGEX);
+    }
+
+    public static boolean hasMessageText(Update update) {
+        return Objects.nonNull(update.getMessage()) && Objects.nonNull(update.getMessage().getText());
     }
 }
