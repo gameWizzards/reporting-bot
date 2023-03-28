@@ -12,8 +12,6 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -35,14 +33,11 @@ public class I18nPropsResolverImpl implements I18nPropsResolver {
     public String getPropsValue(Long chatId, String key, String... args) {
         Validate.notBlank(key, "Key is required to resolve I18n properties. ChatId: %d".formatted(chatId));
 
-        User principalUser = null;
+        User principalUser;
+
         try {
             principalUser = runtimeDialogManager.getPrincipalUser(chatId);
         } catch (TelegramUserException | TelegramUserDeletedException e) {
-            log.warn("Not valid user. Can't get locale. Reason: {}", e.getMessage());
-        }
-
-        if (Objects.isNull(principalUser)) {
             return messageSource.getMessage(key, args, DEFAULT_LOCALE);
         }
         return messageSource.getMessage(key, args, principalUser.getLocale());

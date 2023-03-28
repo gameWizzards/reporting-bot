@@ -37,6 +37,13 @@ public class DefaultMenuTemplateServiceImpl implements MenuTemplateService {
         return subMenuStructure.get(dialogHandlerAlias);
     }
 
+    @Override
+    public boolean belongToRootMenu(ButtonLabelKey buttonLabelKey) {
+        return rootMenuStructure.values().stream()
+                .flatMap(List::stream)
+                .anyMatch(buttonLabels -> buttonLabels.contains(buttonLabelKey));
+    }
+
     private List<List<ButtonLabelKey>> generalRootMenuStructure() {
         return List.of(
                 List.of(ButtonLabelKey.GCR_START_DIALOG),

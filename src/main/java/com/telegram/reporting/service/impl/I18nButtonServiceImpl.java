@@ -97,8 +97,7 @@ public class I18nButtonServiceImpl implements I18nButtonService {
         subDialogHandlers.stream()
                 .map(SubDialogHandlerDelegate::getRootMenuTemplate)
                 .flatMap(Collection::stream)
-                .flatMap(Collection::stream)
-                .forEach(availableMenuButtons::add);
+                .forEach(availableMenuButtons::addAll);
 
         // filtering by access role & sorting the root menu template
         List<List<ButtonLabelKey>> rootMenuTemplate = dialogHandlers.stream()

@@ -1,11 +1,11 @@
 package com.telegram.reporting.bot.command;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
+import com.telegram.reporting.bot.event.CommandEvent;
 
 public interface Command {
     String COMMAND_PREFIX = "/";
 
     String alias();
 
-    void execute(Update update);
+    void execute(CommandEvent event);
 }

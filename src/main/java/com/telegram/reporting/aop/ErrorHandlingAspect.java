@@ -2,6 +2,7 @@ package com.telegram.reporting.aop;
 
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.exception.ButtonToEventMappingException;
+import com.telegram.reporting.exception.TelegramEventException;
 import com.telegram.reporting.exception.TelegramUserDeletedException;
 import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.service.I18nButtonService;
@@ -88,5 +89,14 @@ public class ErrorHandlingAspect {
                 I18nPropsResolver.DEFAULT_LOCALE);
 
         sendBotMessageService.sendMessage(chatId, deletedUserErrMessage);
+    }
+
+    @AfterThrowing(pointcut = "this(com.telegram.reporting.bot.TelegramEventFactory)", throwing = "e")
+    public void onTelegramEventExceptionMessage(TelegramEventException e) {
+        Long chatId = e.getChatId();
+
+        SendMessage sendMessage = new SendMessage(chatId.toString(),
+                i18NMessageService.getMessage(chatId, MessageKey.COMMON_WARNING_SOMETHING_GOING_WRONG));
+        sendBotMessageService.sendMessageWithKeys(sendMessage, i18nButtonService.createMainMenuInlineMarkup(chatId));
     }
 }

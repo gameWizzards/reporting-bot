@@ -9,4 +9,6 @@ public interface MenuTemplateService {
     List<List<ButtonLabelKey>> rootMenuTemplate(DialogHandlerAlias dialogHandlerAlias);
 
     List<List<ButtonLabelKey>> subMenuTemplate(DialogHandlerAlias dialogHandlerAlias);
+
+    boolean belongToRootMenu(ButtonLabelKey buttonLabelKey);
 }
