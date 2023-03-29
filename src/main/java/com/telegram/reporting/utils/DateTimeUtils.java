@@ -19,7 +19,8 @@ public final class DateTimeUtils {
     private static final String DATE_TYPE = "Date";
     private static final String DATE_TIME_TYPE = "DateTime";
 
-    private DateTimeUtils() {}
+    private DateTimeUtils() {
+    }
 
     public static LocalDate parseDefaultDate(String date) {
         checkStringInputFormat(date, DEFAULT_DATE_PATTERN, DATE_TYPE);
@@ -58,7 +59,7 @@ public final class DateTimeUtils {
             return false;
         }
         return (checkedDate.isEqual(startPeriod) || checkedDate.isAfter(startPeriod))
-                && (checkedDate.isEqual(finishPeriod) || checkedDate.isBefore(finishPeriod));
+               && (checkedDate.isEqual(finishPeriod) || checkedDate.isBefore(finishPeriod));
     }
 
     public static LocalDate getStatisticMonth(String statisticDate) {
