@@ -1,4 +1,4 @@
-package com.telegram.reporting.scheduler;
+package com.telegram.reporting.config;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;

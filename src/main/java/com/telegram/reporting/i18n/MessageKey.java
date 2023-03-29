@@ -129,8 +129,13 @@ public enum MessageKey implements I18nKey {
     PD_FAILED_CONTACT_CHECKING("predialog.failed.contact.checking"),
     PD_START_FLOW_MESSAGE("predialog.start.flow"),
     PD_SUCCESS_CONTACT_SHARING("predialog.success.contact.sharing"),
-    PD_UNKNOWN_COMMAND_CHOSEN("predialog.unknown.command.chosen");
+    PD_UNKNOWN_COMMAND_CHOSEN("predialog.unknown.command.chosen"),
 
+    //notification
+    NOTIFICATION_REPORT_REMAINDER_BEFORE_WEEKEND("notification.report.remainder.before.weekend"),
+    NOTIFICATION_REPORT_REMAINDER_AFTER_WEEKEND("notification.report.remainder.after.weekend"),
+
+    ;
     private final String value;
 
     MessageKey(String value) {

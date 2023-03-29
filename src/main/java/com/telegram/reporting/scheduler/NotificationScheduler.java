@@ -1,7 +1,10 @@
 package com.telegram.reporting.scheduler;
 
+import com.telegram.reporting.i18n.I18nKey;
+import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.repository.filter.UserFilter;
+import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.SettingService;
 import com.telegram.reporting.service.TelegramUserService;
@@ -29,13 +32,13 @@ public class NotificationScheduler {
     private final SettingService settingService;
     private final TelegramUserService userService;
     private final SendBotMessageService sendBotMessageService;
+    private final I18nMessageService i18nMessageService;
 
     @Scheduled(cron = "0 0 19 * * 4")
-    public void endWeekReportRemainder() {
+    public void beforeWeekendReportRemainder() {
         if (isSendingReportsRemainderEnable()) {
-            log.info("Execute EndWeekReportRemainder");
-            var message = "%s, впереди выходные и работа на заказах, отправь отчеты за работу в будние дни)";
-            executeReminderNotification(message);
+            log.info("Execute BeforeWeekendReportRemainder");
+            executeReminderNotification(MessageKey.NOTIFICATION_REPORT_REMAINDER_BEFORE_WEEKEND);
         }
     }
 
@@ -43,14 +46,13 @@ public class NotificationScheduler {
     public void afterWeekendReportRemainder() {
         if (isSendingReportsRemainderEnable()) {
             log.info("Execute AfterWeekendReportRemainder");
-            var message = "%s, выходные прошли, не забудь отправить отчеты)";
-            executeReminderNotification(message);
+            executeReminderNotification(MessageKey.NOTIFICATION_REPORT_REMAINDER_AFTER_WEEKEND);
         }
     }
 
-    private void executeReminderNotification(String message) {
-        StringBuilder listChatIdsLogging = new StringBuilder();
+    private void executeReminderNotification(I18nKey messageKey) {
         String excludeEmployeeByChatIds = settingService.getValue("scheduling.notification.exclude.employee.chat.ids").orElse("");
+
         List<Long> excludeChatIds = Arrays.stream(excludeEmployeeByChatIds.split(","))
                 .mapToLong(Long::parseLong)
                 .boxed()
@@ -60,13 +62,16 @@ public class NotificationScheduler {
                 .userStatus(UserFilter.UserStatus.ACTIVE)
                 .build();
 
-        List<User> employeesToRemindChatIds = userService.findUsers(filter).stream()
+        StringBuilder listChatIdsLogging = new StringBuilder();
+        List<User> employeesToRemind = userService.findUsers(filter).stream()
                 .filter(user -> !excludeChatIds.contains(user.getChatId()))
                 .peek(user -> listChatIdsLogging.append(user.getChatId()).append(" "))
                 .toList();
 
-        log.info("Notification sent to Chats = [{}]. Text [{}]", listChatIdsLogging, message);
-        employeesToRemindChatIds.forEach(user -> sendBotMessageService.sendMessage(user.getChatId(), message.formatted(user.getName())));
+        log.info("Notification sent to Chats = [{}]. Text [{}]", listChatIdsLogging, messageKey.value());
+
+        employeesToRemind.forEach(user -> sendBotMessageService.sendMessage(user.getChatId(),
+                i18nMessageService.getMessage(user.getChatId(), messageKey).formatted(user.getName())));
     }
 
     private boolean isSendingReportsRemainderEnable() {
