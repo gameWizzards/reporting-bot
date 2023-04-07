@@ -3,6 +3,7 @@ package com.telegram.reporting.service.impl;
 import com.telegram.reporting.repository.ReportRepository;
 import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.service.ReportService;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
     private final ReportRepository reportRepository;
-
-    public ReportServiceImpl(ReportRepository reportRepository) {
-        this.reportRepository = reportRepository;
-    }
 
     @Override
     public Report save(Report report) {

@@ -8,6 +8,7 @@ import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
@@ -29,6 +30,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,7 @@ public class CreateReportActions {
     private final I18nMessageService i18NMessageService;
     private final I18nButtonService i18nButtonService;
     private final CategoryService categoryService;
+    private final CacheService cacheService;
 
     public void requestInputDate(StateContext<CreateReportState, CreateReportEvent> context) {
         Long chatId = CommonUtils.currentChatId(context);
@@ -224,23 +227,25 @@ public class CreateReportActions {
 
     public void persistReport(StateContext<CreateReportState, CreateReportEvent> context) {
         Long chatId = CommonUtils.currentChatId(context);
-        String date = CommonUtils.getContextVarAsString(context, ContextVarKey.DATE);
+        LocalDate date = DateTimeUtils.parseDefaultDate(CommonUtils.getContextVarAsString(context, ContextVarKey.DATE));
         String timeRecordJson = CommonUtils.getContextVarAsString(context, ContextVarKey.TIME_RECORDS_JSON);
 
-        Report report = reportService.getReportByDateAndChatId(DateTimeUtils.parseDefaultDate(date), chatId);
+        Report report = reportService.getReportByDateAndChatId(date, chatId);
 
         if (Objects.isNull(report)) {
             report = new Report();
 
             User user = runtimeDialogManager.getPrincipalUser(chatId);
 
-            report.setDate(DateTimeUtils.parseDefaultDate(date));
+            report.setDate(date);
             report.setUser(user);
         }
 
         List<TimeRecord> timeRecordEntities = timeRecordService.convertToTimeRecordEntities(timeRecordJson, report);
         report.setTimeRecords(timeRecordEntities);
         reportService.save(report);
+
+        cacheService.evictCache(CacheService.EMPLOYEE_STATISTIC_CACHE, chatId, date);
 
         log.info("{} report saved - {}", CommonUtils.getContextVarAsString(context, ContextVarKey.LOG_PREFIX), report);
 

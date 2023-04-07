@@ -11,7 +11,6 @@ import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.utils.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
@@ -30,7 +29,6 @@ public class StatisticDialogProcessor implements DialogProcessor {
     private final StateMachineFactory<StatisticState, StatisticEvent> stateMachineFactory;
     private final SendBotMessageService sendBotMessageService;
     private final I18nMessageService i18NMessageService;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void handleButtonClick(Long chatId, ButtonLabelKey buttonLabelKey) {
@@ -67,7 +65,6 @@ public class StatisticDialogProcessor implements DialogProcessor {
 
         stateMachines.put(chatId, stateMachine);
 
-        eventPublisher.publishEvent(new ClearStatisticCacheEvent(chatId));
         return this;
     }
 
