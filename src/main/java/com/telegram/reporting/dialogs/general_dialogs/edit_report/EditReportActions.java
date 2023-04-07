@@ -1,18 +1,20 @@
 package com.telegram.reporting.dialogs.general_dialogs.edit_report;
 
-import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
-import com.telegram.reporting.service.impl.MenuButtons;
+import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Category;
 import com.telegram.reporting.repository.entity.TimeRecord;
+import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TimeRecordService;
+import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.utils.CommonUtils;
+import com.telegram.reporting.utils.DateTimeUtils;
 import com.telegram.reporting.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -36,6 +39,7 @@ public class EditReportActions {
     private final TimeRecordService timeRecordService;
     private final I18nMessageService i18NMessageService;
     private final I18nButtonService i18nButtonService;
+    private final CacheService cacheService;
 
     public void requestChooseEditData(StateContext<EditReportState, EditReportEvent> context) {
         Long chatId = CommonUtils.currentChatId(context);
@@ -164,6 +168,8 @@ public class EditReportActions {
     public void saveTimeRecordChanges(StateContext<EditReportState, EditReportEvent> context) {
         Long chatId = CommonUtils.currentChatId(context);
         String editTimeRecord = CommonUtils.getContextVarAsString(context, ContextVarKey.TARGET_TIME_RECORD_JSON);
+        LocalDate date = DateTimeUtils.parseDefaultDate(CommonUtils.getContextVarAsString(context, ContextVarKey.DATE));
+
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecord, TimeRecordTO.class);
         TimeRecord timeRecord = timeRecordService.getById(trTO.getId());
         Category category = categoryService.getCategoryByName(trTO.getCategoryNameKey());
@@ -173,6 +179,9 @@ public class EditReportActions {
         timeRecord.setCategory(category);
 
         timeRecordService.save(timeRecord);
+
+        cacheService.evictCache(CacheService.EMPLOYEE_STATISTIC_CACHE, chatId, date);
+
         context.getExtendedState().getVariables().remove(ContextVarKey.TARGET_TIME_RECORD_JSON);
         sendBotMessageService.sendMessage(chatId, i18NMessageService.getMessage(chatId, MessageKey.GER_REPORT_SUCCESSFUL_UPDATED));
     }

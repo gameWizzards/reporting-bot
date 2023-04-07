@@ -27,6 +27,18 @@ spring:
   banner:
     location: classpath:META-INF/banner.txt
 
+cache-config:
+  caffeine:
+    caches:
+      - name: employeeStatistic
+        capacity: 100
+        maxSize: 200
+        ttlSecond: 300
+#      - name: managerStatistic
+#        capacity: 100
+#        maxSize: 300
+#        ttlSecond: 300
+
 # TelegramBot configurations:
 bot:
   username: ${BOT_USERNAME}

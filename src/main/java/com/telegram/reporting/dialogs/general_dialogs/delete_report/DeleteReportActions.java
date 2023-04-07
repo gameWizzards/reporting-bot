@@ -2,6 +2,7 @@ package com.telegram.reporting.dialogs.general_dialogs.delete_report;
 
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
+import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
@@ -10,6 +11,7 @@ import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.TimeRecordService;
 import com.telegram.reporting.utils.CommonUtils;
+import com.telegram.reporting.utils.DateTimeUtils;
 import com.telegram.reporting.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
+import java.time.LocalDate;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -29,6 +32,7 @@ public class DeleteReportActions {
     private final TimeRecordService timeRecordService;
     private final I18nButtonService i18nButtonService;
     private final I18nMessageService i18NMessageService;
+    private final CacheService cacheService;
 
     public void requestDeleteConfirmation(StateContext<DeleteReportState, DeleteReportEvent> context) {
         Long chatId = CommonUtils.currentChatId(context);
@@ -50,15 +54,18 @@ public class DeleteReportActions {
     public void removeTimeRecord(StateContext<DeleteReportState, DeleteReportEvent> context) {
         Long chatId = CommonUtils.currentChatId(context);
         String timeRecordJson = CommonUtils.getContextVarAsString(context, ContextVarKey.TARGET_TIME_RECORD_JSON);
+        LocalDate date = DateTimeUtils.parseDefaultDate(CommonUtils.getContextVarAsString(context, ContextVarKey.DATE));
 
         if (StringUtils.isBlank(timeRecordJson)) {
             sendBotMessageService.sendMessage(chatId, i18NMessageService.getMessage(chatId, MessageKey.GDR_FAILURE_DELETING_REPORT));
 
             throw new NoSuchElementException("Can't find timeRecord to delete on Date = %s"
-                    .formatted(CommonUtils.getContextVarAsString(context, ContextVarKey.DATE)));
+                    .formatted(date));
         }
         TimeRecordTO timeRecordTO = JsonUtils.deserializeItem(timeRecordJson, TimeRecordTO.class);
         timeRecordService.deleteByTimeRecordTO(timeRecordTO);
+
+        cacheService.evictCache(CacheService.EMPLOYEE_STATISTIC_CACHE, chatId, date);
 
         log.info("{} timeRecord removed - {}", CommonUtils.getContextVarAsString(context, ContextVarKey.LOG_PREFIX), timeRecordTO);
 

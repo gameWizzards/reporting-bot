@@ -3,20 +3,22 @@ package com.telegram.reporting.service.impl;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.i18n.MessageKey;
+import com.telegram.reporting.i18n.MonthKey;
 import com.telegram.reporting.repository.dto.EmployeeTO;
 import com.telegram.reporting.repository.dto.TimeRecordTO;
 import com.telegram.reporting.repository.entity.Report;
 import com.telegram.reporting.repository.entity.Role;
 import com.telegram.reporting.repository.entity.TimeRecord;
 import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.I18nPropsResolver;
 import com.telegram.reporting.utils.DateTimeUtils;
-import com.telegram.reporting.i18n.MonthKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -193,6 +195,9 @@ public class I18nMessageServiceImpl implements I18nMessageService {
                 fullName, employeeTO.getPhone(), roles, employeeStatus);
     }
 
+    @Cacheable(value = CacheService.EMPLOYEE_STATISTIC_CACHE,
+            key = "#chatId.toString + #statisticDate.monthValue + #statisticDate.year")
+    @Override
     public String createMonthStatisticMessage(Long chatId, LocalDate statisticDate, List<Report> reports) {
         AtomicInteger ordinalNumb = new AtomicInteger(1);
         Map<String, Integer> categoryHours = new HashMap<>();
