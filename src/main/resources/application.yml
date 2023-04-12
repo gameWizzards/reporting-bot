@@ -1,7 +1,7 @@
 # Application configurations:
 spring:
   liquibase:
-    change-log: classpath:/migrations/liquibase-changeLog.xml
+    change-log: classpath:/migrations/1-root-changeLog.xml
   date:
     redis:
       repositories:
