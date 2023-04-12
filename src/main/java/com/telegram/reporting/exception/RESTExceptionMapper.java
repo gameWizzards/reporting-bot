@@ -20,21 +20,16 @@ import java.util.NoSuchElementException;
 public class RESTExceptionMapper {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Object> handleMethodArgumentException(MissingServletRequestParameterException ex, ServletWebRequest servletRequest) {
-        val httpRequest = servletRequest.getRequest();
-        return createResponse(
-                ex.getMessage(),
-                httpRequest.getMethod(),
-                httpRequest.getServletPath(),
-                HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Object> handleMethodArgumentException(MissingServletRequestParameterException e, ServletWebRequest servletRequest) {
+        return createResponse(e, servletRequest, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, ServletWebRequest servletRequest) {
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e, ServletWebRequest servletRequest) {
         val httpRequest = servletRequest.getRequest();
         val httpStatus = HttpStatus.BAD_REQUEST;
 
-        val apiExceptionTOS = ex.getConstraintViolations().stream()
+        val apiExceptionTOS = e.getConstraintViolations().stream()
                 .map(cv -> new ApiExceptionTO(
                         cv.getMessage(),
                         httpRequest.getMethod(),
@@ -46,37 +41,40 @@ public class RESTExceptionMapper {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Object> handleNotFoundException(NoSuchElementException ex, ServletWebRequest servletRequest) {
-        val httpRequest = servletRequest.getRequest();
-        return createResponse(
-                ex.getMessage(),
-                httpRequest.getMethod(),
-                httpRequest.getServletPath(),
-                HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> handleNotFoundException(NoSuchElementException e, ServletWebRequest servletRequest) {
+        return createResponse(e, servletRequest, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<Object> handleDuplicateKeyException(DuplicateKeyException ex, ServletWebRequest servletRequest) {
-        val httpRequest = servletRequest.getRequest();
-        return createResponse(
-                ex.getMessage(),
-                httpRequest.getMethod(),
-                httpRequest.getServletPath(),
-                HttpStatus.CONFLICT);
+    public ResponseEntity<Object> handleDuplicateKeyException(DuplicateKeyException e, ServletWebRequest servletRequest) {
+        return createResponse(e, servletRequest, HttpStatus.CONFLICT);
     }
 
     private ResponseEntity<Object> createResponse(List<ApiExceptionTO> apiExceptionTOS, HttpStatus httpStatus) {
-        log.error("Error in REST API. Errors - {}", apiExceptionTOS);
+        logError(apiExceptionTOS);
         return new ResponseEntity<>(apiExceptionTOS, httpStatus);
     }
 
-    private ResponseEntity<Object> createResponse(String message, String method, String path, HttpStatus statusCode) {
-        log.error("Error in REST API. Errors - {}. StatusCode - {}", message, statusCode);
-        return new ResponseEntity<>(
-                new ApiExceptionTO(message, method, path, statusCode),
-                statusCode);
+    private ResponseEntity<Object> createResponse(Exception e, ServletWebRequest servletRequest, HttpStatus statusCode) {
+        val httpRequest = servletRequest.getRequest();
+        val message = e.getMessage();
+        val apiException = new ApiExceptionTO(message, httpRequest.getMethod(), httpRequest.getServletPath(), statusCode);
+
+        logError(apiException);
+        return new ResponseEntity<>(apiException, statusCode);
     }
 
+    private <T> void logError(T apiException) {
+        log.error("Error in REST API. Error details - {}", apiException);
+    }
+
+    /**
+     * This class is used to transfer error details to the client.
+     * detail - human-readable error message
+     * method - HTTP method
+     * path - HTTP path
+     * httpStatus - HTTP status code
+     */
     public record ApiExceptionTO(String detail, String method, String path, HttpStatus httpStatus) {
     }
 }
