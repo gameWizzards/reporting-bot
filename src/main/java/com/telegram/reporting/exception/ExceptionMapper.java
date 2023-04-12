@@ -2,6 +2,7 @@
 package com.telegram.reporting.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +21,16 @@ import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
-public class ExceptionMapper extends ResponseEntityExceptionHandler {
+public class RESTExceptionMapper extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
                                                                   HttpStatus status, WebRequest request) {
-
         Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (k1, k2) -> k1));
         return createResponse(errors, HttpStatus.BAD_REQUEST);
@@ -46,15 +47,21 @@ public class ExceptionMapper extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleNotFoundException(NoSuchElementException ex, NativeWebRequest request) {
         HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
         String method = "%s - %s".formatted(servletRequest.getMethod(), servletRequest.getServletPath());
+        return createResponse(Map.of(method, ex.getMessage()), HttpStatus.NOT_FOUND);
+    }
 
-        Map<String, String> errors = new HashMap<>();
-        errors.put(method, ex.getMessage());
-        return createResponse(errors, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<Object> handleDuplicateKeyException(DuplicateKeyException ex, NativeWebRequest request) {
+        HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+        String method = "%s - %s".formatted(servletRequest.getMethod(), servletRequest.getServletPath());
+        String errorMessage = Optional.ofNullable(ex.getMessage())
+                .orElse("Unknown error occurred related to duplicate key");
+        return createResponse(Map.of(method, errorMessage), HttpStatus.CONFLICT);
     }
 
     private ResponseEntity<Object> createResponse(Map<String, String> errors, HttpStatus statusCode) {
         Map<String, Map<String, String>> body = new HashMap<>();
-        log.error("Error in REST API. Errors - '{}'. StatusCode - {}", errors, statusCode);
+        log.error("Error in REST API. Errors - {}. StatusCode - {}", errors, statusCode);
         body.put("errors", errors);
         return new ResponseEntity<>(body, statusCode);
     }
