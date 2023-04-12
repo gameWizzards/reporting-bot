@@ -2,67 +2,81 @@
 package com.telegram.reporting.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
-public class RESTExceptionMapper extends ResponseEntityExceptionHandler {
+public class RESTExceptionMapper {
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
-                                                                  HttpStatus status, WebRequest request) {
-        Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
-                .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (k1, k2) -> k1));
-        return createResponse(errors, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Object> handleMethodArgumentException(MissingServletRequestParameterException ex, ServletWebRequest servletRequest) {
+        val httpRequest = servletRequest.getRequest();
+        return createResponse(
+                ex.getMessage(),
+                httpRequest.getMethod(),
+                httpRequest.getServletPath(),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, NativeWebRequest request) {
-        Map<String, String> errors = ex.getConstraintViolations().stream()
-                .collect(Collectors.toMap(constraint -> constraint.getPropertyPath().toString(), ConstraintViolation::getMessage, (k1, k2) -> k1));
-        return createResponse(errors, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, ServletWebRequest servletRequest) {
+        val httpRequest = servletRequest.getRequest();
+        val httpStatus = HttpStatus.BAD_REQUEST;
+
+        val apiExceptionTOS = ex.getConstraintViolations().stream()
+                .map(cv -> new ApiExceptionTO(
+                        cv.getMessage(),
+                        httpRequest.getMethod(),
+                        httpRequest.getServletPath(),
+                        httpStatus))
+                .toList();
+
+        return createResponse(apiExceptionTOS, httpStatus);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Object> handleNotFoundException(NoSuchElementException ex, NativeWebRequest request) {
-        HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
-        String method = "%s - %s".formatted(servletRequest.getMethod(), servletRequest.getServletPath());
-        return createResponse(Map.of(method, ex.getMessage()), HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> handleNotFoundException(NoSuchElementException ex, ServletWebRequest servletRequest) {
+        val httpRequest = servletRequest.getRequest();
+        return createResponse(
+                ex.getMessage(),
+                httpRequest.getMethod(),
+                httpRequest.getServletPath(),
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<Object> handleDuplicateKeyException(DuplicateKeyException ex, NativeWebRequest request) {
-        HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
-        String method = "%s - %s".formatted(servletRequest.getMethod(), servletRequest.getServletPath());
-        String errorMessage = Optional.ofNullable(ex.getMessage())
-                .orElse("Unknown error occurred related to duplicate key");
-        return createResponse(Map.of(method, errorMessage), HttpStatus.CONFLICT);
+    public ResponseEntity<Object> handleDuplicateKeyException(DuplicateKeyException ex, ServletWebRequest servletRequest) {
+        val httpRequest = servletRequest.getRequest();
+        return createResponse(
+                ex.getMessage(),
+                httpRequest.getMethod(),
+                httpRequest.getServletPath(),
+                HttpStatus.CONFLICT);
     }
 
-    private ResponseEntity<Object> createResponse(Map<String, String> errors, HttpStatus statusCode) {
-        Map<String, Map<String, String>> body = new HashMap<>();
-        log.error("Error in REST API. Errors - {}. StatusCode - {}", errors, statusCode);
-        body.put("errors", errors);
-        return new ResponseEntity<>(body, statusCode);
+    private ResponseEntity<Object> createResponse(List<ApiExceptionTO> apiExceptionTOS, HttpStatus httpStatus) {
+        log.error("Error in REST API. Errors - {}", apiExceptionTOS);
+        return new ResponseEntity<>(apiExceptionTOS, httpStatus);
+    }
+
+    private ResponseEntity<Object> createResponse(String message, String method, String path, HttpStatus statusCode) {
+        log.error("Error in REST API. Errors - {}. StatusCode - {}", message, statusCode);
+        return new ResponseEntity<>(
+                new ApiExceptionTO(message, method, path, statusCode),
+                statusCode);
+    }
+
+    public record ApiExceptionTO(String detail, String method, String path, HttpStatus httpStatus) {
     }
 }
