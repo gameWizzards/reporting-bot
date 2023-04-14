@@ -54,11 +54,11 @@ server:
 
 ---
 
-# Dev profile without sslMode
+# production profile
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
   datasource:
     url: jdbc:postgresql://${BOT_DB_HOST}:${BOT_DB_PORT}/${BOT_DB_NAME}
   task:
