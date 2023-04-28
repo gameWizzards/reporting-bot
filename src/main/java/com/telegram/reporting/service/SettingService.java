@@ -1,17 +1,17 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.repository.entity.Setting;
+import com.telegram.reporting.repository.dto.SettingTO;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface SettingService {
 
-    Setting createSetting(String key, String value);
+    SettingTO createSetting(SettingTO settingTO);
 
-    Setting updateSetting(String key, String value);
+    SettingTO updateSetting(SettingTO settingTO);
 
-    Optional<String> getValue(String key);
+    Optional<SettingTO> getByKey(String key);
 
-    List<Setting> getAllSettings();
+    List<SettingTO> getAllSettings();
 }

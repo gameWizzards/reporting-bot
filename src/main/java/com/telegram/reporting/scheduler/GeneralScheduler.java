@@ -1,5 +1,6 @@
 package com.telegram.reporting.scheduler;
 
+import com.telegram.reporting.repository.dto.SettingTO;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.LockUpdateReportService;
@@ -33,11 +34,12 @@ public class GeneralScheduler {
     @Scheduled(cron = "0 0 2 1,11 * *")
     public void lockEditReport() {
         log.info("LockEditReport job started");
-        String offsetSetting = settingService.getValue(LOCK_EDIT_REPORT_SETTING_KEY).orElse("");
+        SettingTO settingTO = settingService.getByKey(LOCK_EDIT_REPORT_SETTING_KEY)
+                .orElseThrow(() -> new NoSuchElementException("Can't find setting with key: %s".formatted(LOCK_EDIT_REPORT_SETTING_KEY)));
 
-        validateSettingValue(LOCK_EDIT_REPORT_SETTING_KEY, offsetSetting);
+        validateSettingValue(LOCK_EDIT_REPORT_SETTING_KEY, settingTO.getValue());
 
-        int offsetMinusMonth = Integer.parseInt(offsetSetting);
+        int offsetMinusMonth = Integer.parseInt(settingTO.getValue());
 
         LocalDate statisticMonth = LocalDate.now().minusMonths(offsetMinusMonth);
         UserFilter filter = UserFilter.builder()
@@ -58,10 +60,11 @@ public class GeneralScheduler {
     @Scheduled(cron = "0 0 1 * * *")
     public void removeNotAuthorizedUsers() {
         log.info("RemoveNotAuthorizedUsers job started");
-        String offsetSetting = settingService.getValue(REMOVE_UNAUTHORIZED_USER_SETTING_KEY).orElse("");
+        SettingTO settingTO = settingService.getByKey(REMOVE_UNAUTHORIZED_USER_SETTING_KEY)
+                .orElseThrow(() -> new NoSuchElementException("Can't find setting with key: %s".formatted(REMOVE_UNAUTHORIZED_USER_SETTING_KEY)));
 
-        validateSettingValue(REMOVE_UNAUTHORIZED_USER_SETTING_KEY, offsetSetting);
-        int offsetMinusDays = Integer.parseInt(offsetSetting);
+        validateSettingValue(REMOVE_UNAUTHORIZED_USER_SETTING_KEY, settingTO.getValue());
+        int offsetMinusDays = Integer.parseInt(settingTO.getValue());
 
         LocalDate offsetRemoveDate = LocalDate.now().minusDays(offsetMinusDays);
         UserFilter filter = UserFilter.builder()
@@ -87,6 +90,9 @@ public class GeneralScheduler {
     private void validateSettingValue(String key, String value) {
         if (StringUtils.isBlank(value)) {
             throw new NoSuchElementException("Value doesn't exist or empty for key: %s ".formatted(key));
+        }
+        if (!StringUtils.isNumeric(value)) {
+            throw new NumberFormatException("Can't parse setting. Value is not numeric for key: %s ".formatted(key));
         }
     }
 }

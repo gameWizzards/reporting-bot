@@ -2,6 +2,7 @@ package com.telegram.reporting.scheduler;
 
 import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.i18n.MessageKey;
+import com.telegram.reporting.repository.dto.SettingTO;
 import com.telegram.reporting.repository.entity.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.I18nMessageService;
@@ -29,6 +30,8 @@ public class NotificationScheduler {
     private final String START_PERIOD_NOTIFICATION_SETTING = "scheduling.notification.start.report.reminder";
     private final String FINISH_PERIOD_NOTIFICATION_SETTING = "scheduling.notification.finish.report.reminder";
 
+    private final String EXCLUDE_EMPLOYEE_IDS = "scheduling.notification.exclude.employee.chat.ids";
+
     private final SettingService settingService;
     private final TelegramUserService userService;
     private final SendBotMessageService sendBotMessageService;
@@ -51,9 +54,10 @@ public class NotificationScheduler {
     }
 
     private void executeReminderNotification(I18nKey messageKey) {
-        String excludeEmployeeByChatIds = settingService.getValue("scheduling.notification.exclude.employee.chat.ids").orElse("");
+        SettingTO excludeIdsSetting = settingService.getByKey(EXCLUDE_EMPLOYEE_IDS)
+                .orElseThrow(() -> new NoSuchElementException("Setting not found by key - " + EXCLUDE_EMPLOYEE_IDS));
 
-        List<Long> excludeChatIds = Arrays.stream(excludeEmployeeByChatIds.split(","))
+        List<Long> excludeChatIds = Arrays.stream(excludeIdsSetting.getValue().split(","))
                 .mapToLong(Long::parseLong)
                 .boxed()
                 .toList();
@@ -75,13 +79,14 @@ public class NotificationScheduler {
     }
 
     private boolean isSendingReportsRemainderEnable() {
-        String startPeriod = settingService.getValue(START_PERIOD_NOTIFICATION_SETTING)
+        SettingTO startPeriodSetting = settingService.getByKey(START_PERIOD_NOTIFICATION_SETTING)
                 .orElseThrow(() -> new NoSuchElementException("Setting not found by key - '%s'".formatted(START_PERIOD_NOTIFICATION_SETTING)));
-        String finishPeriod = settingService.getValue(FINISH_PERIOD_NOTIFICATION_SETTING)
+        SettingTO finishPeriodSetting = settingService.getByKey(FINISH_PERIOD_NOTIFICATION_SETTING)
                 .orElseThrow(() -> new NoSuchElementException("Setting not found by key - '%s'".formatted(FINISH_PERIOD_NOTIFICATION_SETTING)));
 
-        LocalDate startReportRemainder = DateTimeUtils.parseShortDateToLocalDate(startPeriod);
-        LocalDate finishReportRemainder = DateTimeUtils.parseShortDateToLocalDate(finishPeriod);
+        LocalDate startReportRemainder = DateTimeUtils.parseShortDateToLocalDate(startPeriodSetting.getValue());
+        LocalDate finishReportRemainder = DateTimeUtils.parseShortDateToLocalDate(finishPeriodSetting.getKey());
+
         return DateTimeUtils.isBelongToPeriod(LocalDate.now(), startReportRemainder, finishReportRemainder);
     }
 }

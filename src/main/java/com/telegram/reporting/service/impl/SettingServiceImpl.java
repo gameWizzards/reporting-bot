@@ -1,14 +1,16 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.mapper.SettingMapper;
 import com.telegram.reporting.repository.SettingRepository;
+import com.telegram.reporting.repository.dto.SettingTO;
 import com.telegram.reporting.repository.entity.Setting;
 import com.telegram.reporting.service.SettingService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,41 +20,45 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SettingServiceImpl implements SettingService {
     private final SettingRepository settingRepository;
+    private final SettingMapper settingMapper;
 
     @Override
-    public Setting createSetting(String key, String value) {
-        validateArgs(key, value);
-        if (settingRepository.findById(key).isPresent()) {
-            throw new DuplicateKeyException("You try to create setting with existing key: %s".formatted(key));
-        }
-        return settingRepository.save(new Setting(key, value));
+    public SettingTO createSetting(@Valid SettingTO settingTO) {
+
+        Optional<Setting> setting = settingRepository.findById(settingTO.getKey());
+        setting.ifPresent(s -> {
+            throw new DuplicateKeyException("You try to create setting with existing key: %s".formatted(s.getKey()));
+        });
+        settingRepository.save(settingMapper.toEntity(settingTO));
+
+        return settingTO;
     }
 
     @Override
-    public Setting updateSetting(String key, String value) {
-        validateArgs(key, value);
-        Setting setting = settingRepository.findById(key).orElseThrow(() -> new NoSuchElementException("Can't update setting '%s', it doesn't exist!".formatted(key)));
-        setting.setValue(value);
-        return settingRepository.save(setting);
+    public SettingTO updateSetting(SettingTO settingTO) {
+        Setting setting = settingRepository.findById(settingTO.getKey())
+                .orElseThrow(() -> new NoSuchElementException("Can't update setting '%s', it doesn't exist!".formatted(settingTO.getKey())));
+
+        setting.setValue(settingTO.getValue());
+        settingRepository.save(setting);
+
+        return settingTO;
     }
 
     @Override
-    public Optional<String> getValue(String key) {
+    public Optional<SettingTO> getByKey(String key) {
         if (StringUtils.isBlank(key)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(settingRepository.getValue(key));
+        return settingRepository.getByKey(key)
+                .map(settingMapper::toDto);
     }
 
     @Override
-    public List<Setting> getAllSettings() {
+    public List<SettingTO> getAllSettings() {
         return settingRepository.findAll().stream()
                 .sorted(Comparator.comparing(Setting::getKey))
+                .map(settingMapper::toDto)
                 .toList();
-    }
-
-    private void validateArgs(String key, String value) {
-        Validate.notBlank(key, "Key is required for setting");
-        Validate.notBlank(value, "Value is required for setting");
     }
 }
