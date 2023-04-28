@@ -1,18 +1,18 @@
 -- Adding new report's categories
-INSERT INTO public.category (name_key, description_key)
-SELECT 'common.category.on.storage', 'common.category.on.storage.description'
+INSERT INTO public.category (name_key, description_key, deleted)
+SELECT 'common.category.on.storage', 'common.category.on.storage.description', false
 WHERE NOT EXISTS (SELECT 1 FROM public.category WHERE name_key = 'common.category.on.storage');
 
-INSERT INTO public.category (name_key, description_key)
-SELECT 'common.category.on.order', 'common.category.on.order.description'
+INSERT INTO public.category (name_key, description_key, deleted)
+SELECT 'common.category.on.order', 'common.category.on.order.description', false
 WHERE NOT EXISTS (SELECT 1 FROM public.category WHERE name_key = 'common.category.on.order');
 
-INSERT INTO public.category (name_key, description_key)
-SELECT 'common.category.on.office', 'common.category.on.office.description'
+INSERT INTO public.category (name_key, description_key, deleted)
+SELECT 'common.category.on.office', 'common.category.on.office.description', false
 WHERE NOT EXISTS (SELECT 1 FROM public.category WHERE name_key = 'common.category.on.office');
 
-INSERT INTO public.category (name_key, description_key)
-SELECT 'common.category.on.coordination', 'common.category.on.coordination.description'
+INSERT INTO public.category (name_key, description_key, deleted)
+SELECT 'common.category.on.coordination', 'common.category.on.coordination.description', false
 WHERE NOT EXISTS (SELECT 1 FROM public.category WHERE name_key = 'common.category.on.coordination');
 
 -- Adding settings for scheduling
