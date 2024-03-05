@@ -4,12 +4,12 @@ import com.telegram.reporting.bot.event.CommandEvent;
 import com.telegram.reporting.bot.command.Command;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import com.telegram.reporting.utils.KeyboardUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class StartCommand implements Command {
     private static final String ALIAS = "/start";
 
     private final SendBotMessageService sendBotMessageService;
-    private final TelegramUserService telegramUserService;
+    private final UserService userService;
     private final DialogRouterService dialogRouterService;
     private final I18nButtonService i18nButtonService;
     private final I18nMessageService i18nMessageService;
@@ -39,7 +39,7 @@ public class StartCommand implements Command {
     @Override
     public void execute(CommandEvent event) {
         Long chatId = event.chatId();
-        User activatedUser = telegramUserService.findByChatId(event.chatId());
+        User activatedUser = userService.findByChatId(event.chatId());
 
         if (Objects.isNull(activatedUser)) {
             log.warn("Can't find activatedUser by chatId={}. TelegramUser={}", chatId, event.fromUser());

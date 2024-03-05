@@ -1,11 +1,11 @@
 package com.telegram.reporting.scheduler;
 
-import com.telegram.reporting.repository.dto.SettingTO;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.dto.SettingTO;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.LockUpdateReportService;
 import com.telegram.reporting.service.SettingService;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +27,7 @@ public class GeneralScheduler {
     private final String LOCK_EDIT_REPORT_SETTING_KEY = "scheduling.general.lock.edit.report.offset.month";
     private final String REMOVE_UNAUTHORIZED_USER_SETTING_KEY = "scheduling.general.remove.unauthorized.user.offset.days";
 
-    private final TelegramUserService userService;
+    private final UserService userService;
     private final LockUpdateReportService lockService;
     private final SettingService settingService;
 

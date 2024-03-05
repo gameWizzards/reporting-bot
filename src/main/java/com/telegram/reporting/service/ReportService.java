@@ -1,6 +1,6 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.repository.entity.Report;
+import com.telegram.reporting.domain.Report;
 
 import java.time.LocalDate;
 import java.util.List;

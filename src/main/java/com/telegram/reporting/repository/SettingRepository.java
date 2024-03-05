@@ -1,6 +1,6 @@
 package com.telegram.reporting.repository;
 
-import com.telegram.reporting.repository.entity.Setting;
+import com.telegram.reporting.domain.Setting;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -2,13 +2,11 @@ package com.telegram.reporting.utils;
 
 import com.telegram.reporting.ExceptionHelper;
 import com.telegram.reporting.exception.JsonUtilsException;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.repository.entity.Report;
+import com.telegram.reporting.dto.TimeRecordTO;
+import com.telegram.reporting.domain.Report;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,11 +31,11 @@ class JsonUtilsTest {
     public void serializeItem_inputValidObject_success() {
         var timeRecordNote = "Time record note";
 
-        var timeRecordTO = new TimeRecordTO();
-        timeRecordTO.setNote(timeRecordNote);
-        timeRecordTO.setHours(2);
-        timeRecordTO.setCreated(LocalDateTime.now());
-        timeRecordTO.setCategoryNameKey("Category name");
+        var timeRecordTO = TimeRecordTO.builder()
+                .note(timeRecordNote)
+                .hours(2)
+                .categoryNameKey("Category name")
+                .build();
 
         var json = JsonUtils.serializeItem(timeRecordTO);
 

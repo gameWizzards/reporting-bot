@@ -22,9 +22,11 @@ public class DefaultMenuTemplateServiceImpl implements MenuTemplateService {
         rootMenuStructure.put(DialogHandlerAlias.ADMIN_DIALOGS, adminRootMenuStructure());
         rootMenuStructure.put(DialogHandlerAlias.GENERAL_DIALOGS, generalRootMenuStructure());
         rootMenuStructure.put(DialogHandlerAlias.MANAGER_DIALOGS, managerRootMenuStructure());
+        rootMenuStructure.put(DialogHandlerAlias.TARIFF_DIALOGS, tariffRootMenuStructure());
 
         subMenuStructure.put(DialogHandlerAlias.ADMIN_DIALOGS, adminSubMenuStructure());
         subMenuStructure.put(DialogHandlerAlias.MANAGER_DIALOGS, managerSubMenuStructure());
+        subMenuStructure.put(DialogHandlerAlias.TARIFF_DIALOGS, tariffSubMenuStructure());
     }
 
     @Override
@@ -62,6 +64,11 @@ public class DefaultMenuTemplateServiceImpl implements MenuTemplateService {
                 List.of(ButtonLabelKey.MSD_MANAGER_START_SUB_DIALOG));
     }
 
+    private List<List<ButtonLabelKey>> tariffRootMenuStructure() {
+        return List.of(
+                List.of(ButtonLabelKey.TSD_TARIFF_START_SUB_DIALOG));
+    }
+
     private List<List<ButtonLabelKey>> adminSubMenuStructure() {
         return List.of(
                 List.of(ButtonLabelKey.ALU_START_DIALOG));
@@ -71,5 +78,11 @@ public class DefaultMenuTemplateServiceImpl implements MenuTemplateService {
         return List.of(
                 List.of(ButtonLabelKey.MES_START_DIALOG),
                 List.of(ButtonLabelKey.MAE_START_DIALOG, ButtonLabelKey.MESTATUS_START_DIALOG));
+    }
+
+    private List<List<ButtonLabelKey>> tariffSubMenuStructure() {
+        return List.of(
+                List.of(ButtonLabelKey.TL_START_DIALOG),
+                List.of(ButtonLabelKey.TE_START_DIALOG, ButtonLabelKey.TEE_START_DIALOG));
     }
 }

@@ -5,14 +5,14 @@ import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.exception.TelegramUserException;
-import com.telegram.reporting.repository.dto.EmployeeTO;
-import com.telegram.reporting.repository.entity.Role;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.dto.EmployeeTO;
+import com.telegram.reporting.domain.Role;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import com.telegram.reporting.utils.CommonUtils;
 import com.telegram.reporting.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class EmployeeStatusActions {
-    private final TelegramUserService userService;
+    private final UserService userService;
     private final SendBotMessageService sendBotMessageService;
     private final I18nMessageService i18NMessageService;
     private final I18nButtonService i18nButtonService;
@@ -103,7 +103,7 @@ public class EmployeeStatusActions {
             EmployeeTO employeeTO = JsonUtils.deserializeItem(targetEmployeeJson, EmployeeTO.class);
             employeeInfo = i18NMessageService.convert2EmployeeStatusInfoMessage(chatId, employeeTO);
         } else {
-            Long employeeOrdinalNumber = Long.parseLong(CommonUtils.getContextVar(context, String.class, ContextVarKey.EMPLOYEE_ORDINAL));
+            Long employeeOrdinalNumber = CommonUtils.getContextVar(context, Long.class, ContextVarKey.EMPLOYEE_ORDINAL);
             String employeesTOJson = CommonUtils.getContextVarAsString(context, ContextVarKey.LIST_EMPLOYEES_JSON);
             List<EmployeeTO> employeeTOS = JsonUtils.deserializeListItems(employeesTOJson, EmployeeTO.class);
 

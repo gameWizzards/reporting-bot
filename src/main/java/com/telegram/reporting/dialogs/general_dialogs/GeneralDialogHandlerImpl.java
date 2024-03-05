@@ -4,7 +4,7 @@ import com.telegram.reporting.dialogs.DialogHandler;
 import com.telegram.reporting.dialogs.DialogHandlerAlias;
 import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.i18n.ButtonLabelKey;
-import com.telegram.reporting.repository.entity.Role;
+import com.telegram.reporting.domain.Role;
 import com.telegram.reporting.service.MenuTemplateService;
 import com.telegram.reporting.strategy.DialogProcessorStrategy;
 import lombok.RequiredArgsConstructor;

@@ -2,8 +2,8 @@ package com.telegram.reporting.dialogs;
 
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.dto.TimeRecordTO;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
@@ -76,7 +76,7 @@ public class CommonActions {
     }
 
     public <S, E> void handleChoiceTimeRecord(StateContext<S, E> context) {
-        Long ordinalNumberTR = Long.parseLong(CommonUtils.getContextVar(context, String.class, ContextVarKey.TIME_RECORD_CHOICE));
+        Long ordinalNumberTR = CommonUtils.getContextVar(context, Long.class, ContextVarKey.TIME_RECORD_CHOICE);
 
         String timeRecordJson = CommonUtils.getContextVarAsString(context, ContextVarKey.TIME_RECORDS_JSON);
         List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);

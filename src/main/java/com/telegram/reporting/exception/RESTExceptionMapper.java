@@ -2,7 +2,6 @@
 package com.telegram.reporting.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +29,10 @@ public class RESTExceptionMapper {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e, ServletWebRequest servletRequest) {
-        val httpRequest = servletRequest.getRequest();
-        val httpStatus = HttpStatus.BAD_REQUEST;
+        var httpRequest = servletRequest.getRequest();
+        var httpStatus = HttpStatus.BAD_REQUEST;
 
-        val apiExceptionTOS = e.getConstraintViolations().stream()
+        var apiExceptionTOS = e.getConstraintViolations().stream()
                 .map(cv -> new ApiExceptionTO(
                         cv.getMessage(),
                         httpRequest.getMethod(),
@@ -60,9 +59,9 @@ public class RESTExceptionMapper {
     }
 
     private ResponseEntity<Object> createResponse(Exception e, ServletWebRequest servletRequest, HttpStatus statusCode) {
-        val httpRequest = servletRequest.getRequest();
-        val message = e.getMessage();
-        val apiException = new ApiExceptionTO(message, httpRequest.getMethod(), httpRequest.getServletPath(), statusCode);
+        var httpRequest = servletRequest.getRequest();
+        var message = e.getMessage();
+        var apiException = new ApiExceptionTO(message, httpRequest.getMethod(), httpRequest.getServletPath(), statusCode);
 
         logError(apiException);
         return new ResponseEntity<>(apiException, statusCode);

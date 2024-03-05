@@ -1,7 +1,7 @@
 package com.telegram.reporting.dialogs;
 
 import com.telegram.reporting.i18n.ButtonLabelKey;
-import com.telegram.reporting.repository.entity.Role;
+import com.telegram.reporting.domain.Role;
 
 import java.util.Collection;
 import java.util.List;

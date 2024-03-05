@@ -35,6 +35,7 @@ public enum MessageKey implements I18nKey {
     COMMON_WARNING_USER_STATUS_DELETED("common.warning.user.status.deleted"),
     COMMON_EMPLOYEE_ROLE("common.employee.role"),
     COMMON_MANAGER_ROLE("common.manager.role"),
+    COMMON_TARIFF_EDITOR_ROLE("common.tariff.editor.role"),
     COMMON_ADMIN_ROLE("common.admin.role"),
     COMMON_WARNING_ROLE_UNMAPPED("common.warning.role.unmapped"),
 
@@ -79,6 +80,7 @@ public enum MessageKey implements I18nKey {
 
     // common guards
     GUARD_WARNING_DATE_BEFORE_AUTH("guard.warning.date.before.authorization"),
+    GUARD_WARNING_NON_EXISTENT_DATE("guard.warning.non.existent.date"),
     GUARD_WARNING_DUPLICATE_ADDING_PHONE("guard.warning.duplicate.adding.phone"),
     GUARD_WARNING_FAILED_DISPLAY_USERNAME("guard.warning.failed.display.username"),
     GUARD_WARNING_PERIOD_LOCKED_TO_EDITING("guard.warning.period.locked.to.editing"),
@@ -120,6 +122,15 @@ public enum MessageKey implements I18nKey {
     MESTATUS_REQUEST_CHANGE_EMPLOYEE_STATUS("manager.employee-status.request.change.employee.status"),
     MESTATUS_WARNING_CANNOT_CHANGE_ROLE("manager.employee-status.warning.cannot.change.role"),
 
+    //tariff dialogs
+    TSD_START_SUB_DIALOG_FLOW("tariff.sub-dialog.start.flow"),
+    TLT_COMPANY_TARIFFS("tariff.list-tariffs.company.tariffs"),
+    TLT_OVERRIDDEN_TARIFFS_BY_CATEGORY("tariff.list-tariffs.overridden.tariffs.by.category"),
+    TLT_TARIFF_ROW("tariff.list-tariffs.tariff.row"),
+    TLT_SHOW_OVERRIDDEN_TARIFFS("tariff.list-tariffs.show.overridden.tariffs"),
+    TLT_NO_OVERRIDDEN_TARIFFS("tariff.list-tariffs.no.overridden.tariffs"),
+    TLT_CHOOSE_OVERRIDDEN_TARIFF_BY_CATEGORY("tariff.list-tariffs.choose.overridden.tariff.by.category"),
+    TLT_CHOOSE_OVERRIDDEN_TARIFF_BY_EMPLOYEE("tariff.list-tariffs.choose.overridden.tariff.by.employee"),
 
     //pre dialogs
     PD_ACCOUNT_DELETED("predialog.account.deleted"),

@@ -3,9 +3,7 @@ package com.telegram.reporting.dialogs.general_dialogs.edit_report;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.repository.entity.Category;
-import com.telegram.reporting.repository.entity.TimeRecord;
+import com.telegram.reporting.dto.TimeRecordTO;
 import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nButtonService;
@@ -143,7 +141,7 @@ public class EditReportActions {
         Long chatId = CommonUtils.currentChatId(context);
         String timeRecordsJson = CommonUtils.getContextVarAsString(context, ContextVarKey.TIME_RECORDS_JSON);
 
-        List<List<InlineKeyboardButton>> rows = i18nButtonService.getAvailableCategoryInlineButtons(chatId, timeRecordsJson, 2);
+        List<List<InlineKeyboardButton>> rows = i18nButtonService.getUnoccupiedCategoryInlineButtons(chatId, timeRecordsJson, 2);
 
         SendMessage sendMessage = new SendMessage(chatId.toString(), i18NMessageService.getMessage(chatId, MessageKey.COMMON_CHOOSE_CATEGORY));
 
@@ -171,14 +169,8 @@ public class EditReportActions {
         LocalDate date = DateTimeUtils.parseDefaultDate(CommonUtils.getContextVarAsString(context, ContextVarKey.DATE));
 
         TimeRecordTO trTO = JsonUtils.deserializeItem(editTimeRecord, TimeRecordTO.class);
-        TimeRecord timeRecord = timeRecordService.getById(trTO.getId());
-        Category category = categoryService.getCategoryByName(trTO.getCategoryNameKey());
 
-        timeRecord.setHours(trTO.getHours());
-        timeRecord.setNote(trTO.getNote());
-        timeRecord.setCategory(category);
-
-        timeRecordService.save(timeRecord);
+        timeRecordService.update(trTO);
 
         cacheService.evictCache(CacheService.EMPLOYEE_STATISTIC_CACHE, chatId, date);
 

@@ -1,6 +1,6 @@
 package com.telegram.reporting.repository;
 
-import com.telegram.reporting.repository.entity.LockUpdateReport;
+import com.telegram.reporting.domain.LockUpdateReport;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

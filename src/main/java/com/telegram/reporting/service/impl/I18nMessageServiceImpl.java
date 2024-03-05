@@ -1,15 +1,14 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.domain.*;
+import com.telegram.reporting.dto.EmployeeTO;
+import com.telegram.reporting.dto.TimeRecordTO;
+import com.telegram.reporting.exception.MismatchCategoryException;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.i18n.MonthKey;
-import com.telegram.reporting.repository.dto.EmployeeTO;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.repository.entity.Report;
-import com.telegram.reporting.repository.entity.Role;
-import com.telegram.reporting.repository.entity.TimeRecord;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.repository.EmployeeTariffRepository;
 import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nMessageService;
@@ -22,12 +21,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -37,6 +35,7 @@ import java.util.stream.Collectors;
 public class I18nMessageServiceImpl implements I18nMessageService {
     private final CategoryService categoryService;
     private final I18nPropsResolver i18nPropsResolver;
+    private final EmployeeTariffRepository employeeTariffRepository;
 
     @Override
     public String getMessage(Long chatId, String key) {
@@ -231,10 +230,80 @@ public class I18nMessageServiceImpl implements I18nMessageService {
                 statistic);
     }
 
+    @Override
+    public String convertToCompanyTariffsMessage(Long chatId, List<Tariff> tariffs) {
+        String companyTariffsMessage = tariffs.stream()
+                .map(tariff -> convertToTariffRow(chatId, tariff))
+                .collect(Collectors.joining("\n"));
+
+        return getMessage(chatId, MessageKey.TLT_COMPANY_TARIFFS,
+                companyTariffsMessage);
+    }
+
+    @Override
+    public String convertToOverriddenTariffsByCategoryMessage(Long chatId, ButtonLabelKey tariffCategory) {
+
+        var overriddenTariffs = employeeTariffRepository.getOverriddenTariffsByCategory(tariffCategory.value());
+        String overriddenTariffsMessage =  overriddenTariffs.stream()
+                .map(employeeTariff -> convertToOverriddenTariffRow(chatId, employeeTariff))
+                .collect(Collectors.joining("\n"));
+
+        var overriddenTariff = overriddenTariffs.stream().findFirst()
+                .orElseThrow(() -> new MismatchCategoryException("No overridden tariffs for category: " + tariffCategory.value()));
+
+        var tariffName = getMessage(chatId, overriddenTariff.getTariff().getCategory().getNameKey());
+        var companyTariffPerHour = overriddenTariff.getTariff().getTariffication();
+
+        return getMessage(chatId, MessageKey.TLT_OVERRIDDEN_TARIFFS_BY_CATEGORY,
+                tariffName,
+                companyTariffPerHour.toPlainString(),
+                overriddenTariffsMessage);
+    }
+//       Список сотрудников с индивидуальными тарифами.
+//       Тариф - "{categoryName}" - {tariffication} грн/час.
+
+//       *   {fullname} - {tariffication} грн/час.
+//       выбрать другую категорию? + кнопка "выбрать категорию"
+
+    private String convertToOverriddenTariffRow(Long chatId, EmployeeTariff employeeTariff) {
+
+
+        var employeeFullName = employeeTariff.getEmployee().getFullName();
+        var employeeTariffPerHour = employeeTariff.getOverriddenTariffication();
+
+        var roundUp = new MathContext(2, RoundingMode.HALF_UP);
+        var dayTariff = employeeTariffPerHour.multiply(BigDecimal.valueOf(8), roundUp);
+        var monthAverageTariff = DateTimeUtils.getAverageWorkingDaysPerMonth().multiply(dayTariff, roundUp);
+
+        return getMessage(chatId, MessageKey.TLT_TARIFF_ROW,
+                employeeFullName,
+                employeeTariffPerHour.toPlainString(),
+                dayTariff.toPlainString(),
+                monthAverageTariff.toPlainString());
+    }
+
+    // TODO: consider to move the common logic to separate method for all tariff row converters
+    private String convertToTariffRow(Long chatId, Tariff tariff) {
+        var tariffPerHour = tariff.getTariffication();
+
+        var roundUp = new MathContext(2, RoundingMode.HALF_UP);
+        var dayTariff = tariffPerHour.multiply(BigDecimal.valueOf(8), roundUp);
+        var monthAverageTariff = DateTimeUtils.getAverageWorkingDaysPerMonth().multiply(dayTariff, roundUp);
+
+        var tariffName = getMessage(chatId, tariff.getCategory().getNameKey());
+
+        return getMessage(chatId, MessageKey.TLT_TARIFF_ROW,
+                tariffName,
+                tariffPerHour.toPlainString(),
+                dayTariff.toPlainString(),
+                monthAverageTariff.toPlainString());
+    }
+
     private String convertRole2Text(Long chatId, Role role) {
         return switch (role) {
             case EMPLOYEE_ROLE -> i18nPropsResolver.getPropsValue(chatId, MessageKey.COMMON_EMPLOYEE_ROLE);
             case MANAGER_ROLE -> i18nPropsResolver.getPropsValue(chatId, MessageKey.COMMON_MANAGER_ROLE);
+            case TARIFF_EDITOR_ROLE -> i18nPropsResolver.getPropsValue(chatId, MessageKey.COMMON_TARIFF_EDITOR_ROLE);
             case ADMIN_ROLE -> i18nPropsResolver.getPropsValue(chatId, MessageKey.COMMON_ADMIN_ROLE);
             default -> i18nPropsResolver.getPropsValue(chatId, MessageKey.COMMON_WARNING_ROLE_UNMAPPED);
         };

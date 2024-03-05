@@ -2,10 +2,10 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.exception.TelegramUserDeletedException;
 import com.telegram.reporting.exception.TelegramUserException;
-import com.telegram.reporting.repository.entity.Role;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.Role;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.RuntimeDialogManager;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RuntimeDialogManagerImpl implements RuntimeDialogManager {
     private final Map<Long, User> principalUsers = new ConcurrentHashMap<>();
 
-    private final TelegramUserService userService;
+    private final UserService userService;
 
     @Override
     public User addPrincipalUser(Long chatId) {

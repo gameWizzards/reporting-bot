@@ -1,7 +1,7 @@
 package com.telegram.reporting.mapper;
 
-import com.telegram.reporting.repository.dto.SettingTO;
-import com.telegram.reporting.repository.entity.Setting;
+import com.telegram.reporting.dto.SettingTO;
+import com.telegram.reporting.domain.Setting;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

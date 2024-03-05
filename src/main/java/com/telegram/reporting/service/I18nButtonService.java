@@ -2,8 +2,8 @@ package com.telegram.reporting.service;
 
 import com.telegram.reporting.dialogs.DialogHandlerAlias;
 import com.telegram.reporting.i18n.ButtonLabelKey;
-import com.telegram.reporting.repository.dto.Ordinal;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.dto.Ordinal;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.impl.MenuButtons;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -15,7 +15,7 @@ public interface I18nButtonService {
 
     String getButtonLabel(Long chatId, ButtonLabelKey labelKey);
 
-    List<List<InlineKeyboardButton>> getAvailableCategoryInlineButtons(Long chatId, String timeRecordsJson, int buttonsInRow);
+    List<List<InlineKeyboardButton>> getUnoccupiedCategoryInlineButtons(Long chatId, String timeRecordsJson, int buttonsInRow);
 
     List<List<InlineKeyboardButton>> getLanguageInlineButtons(Long chatId);
 

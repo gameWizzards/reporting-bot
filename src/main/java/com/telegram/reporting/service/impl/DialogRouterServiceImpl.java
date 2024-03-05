@@ -9,14 +9,14 @@ import com.telegram.reporting.dialogs.DialogHandler;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.DialogRouterService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.MenuTemplateService;
 import com.telegram.reporting.service.RuntimeDialogManager;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
 
     private final List<DialogHandler> existingDialogHandlers;
     private final SendBotMessageService sendBotMessageService;
-    private final TelegramUserService telegramUserService;
+    private final UserService userService;
     private final RuntimeDialogManager runtimeDialogManager;
     private final I18nMessageService i18NMessageService;
     private final I18nButtonService i18nButtonService;
@@ -112,7 +112,7 @@ public class DialogRouterServiceImpl implements DialogRouterService {
     private void handleSendContactEvent(Long chatId, SendContactEvent sendContactEvent) {
         sendBotMessageService.removeReplyKeyboard(chatId, i18NMessageService.getMessage(chatId, MessageKey.PD_SUCCESS_CONTACT_SHARING));
         try {
-            User user = telegramUserService.verifyContact(sendContactEvent);
+            User user = userService.verifyContact(sendContactEvent);
             startFlow(user.getChatId(), user.getLocale());
         } catch (TelegramUserException e) {
             log.error("Can't verify contact! Reason: {}", e.getMessage());

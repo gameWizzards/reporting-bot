@@ -1,6 +1,6 @@
 package com.telegram.reporting.repository;
 
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,9 +34,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
             AND u.deleted=true""")
     List<User> findDeletedUsers(@Param("name") String name, @Param("surname") String surname);
 
+    // TODO rewrite args to use :arg syntax without using @Param annotation
     @Query(value = """
             SELECT u FROM User u LEFT JOIN u.reports r WHERE u.chatId IS NOT NULL
             AND extract(month from r.date)=:month AND extract(year from r.date)=:year
             GROUP BY u.id ORDER BY u.name""")
     List<User> findUsersWithExistReportsByMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query(value = """
+            SELECT distinct u.id, u.chat_id, u.name, u.surname, u.telegram_nickname, u.phone, u.deleted, u.created, u.activated, u.locale
+            FROM "public"."user" u
+            INNER JOIN "public"."employee_tariff" et ON u.id = et.employee_id
+            WHERE u.deleted = false
+            """, nativeQuery = true)
+    List<User> findUsersWithExistOverriddenTariffs();
 }

@@ -4,7 +4,7 @@ import com.telegram.reporting.dialogs.DialogHandler;
 import com.telegram.reporting.dialogs.DialogHandlerAlias;
 import com.telegram.reporting.dialogs.SubDialogHandlerDelegate;
 import com.telegram.reporting.i18n.ButtonLabelKey;
-import com.telegram.reporting.repository.entity.Role;
+import com.telegram.reporting.domain.Role;
 import com.telegram.reporting.strategy.SubDialogHandlerDelegateStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public class AdminDialogHandlerImpl implements DialogHandler {
 
     @Override
     public Integer displayOrder() {
-        return 3;
+        return 4;
     }
 
     @Override

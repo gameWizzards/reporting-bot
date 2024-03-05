@@ -1,0 +1,17 @@
+package com.telegram.reporting.dialogs.tariff_dialogs.edit_employee_tariff;
+
+public enum EditEmployeeTariffState {
+    START_EDIT_EMPLOYEE_TARIFF_DIALOG,
+
+
+
+    USER_DATE_INPUTTING,
+    USER_TIME_RECORD_CHOICE,
+    USER_EDIT_DATA_CONFIRMATION,
+    USER_EDIT_DATA_CHOICE, USER_CHANGE_NOTE,
+    USER_EDIT_ADDITIONAL_DATA,
+    USER_EDIT_ADDITIONAL_TIME_RECORD,
+    USER_CHANGE_SPEND_TIME,
+    USER_CHANGE_CATEGORY,
+    END_EDIT_REPORT_DIALOG
+}

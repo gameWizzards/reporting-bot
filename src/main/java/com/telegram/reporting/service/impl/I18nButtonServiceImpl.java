@@ -6,9 +6,9 @@ import com.telegram.reporting.dialogs.DialogProcessor;
 import com.telegram.reporting.dialogs.SubDialogHandlerDelegate;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.I18nKey;
-import com.telegram.reporting.repository.dto.Ordinal;
-import com.telegram.reporting.repository.entity.Category;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.dto.CategoryTO;
+import com.telegram.reporting.dto.Ordinal;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nPropsResolver;
@@ -49,10 +49,10 @@ public class I18nButtonServiceImpl implements I18nButtonService {
 
     @Override
     public boolean hasAvailableCategoryButtons(String timeRecordsJson) {
-        List<Category> categories = categoryService.getAll(false);
+        List<CategoryTO> categories = categoryService.getAll(false);
         return categories.stream()
-                .map(Category::getNameKey)
-                .anyMatch(isCategoryNotOccupied(timeRecordsJson));
+                .map(CategoryTO::getNameKey)
+                .anyMatch(isCategoryUnoccupied(timeRecordsJson));
     }
 
     @Override
@@ -61,11 +61,11 @@ public class I18nButtonServiceImpl implements I18nButtonService {
     }
 
     @Override
-    public List<List<InlineKeyboardButton>> getAvailableCategoryInlineButtons(Long chatId, String timeRecordsJson, int buttonsInRow) {
-        List<Category> categories = categoryService.getAll(false);
+    public List<List<InlineKeyboardButton>> getUnoccupiedCategoryInlineButtons(Long chatId, String timeRecordsJson, int buttonsInRow) {
+        List<CategoryTO> categories = categoryService.getAll(false);
         List<InlineKeyboardButton> availableCategoryLabels = categories.stream()
-                .map(Category::getNameKey)
-                .filter(isCategoryNotOccupied(timeRecordsJson))
+                .map(CategoryTO::getNameKey)
+                .filter(isCategoryUnoccupied(timeRecordsJson))
                 .map(ButtonLabelKey::getByKey)
                 .filter(Objects::nonNull)
                 .map(key -> createInlineButton(chatId, key))
@@ -193,10 +193,12 @@ public class I18nButtonServiceImpl implements I18nButtonService {
         return button;
     }
 
+    // TODO: change to some kind of appropriate pattern
     private ReplyKeyboard createMarkupWithMenuButtons(Long chatId, MenuButtons addMenu, List<List<InlineKeyboardButton>> rows) {
         return switch (addMenu) {
             case MAIN_MENU -> new InlineKeyboardMarkup(addMainMenuButton(chatId, rows));
             case MANAGER_MENU -> new InlineKeyboardMarkup(addManagerMenuButtons(chatId, rows));
+            case TARIFF_MENU -> new InlineKeyboardMarkup(addTariffMenuButtons(chatId, rows));
             case ADMIN_MENU -> new InlineKeyboardMarkup(addAdminMenuButtons(chatId, rows));
             case NONE -> new InlineKeyboardMarkup(rows);
         };
@@ -225,7 +227,16 @@ public class I18nButtonServiceImpl implements I18nButtonService {
         return rows;
     }
 
-    private Predicate<String> isCategoryNotOccupied(String timeRecordsJson) {
+    private List<List<InlineKeyboardButton>> addTariffMenuButtons(Long chatId, List<List<InlineKeyboardButton>> rows) {
+        var tariffMenuButtons = createInlineButtonRows(chatId,
+                List.of(ButtonLabelKey.COMMON_RETURN_TARIFF_MENU),
+                List.of(ButtonLabelKey.COMMON_RETURN_MAIN_MENU));
+
+        rows.addAll(tariffMenuButtons);
+        return rows;
+    }
+
+    private Predicate<String> isCategoryUnoccupied(String timeRecordsJson) {
         if (StringUtils.isBlank(timeRecordsJson)) {
             return category -> true;
         }

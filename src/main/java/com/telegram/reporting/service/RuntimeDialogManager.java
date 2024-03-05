@@ -1,7 +1,7 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.repository.entity.Role;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.Role;
+import com.telegram.reporting.domain.User;
 
 import java.util.Locale;
 import java.util.Set;

@@ -1,69 +1,77 @@
 package com.telegram.reporting.service.impl;
 
-import com.telegram.reporting.exception.MismatchCategoryException;
+import com.telegram.reporting.mapper.CategoryMapper;
 import com.telegram.reporting.repository.CategoryRepository;
-import com.telegram.reporting.repository.entity.Category;
+import com.telegram.reporting.dto.CategoryTO;
+import com.telegram.reporting.domain.Category;
 import com.telegram.reporting.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @Override
-    public Category update(Category category) {
-        Category toUpdate = findById(category.getId());
-        if (Objects.isNull(toUpdate)) {
-            return null;
+    @Transactional
+    public CategoryTO update(CategoryTO categoryTO) {
+        Objects.requireNonNull(categoryTO, "Can't update category. Param 'category' is required");
+        Category toUpdate = categoryRepository.findById(categoryTO.getId())
+                .orElseThrow(() -> new NoSuchElementException("Can't find category to update with id = " + categoryTO.getId()));
+
+        if (Objects.nonNull(categoryTO.getNameKey())) {
+            toUpdate.setNameKey(categoryTO.getNameKey());
         }
-        if (Objects.nonNull(category.getNameKey())) {
-            toUpdate.setNameKey(category.getNameKey());
+        if (Objects.nonNull(categoryTO.getDescriptionKey())) {
+            toUpdate.setDescriptionKey(categoryTO.getDescriptionKey());
         }
-        if (Objects.nonNull(category.getDescriptionKey())) {
-            toUpdate.setDescriptionKey(category.getDescriptionKey());
-        }
-        if (toUpdate.isDeleted() != category.isDeleted()) {
-            toUpdate.setDeleted(category.isDeleted());
+        if (toUpdate.isDeleted() != categoryTO.isDeleted()) {
+            toUpdate.setDeleted(categoryTO.isDeleted());
         }
 
-        return categoryRepository.save(toUpdate);
+        return categoryMapper.toDto(toUpdate);
     }
 
     @Override
     public void delete(Long id) {
-        Category toDelete = findById(id);
-        if (Objects.isNull(toDelete)) {
-            throw new IllegalArgumentException("Can't find category to delete with id = " + id);
-        }
+        Objects.requireNonNull(id, "Can't delete category. Param 'id' is required");
+        Category toDelete = categoryRepository.findById((id))
+                .orElseThrow(() -> new NoSuchElementException("Can't find category to delete with id = " + id));
         toDelete.setDeleted(true);
-        categoryRepository.save(toDelete);
+//        categoryRepository.save(toDelete);
     }
 
     @Override
-    public Category findById(Long id) {
-        return categoryRepository.getById(id);
+    public Optional<CategoryTO> findById(Long id) {
+        Objects.requireNonNull(id, "Can't find category. Param 'id' is required");
+        return categoryRepository.findById(id)
+                .map(categoryMapper::toDto);
     }
 
     @Override
-    public Category getCategoryByName(String name) {
-        Objects.requireNonNull(name, "Can't find category. Param 'name' is required");
+    public Optional<CategoryTO> getAvailableCategoryByName(String name) {
+        Objects.requireNonNull(name, "Can't find category by name. Param 'name' is required");
         return categoryRepository.getByName(name)
                 .filter(Predicate.not(Category::isDeleted))
-                .orElseThrow(() -> new MismatchCategoryException("Can't find category by name = %s".formatted(name)));
+                .map(categoryMapper::toDto);
     }
 
     @Override
-    public List<Category> getAll(boolean includeDeleted) {
-         return categoryRepository.getAll(includeDeleted).stream()
-                 .sorted(Comparator.comparing(Category::getId))
-                 .toList();
+    public List<CategoryTO> getAll(boolean includeDeleted) {
+        return categoryRepository.getAll(includeDeleted).stream()
+                .sorted(Comparator.comparing(Category::getId))
+                .map(categoryMapper::toDto)
+                .toList();
     }
 
     @Override
@@ -71,5 +79,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.getByName(name)
                 .filter(Predicate.not(Category::isDeleted))
                 .isPresent();
+    }
+
+    @Override
+    public List<CategoryTO> getAllWithExistedOverriddenTariffs(boolean includeDeleted) {
+        return categoryRepository.getAllWithExistedOverriddenTariffs(includeDeleted).stream()
+                .map(categoryMapper::toDto)
+                .toList();
     }
 }

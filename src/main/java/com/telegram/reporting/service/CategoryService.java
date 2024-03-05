@@ -1,20 +1,23 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.repository.entity.Category;
+import com.telegram.reporting.dto.CategoryTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CategoryService {
 
-    Category findById(Long id);
+    Optional<CategoryTO> findById(Long id);
 
-    List<Category> getAll(boolean includeDeleted);
+    List<CategoryTO> getAll(boolean includeDeleted);
 
-    Category getCategoryByName(String name);
+    Optional<CategoryTO> getAvailableCategoryByName(String name);
 
     boolean isCategory(String name);
 
-    Category update(Category category);
+    CategoryTO update(CategoryTO category);
 
     void delete(Long id);
+
+    List<CategoryTO> getAllWithExistedOverriddenTariffs(boolean includeDeleted);
 }

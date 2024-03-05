@@ -2,8 +2,8 @@ package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.mapper.SettingMapper;
 import com.telegram.reporting.repository.SettingRepository;
-import com.telegram.reporting.repository.dto.SettingTO;
-import com.telegram.reporting.repository.entity.Setting;
+import com.telegram.reporting.dto.SettingTO;
+import com.telegram.reporting.domain.Setting;
 import com.telegram.reporting.service.SettingService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;

@@ -4,7 +4,7 @@ import com.telegram.reporting.bot.command.Command;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.dialogs.DialogHandler;
 import com.telegram.reporting.i18n.ButtonLabelKey;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.statemachine.StateContext;

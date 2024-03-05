@@ -3,12 +3,12 @@ package com.telegram.reporting.dialogs.admin_dialogs.list_users;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.utils.CommonUtils;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ListUsersActions {
-    private final TelegramUserService userService;
+    private final UserService userService;
     private final SendBotMessageService sendBotMessageService;
     private final I18nButtonService i18nButtonService;
     private final I18nMessageService i18NMessageService;

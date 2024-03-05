@@ -1,6 +1,6 @@
 package com.telegram.reporting.controller;
 
-import com.telegram.reporting.repository.dto.SettingTO;
+import com.telegram.reporting.dto.SettingTO;
 import com.telegram.reporting.service.SettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;

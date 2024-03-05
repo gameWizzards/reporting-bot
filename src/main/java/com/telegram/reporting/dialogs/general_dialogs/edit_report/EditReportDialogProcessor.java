@@ -69,7 +69,7 @@ public class EditReportDialogProcessor implements DialogProcessor {
                 yield EditReportEvent.VALIDATE_USER_DATE_INPUT;
             }
             case USER_TIME_RECORD_CHOICE -> {
-                variables.put(ContextVarKey.TIME_RECORD_CHOICE, userInput);
+                variables.put(ContextVarKey.TIME_RECORD_CHOICE, Long.parseLong(userInput));
                 yield EditReportEvent.CHOOSE_TIME_RECORD;
             }
             case USER_CHANGE_SPEND_TIME -> {

@@ -5,7 +5,7 @@ import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
+import com.telegram.reporting.dto.TimeRecordTO;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;

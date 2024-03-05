@@ -1,6 +1,6 @@
 package com.telegram.reporting.repository.filter;
 
-import com.telegram.reporting.repository.entity.Role;
+import com.telegram.reporting.domain.Role;
 
 import java.util.Arrays;
 import java.util.Set;

@@ -3,7 +3,7 @@ package com.telegram.reporting.service.impl;
 import com.telegram.reporting.exception.TelegramUserDeletedException;
 import com.telegram.reporting.exception.TelegramUserException;
 import com.telegram.reporting.i18n.I18nKey;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.I18nPropsResolver;
 import com.telegram.reporting.service.RuntimeDialogManager;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,13 @@ public class I18nPropsResolverImpl implements I18nPropsResolver {
         } catch (TelegramUserException | TelegramUserDeletedException e) {
             return messageSource.getMessage(key, args, DEFAULT_LOCALE);
         }
-        return messageSource.getMessage(key, args, principalUser.getLocale());
+        // TODO: mock try catch until doesn't implement  tariff dialogs
+        try {
+
+            return messageSource.getMessage(key, args, principalUser.getLocale());
+        } catch (Exception e) {
+        }
+        return key;
     }
 
 }

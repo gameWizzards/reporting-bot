@@ -1,10 +1,12 @@
 package com.telegram.reporting.service.impl;
 
+import com.telegram.reporting.mapper.CategoryMapper;
+import com.telegram.reporting.mapper.TimeRecordMapper;
 import com.telegram.reporting.repository.TimeRecordRepository;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.repository.entity.Category;
-import com.telegram.reporting.repository.entity.Report;
-import com.telegram.reporting.repository.entity.TimeRecord;
+import com.telegram.reporting.dto.TimeRecordTO;
+import com.telegram.reporting.domain.Category;
+import com.telegram.reporting.domain.Report;
+import com.telegram.reporting.domain.TimeRecord;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.ReportService;
 import com.telegram.reporting.service.TimeRecordService;
@@ -19,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,19 +32,37 @@ public class TimeRecordServiceImpl implements TimeRecordService {
     private final TimeRecordRepository timeRecordRepository;
     private final ReportService reportService;
     private final CategoryService categoryService;
+    private final TimeRecordMapper timeRecordMapper;
+    private final CategoryMapper categoryMapper;
 
 
     @Override
-    public TimeRecord getById(Long id) {
+    public Optional<TimeRecordTO> getById(Long id) {
         Validate.notNull(id, "Id is required to getting the TimeRecord!");
         return timeRecordRepository.getTimeRecordById(id)
-                .orElseThrow(() -> new RuntimeException("Can't find timeRecord by id=%s".formatted(id)));
+                .map(timeRecordMapper::toDto);
     }
 
     @Override
-    public TimeRecord save(TimeRecord timeRecord) {
-        Validate.notNull(timeRecord, "TimeRecord object is required to save it!");
-        return timeRecordRepository.saveAndFlush(timeRecord);
+    public TimeRecordTO update(TimeRecordTO trTO) {
+        Validate.notNull(trTO, "TimeRecordTO object is required to save entity!");
+        TimeRecord toSave = timeRecordRepository.getTimeRecordById(trTO.getId())
+                .orElseThrow(() -> new NoSuchElementException("Can't find timeRecord by id=%s".formatted(trTO.getId())));
+
+        toSave.setHours(trTO.getHours());
+        toSave.setNote(trTO.getNote());
+
+        if (!Objects.equals(toSave.getCategory().getNameKey(), trTO.getCategoryNameKey())) {
+
+            Category category = categoryService.getAvailableCategoryByName(trTO.getCategoryNameKey())
+                    .map(categoryMapper::toEntity)
+                    .orElseThrow(() -> new NoSuchElementException("Can't find category by nameKey=%s".formatted(trTO.getCategoryNameKey())));
+            toSave.setCategory(category);
+        }
+
+        TimeRecord saved = timeRecordRepository.saveAndFlush(toSave);
+//        reportService.setLastUpdateTime(trTO.getReportId());
+        return timeRecordMapper.toDto(saved);
     }
 
     @Override
@@ -49,36 +72,39 @@ public class TimeRecordServiceImpl implements TimeRecordService {
         LocalDate localDate = DateTimeUtils.parseDefaultDate(date);
         List<TimeRecord> trs = timeRecordRepository.getTimeRecordsByReportDateAndUserChatId(localDate, chatId);
 
-        return trs.stream()
-                .map(TimeRecordTO::new)
-                .toList();
+        return timeRecordMapper.toDtos(trs);
     }
 
     @Override
     @Transactional
-    public void deleteByTimeRecordTO(TimeRecordTO timeRecordTO) {
-        Validate.notNull(timeRecordTO, "Required not null TimeRecordTO object to remove time record");
-        Validate.notNull(timeRecordTO.getId(), "Required to have timeRecordId when make remove. %s".formatted(timeRecordTO));
+    public void deleteByTimeRecordTO(TimeRecordTO trTO) {
+        Validate.notNull(trTO, "Required not null TimeRecordTO object to remove time record");
+        Validate.notNull(trTO.getId(), "Required to have timeRecordId when make remove. %s".formatted(trTO));
 
-        long timeRecordCount = timeRecordRepository.countTimeRecordsInReport(timeRecordTO.getReportId());
+        long timeRecordCount = timeRecordRepository.countTimeRecordsInReport(trTO.getReportId());
         boolean isLastElement = timeRecordCount == 1;
 
-        if (isLastElement) {
-            reportService.delete(timeRecordTO.getReportId());
-            return;
-        }
+        timeRecordRepository.getTimeRecordById(trTO.getId())
+                .ifPresent(timeRecordRepository::delete);
+        timeRecordRepository.flush();
 
-        timeRecordRepository.delete(timeRecordTO.getId());
+        if (isLastElement) {
+            reportService.delete(trTO.getReportId());
+        }
     }
 
     @Override
     public List<TimeRecord> convertToTimeRecordEntities(String timeRecordJson, Report report) {
+        // TODO vary big possibility to change this method
         List<TimeRecordTO> trTOS = JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class);
         List<TimeRecord> entities = new ArrayList<>();
         for (TimeRecordTO trTO : trTOS) {
-            Category category = categoryService.getCategoryByName(trTO.getCategoryNameKey());
-            TimeRecord timeRecord = new TimeRecord(trTO);
-            timeRecord.setId(trTO.getId());
+            TimeRecord timeRecord = timeRecordMapper.toEntity(trTO);
+
+            Category category = categoryService.getAvailableCategoryByName(trTO.getCategoryNameKey())
+                    .map(categoryMapper::toEntity)
+                    .orElseThrow(() -> new NoSuchElementException("Can't find category by nameKey=%s".formatted(trTO.getCategoryNameKey())));
+
             timeRecord.setCategory(category);
             timeRecord.setReport(report);
             entities.add(timeRecord);

@@ -1,7 +1,7 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.repository.ReportRepository;
-import com.telegram.reporting.repository.entity.Report;
+import com.telegram.reporting.domain.Report;
 import com.telegram.reporting.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Validate;
@@ -18,6 +18,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Report save(Report report) {
         Validate.notNull(report, "Report object is required for save operation");
+//        report.setUpdated(LocalDateTime.now());
         return reportRepository.saveAndFlush(report);
     }
 
@@ -41,4 +42,10 @@ public class ReportServiceImpl implements ReportService {
         Validate.notNull(statisticDate, "StatisticDate is required for get report!");
         return reportRepository.getReportsBelongMonth(statisticDate.getMonthValue(), statisticDate.getYear(), chatId);
     }
+
+//    @Override
+//    public void setLastUpdateTime(Long reportId) {
+//        Validate.notNull(reportId, "ReportId is required to set last update time!");
+//        reportRepository.setLastUpdateTime(reportId, LocalDateTime.now());
+//    }
 }

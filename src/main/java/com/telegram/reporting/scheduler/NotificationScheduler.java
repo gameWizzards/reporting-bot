@@ -2,13 +2,13 @@ package com.telegram.reporting.scheduler;
 
 import com.telegram.reporting.i18n.I18nKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.dto.SettingTO;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.dto.SettingTO;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.repository.filter.UserFilter;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.SendBotMessageService;
 import com.telegram.reporting.service.SettingService;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import com.telegram.reporting.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class NotificationScheduler {
     private final String EXCLUDE_EMPLOYEE_IDS = "scheduling.notification.exclude.employee.chat.ids";
 
     private final SettingService settingService;
-    private final TelegramUserService userService;
+    private final UserService userService;
     private final SendBotMessageService sendBotMessageService;
     private final I18nMessageService i18nMessageService;
 

@@ -60,7 +60,7 @@ public class EmployeeStatisticDialogProcessor implements DialogProcessor {
                 yield EmployeeStatisticEvent.VALIDATE_USER_MONTH_INPUT;
             }
             case USER_EMPLOYEE_CHOOSING -> {
-                variables.put(ContextVarKey.EMPLOYEE_ORDINAL, userInput);
+                variables.put(ContextVarKey.EMPLOYEE_ORDINAL, Long.parseLong(userInput));
                 yield EmployeeStatisticEvent.CHOOSE_EMPLOYEE;
             }
             default -> null;

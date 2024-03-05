@@ -1,7 +1,7 @@
 package com.telegram.reporting.service.impl;
 
 import com.telegram.reporting.repository.LockUpdateReportRepository;
-import com.telegram.reporting.repository.entity.LockUpdateReport;
+import com.telegram.reporting.domain.LockUpdateReport;
 import com.telegram.reporting.service.LockUpdateReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;

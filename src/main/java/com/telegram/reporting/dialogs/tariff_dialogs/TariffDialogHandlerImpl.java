@@ -1,0 +1,87 @@
+package com.telegram.reporting.dialogs.tariff_dialogs;
+
+import com.telegram.reporting.dialogs.DialogHandler;
+import com.telegram.reporting.dialogs.DialogHandlerAlias;
+import com.telegram.reporting.dialogs.SubDialogHandlerDelegate;
+import com.telegram.reporting.i18n.ButtonLabelKey;
+import com.telegram.reporting.domain.Role;
+import com.telegram.reporting.strategy.SubDialogHandlerDelegateStrategy;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class TariffDialogHandlerImpl implements DialogHandler {
+
+    private final SubDialogHandlerDelegateStrategy subDialogHandlerDelegateStrategy;
+
+    private SubDialogHandlerDelegate subDialogDelegate;
+
+    @PostConstruct
+    public void configure() {
+        this.subDialogDelegate = subDialogHandlerDelegateStrategy.getDelegate(dialogHandlerAlias());
+    }
+
+    @Override
+    public void handleInlineButtonInput(Long chatId, ButtonLabelKey buttonLabelKey) {
+
+        // return to tariff submenu when click 'tariff menu' button
+        if (ButtonLabelKey.COMMON_RETURN_TARIFF_MENU.equals(buttonLabelKey)) {
+            subDialogDelegate.startSubDialogFlow(chatId);
+            return;
+        }
+
+        if (!subDialogDelegate.isProcessorCreated(chatId) && subDialogDelegate.belongToSubMenuButtons(buttonLabelKey)) {
+            subDialogDelegate.createDialogProcessor(chatId, buttonLabelKey);
+        }
+
+        if (subDialogDelegate.isProcessorCreated(chatId)) {
+            subDialogDelegate.handleInlineButtonInput(chatId, buttonLabelKey);
+        }
+    }
+
+    @Override
+    public void handleTelegramUserInput(Long chatId, String input) {
+        if (subDialogDelegate.isProcessorCreated(chatId)) {
+            subDialogDelegate.handleTelegramUserInput(chatId, input);
+        }
+    }
+
+    @Override
+    public void createDialogProcessor(Long chatId, ButtonLabelKey buttonLabelKey) {
+        subDialogDelegate.startSubDialogFlow(chatId);
+    }
+
+    @Override
+    public List<List<ButtonLabelKey>> getRootMenuTemplate() {
+        return subDialogDelegate.getRootMenuTemplate();
+    }
+
+    @Override
+    public void removeDialogProcessor(Long chatId) {
+        subDialogDelegate.removeDialogProcessor(chatId);
+    }
+
+
+    @Override
+    public List<Role> roleAccessibility() {
+        //TODO: uncomment before commit
+//        return List.of(Role.TARIFF_EDITOR_ROLE, Role.ADMIN_ROLE);
+        return List.of(Role.EMPLOYEE_ROLE);
+    }
+
+    @Override
+    public Integer displayOrder() {
+        return 3;
+    }
+
+    @Override
+    public DialogHandlerAlias dialogHandlerAlias() {
+        return DialogHandlerAlias.TARIFF_DIALOGS;
+    }
+}

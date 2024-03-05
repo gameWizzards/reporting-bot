@@ -3,7 +3,7 @@ package com.telegram.reporting.dialogs.general_dialogs.statistic;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.entity.Report;
+import com.telegram.reporting.domain.Report;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.ReportService;

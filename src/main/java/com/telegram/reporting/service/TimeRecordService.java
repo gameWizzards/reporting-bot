@@ -1,15 +1,16 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.repository.entity.Report;
-import com.telegram.reporting.repository.entity.TimeRecord;
+import com.telegram.reporting.dto.TimeRecordTO;
+import com.telegram.reporting.domain.Report;
+import com.telegram.reporting.domain.TimeRecord;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TimeRecordService {
-    TimeRecord getById(Long id);
+    Optional<TimeRecordTO> getById(Long id);
 
-    TimeRecord save(TimeRecord timeRecord);
+    TimeRecordTO update(TimeRecordTO timeRecordTO);
 
     List<TimeRecordTO> getTimeRecordTOs(String date, Long chatId);
 

@@ -58,7 +58,7 @@ public class DeleteReportDialogProcessor implements DialogProcessor {
                 messageEvent = DeleteReportEvent.VALIDATE_USER_DATE_INPUT;
             }
             case USER_TIME_RECORD_CHOICE -> {
-                variables.put(ContextVarKey.TIME_RECORD_CHOICE, userInput);
+                variables.put(ContextVarKey.TIME_RECORD_CHOICE, Long.parseLong(userInput));
                 messageEvent = DeleteReportEvent.CHOOSE_TIME_RECORD;
             }
         }

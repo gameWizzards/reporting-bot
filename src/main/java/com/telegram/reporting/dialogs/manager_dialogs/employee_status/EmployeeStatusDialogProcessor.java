@@ -64,7 +64,7 @@ public class EmployeeStatusDialogProcessor implements DialogProcessor {
 
         EmployeeStatusEvent messageEvent = switch (currentState) {
             case USER_EMPLOYEE_CHOOSING -> {
-                variables.put(ContextVarKey.EMPLOYEE_ORDINAL, userInput);
+                variables.put(ContextVarKey.EMPLOYEE_ORDINAL, Long.parseLong(userInput));
                 yield EmployeeStatusEvent.CHOOSE_EMPLOYEE;
             }
             default -> null;

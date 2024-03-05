@@ -17,6 +17,7 @@ public enum ButtonLabelKey implements I18nKey {
     COMMON_CANCEL("common.cancel"),
     COMMON_RETURN_MAIN_MENU("common.return.root.menu"),
     COMMON_RETURN_MANAGER_MENU("common.return.manager.menu"),
+    COMMON_RETURN_TARIFF_MENU("common.return.tariff.menu"),
     COMMON_RETURN_ADMIN_MENU("common.return.admin.menu"),
     COMMON_INPUT_NEW_DATE("common.input.date"),
     COMMON_LIST_TIME_RECORDS("common.time-records.list"),
@@ -68,6 +69,20 @@ public enum ButtonLabelKey implements I18nKey {
     MESTATUS_DELETE_EMPLOYEE("manager.employee-status.delete.employee"),
     MESTATUS_ADD_MANAGER_ROLE("manager.employee-status.add.manager.role"),
     MESTATUS_REMOVE_MANAGER_ROLE("manager.employee-status.remove.manager.role"),
+
+    //tariff dialogs
+    TSD_TARIFF_START_SUB_DIALOG("tariff.start.sub-root.menu"),
+    TE_START_DIALOG("tariff.edit.start.dialog"),
+
+    TEE_START_DIALOG("tariff.edit.employee.start.dialog"),
+
+    TL_START_DIALOG("tariff.list.tariffs.start.dialog"),
+    TL_TARIFFS_BY_CATEGORY("tariff.tariffs.by.category"),
+    TL_TARIFFS_BY_EMPLOYEE("tariff.tariffs.by.employee"),
+
+    TL_SHOW_OVERRIDDEN_TARIFFS_BY_EMPLOYEE("tariff.list.show.overridden.tariffs.by.employee"),
+    TL_SHOW_OVERRIDDEN_TARIFFS_BY_CATEGORY("tariff.list.show.overridden.tariffs.by.category"),
+    TL_CHOOSE_ANOTHER_TARIFF("tariff.list.choose.another.tariff"),
 
     ;
 

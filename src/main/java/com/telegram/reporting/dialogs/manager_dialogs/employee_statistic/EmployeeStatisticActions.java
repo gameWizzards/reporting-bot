@@ -4,14 +4,14 @@ import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.i18n.MessageKey;
 import com.telegram.reporting.exception.TelegramUserException;
-import com.telegram.reporting.repository.dto.EmployeeTO;
-import com.telegram.reporting.repository.entity.Report;
+import com.telegram.reporting.dto.EmployeeTO;
+import com.telegram.reporting.domain.Report;
 import com.telegram.reporting.service.I18nButtonService;
 import com.telegram.reporting.service.I18nMessageService;
 import com.telegram.reporting.service.LockUpdateReportService;
 import com.telegram.reporting.service.ReportService;
 import com.telegram.reporting.service.SendBotMessageService;
-import com.telegram.reporting.service.TelegramUserService;
+import com.telegram.reporting.service.UserService;
 import com.telegram.reporting.service.impl.MenuButtons;
 import com.telegram.reporting.utils.CommonUtils;
 import com.telegram.reporting.utils.DateTimeUtils;
@@ -32,7 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmployeeStatisticActions {
     private final ReportService reportService;
-    private final TelegramUserService userService;
+    private final UserService userService;
     private final SendBotMessageService sendBotMessageService;
     private final LockUpdateReportService lockService;
     private final I18nMessageService i18NMessageService;
@@ -76,7 +76,7 @@ public class EmployeeStatisticActions {
 
     public void sendListTimeRecords(StateContext<EmployeeStatisticState, EmployeeStatisticEvent> context) {
         Long chatId = CommonUtils.currentChatId(context);
-        Long userOrdinalNumber = Long.parseLong(CommonUtils.getContextVar(context, String.class, ContextVarKey.EMPLOYEE_ORDINAL));
+        Long userOrdinalNumber = CommonUtils.getContextVar(context, Long.class, ContextVarKey.EMPLOYEE_ORDINAL);
         String date = CommonUtils.getContextVarAsString(context, ContextVarKey.DATE);
         LocalDate statisticDate = DateTimeUtils.parseDefaultDate(date);
 

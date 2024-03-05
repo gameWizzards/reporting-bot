@@ -3,11 +3,11 @@ package com.telegram.reporting.dialogs.general_dialogs.create_report;
 import com.telegram.reporting.dialogs.ContextVarKey;
 import com.telegram.reporting.i18n.ButtonLabelKey;
 import com.telegram.reporting.i18n.MessageKey;
-import com.telegram.reporting.repository.dto.TimeRecordTO;
-import com.telegram.reporting.repository.entity.Category;
-import com.telegram.reporting.repository.entity.Report;
-import com.telegram.reporting.repository.entity.TimeRecord;
-import com.telegram.reporting.repository.entity.User;
+import com.telegram.reporting.dto.CategoryTO;
+import com.telegram.reporting.dto.TimeRecordTO;
+import com.telegram.reporting.domain.Report;
+import com.telegram.reporting.domain.TimeRecord;
+import com.telegram.reporting.domain.User;
 import com.telegram.reporting.service.CacheService;
 import com.telegram.reporting.service.CategoryService;
 import com.telegram.reporting.service.I18nButtonService;
@@ -31,7 +31,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +93,7 @@ public class CreateReportActions {
         Long chatId = CommonUtils.currentChatId(context);
         String timeRecordsJson = CommonUtils.getContextVarAsString(context, ContextVarKey.TIME_RECORDS_JSON);
 
-        List<List<InlineKeyboardButton>> rows = i18nButtonService.getAvailableCategoryInlineButtons(chatId, timeRecordsJson, 2);
+        List<List<InlineKeyboardButton>> rows = i18nButtonService.getUnoccupiedCategoryInlineButtons(chatId, timeRecordsJson, 2);
 
         boolean isAllCategoriesOccupied = StringUtils.isNotBlank(timeRecordsJson) && rows.isEmpty();
 
@@ -123,10 +122,10 @@ public class CreateReportActions {
 
         String chooseCategoryMessage = i18NMessageService.getMessage(chatId, MessageKey.COMMON_CHOOSE_CATEGORY);
 
-        List<Category> categories = categoryService.getAll(false);
+        List<CategoryTO> categories = categoryService.getAll(false);
 
         String categoryDescription = categories.stream()
-                .map(Category::getDescriptionKey)
+                .map(CategoryTO::getDescriptionKey)
                 .map(labelKey -> i18NMessageService.getMessage(chatId, labelKey))
                 .map(desc -> "* " + desc)
                 .collect(Collectors.joining("\n"));
@@ -179,13 +178,13 @@ public class CreateReportActions {
                 ? JsonUtils.deserializeListItems(timeRecordJson, TimeRecordTO.class)
                 : new ArrayList<>();
 
-        TimeRecordTO timeRecord = new TimeRecordTO();
-        timeRecord.setHours(Integer.parseInt(time));
-        timeRecord.setNote(note);
-        timeRecord.setCategoryNameKey(categoryNameKey);
-        timeRecord.setCreated(LocalDateTime.now());
+        TimeRecordTO timeRecordTO = TimeRecordTO.builder()
+                .hours(Integer.parseInt(time))
+                .note(note)
+                .categoryNameKey(categoryNameKey)
+                .build();
 
-        trTOs.add(timeRecord);
+        trTOs.add(timeRecordTO);
 
         String timeRecordsJson = JsonUtils.serializeItem(trTOs);
 

@@ -1,6 +1,6 @@
 package com.telegram.reporting.service;
 
-import com.telegram.reporting.repository.dto.SettingTO;
+import com.telegram.reporting.dto.SettingTO;
 
 import java.util.List;
 import java.util.Optional;

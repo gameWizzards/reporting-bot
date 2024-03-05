@@ -1,11 +1,25 @@
 package com.telegram.reporting.utils;
 
+import lombok.val;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -113,5 +127,51 @@ class KeyboardUtilsTest {
 
     @Test
     public void createKeyboardMarkup_kulls_provideCustomErrorMessage() {
+      
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1, 5, 30})
+    public void testDateRange(long daysToClone) {
+        var dateOfWs = LocalDate.parse("2023-08-05");
+        var startCloneDate =  dateOfWs.plusDays(1);
+        var endCloneDate = dateOfWs.plusDays(daysToClone);
+
+        var dateRange = getDateRange(startCloneDate, endCloneDate);
+
+        var dates = dateRange.stream()
+                .map(date -> new DateToWeekDay(date.toString(), date.getDayOfWeek().toString()).toString())
+                .collect(Collectors.joining("\n"));
+
+        System.out.printf("inputDate: %s\ndaysToClone: %d\nquantityClonedDays: %d\nclonedDates: \n%s\n", dateOfWs, daysToClone,dateRange.size(), dates);
+    }
+
+    public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
+        Objects.requireNonNull(startDate);
+        if (Objects.isNull(endDate)) {
+            List.of(startDate);
+        }
+
+        // TODO: temporary solution, for testing approach of using nextday(1 day exclude weekend),
+        //  nextweek(5 days excluding weekend, nextmonth(30 days excluding weekend)
+        List<LocalDate> datesInRange = new ArrayList<>();
+        LocalDate currentDate = startDate;
+
+        while (currentDate.isBefore(endDate) || currentDate.isEqual(endDate)) {
+            var dayOfWeek = currentDate.getDayOfWeek();
+
+            if (dayOfWeek.equals(DayOfWeek.SATURDAY) || dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                currentDate = currentDate.plusDays(1);
+                endDate = endDate.plusDays(1);
+            } else {
+                datesInRange.add(currentDate);
+                currentDate = currentDate.plusDays(1);
+            }
+        }
+        return datesInRange;
+    }
+
+    record DateToWeekDay (String date, String weekDay) {
     }
 }

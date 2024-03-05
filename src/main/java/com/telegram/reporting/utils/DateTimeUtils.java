@@ -2,6 +2,8 @@ package com.telegram.reporting.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -67,6 +69,16 @@ public final class DateTimeUtils {
             return LocalDate.now();
         }
         return parseDefaultDate(statisticDate);
+    }
+
+    public static BigDecimal getAverageWorkingDaysPerMonth() {
+        var daysInYear = BigDecimal.valueOf(365);
+        var daysInWeek = BigDecimal.valueOf(7);
+        var workingDaysInWeek = BigDecimal.valueOf(5);
+        var months = BigDecimal.valueOf(12);
+        return daysInYear.divide(daysInWeek,2, RoundingMode.HALF_UP)
+                .multiply(workingDaysInWeek)
+                .divide(months, 2, RoundingMode.HALF_UP);
     }
 
     private static Integer[] parseUserDateInput(String userInput) {
